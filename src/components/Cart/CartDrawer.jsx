@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { X, ShoppingBag } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import CartItem from './CartItem';
@@ -8,6 +8,12 @@ import './CartDrawer.css';
 
 const CartDrawer = () => {
     const { isCartOpen, toggleCart, cartItems, cartTotal } = useCart();
+    const navigate = useNavigate();
+
+    const handleCheckout = () => {
+        toggleCart();
+        navigate('/checkout');
+    };
 
     if (!isCartOpen) return null;
 
@@ -43,7 +49,7 @@ const CartDrawer = () => {
                             <span className="subtotal-amount">${cartTotal.toFixed(2)}</span>
                         </div>
                         <p className="cart-note">Shipping and taxes calculated at checkout.</p>
-                        <Button variant="primary" size="large" style={{ width: '100%' }}>Checkout</Button>
+                        <Button variant="primary" size="large" style={{ width: '100%' }} onClick={handleCheckout}>Checkout</Button>
                     </div>
                 )}
             </div>

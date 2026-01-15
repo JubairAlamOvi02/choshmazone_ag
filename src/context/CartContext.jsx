@@ -42,6 +42,10 @@ export const CartProvider = ({ children }) => {
         }));
     };
 
+    const clearCart = () => {
+        setCartItems([]);
+    };
+
     const toggleCart = () => setIsCartOpen(!isCartOpen);
 
     const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
@@ -56,7 +60,8 @@ export const CartProvider = ({ children }) => {
             isCartOpen,
             toggleCart,
             cartCount,
-            cartTotal
+            cartTotal,
+            clearCart
         }}>
             {children}
         </CartContext.Provider>

@@ -8,8 +8,9 @@ import { useCart } from '../context/CartContext';
 import './Checkout.css';
 
 const Checkout = () => {
-    const { cartItems, cartTotal } = useCart();
+    const { cartItems, cartTotal, clearCart } = useCart();
     const navigate = useNavigate();
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         email: '',
         phone: '',
@@ -29,9 +30,8 @@ const Checkout = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Form Submitted:', formData);
 
         // Mock validation
         if (formData.paymentMethod === 'bkash') {
@@ -41,10 +41,34 @@ const Checkout = () => {
             }
         }
 
-        // Simulate API call
-        setTimeout(() => {
+        setIsSubmitting(true);
+
+        const orderData = {
+            ...formData,
+            items: cartItems.map(item => ({
+                title: item.title,
+                quantity: item.quantity,
+                price: item.price,
+                style: item.style
+            })),
+            totalAmount: cartTotal.toFixed(2)
+        };
+
+        try {
+            await fetch('https://script.google.com/macros/s/AKfycbxkQrsiZ8TezNG_irJoxGeuY1TDU9xmwd0WjaLdpYTWtUtQlpYlYqCvomWd_vk5rrN9Cw/exec', {
+                method: 'POST',
+                // Using default Content-Type (text/plain) to avoid CORS preflight issues with Google Apps Script
+                body: JSON.stringify(orderData)
+            });
+
+            clearCart();
             navigate('/order-success');
-        }, 1000);
+        } catch (error) {
+            console.error('Error placing order:', error);
+            alert('There was an issue processing your order. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -53,31 +77,29 @@ const Checkout = () => {
             <main className="container section-padding">
                 <div className="checkout-layout">
                     {/* Left Column: Forms */}
-                    <div className="checkout-form-container">
+                    <form className="checkout-form-container" onSubmit={handleSubmit}>
                         <section className="checkout-section">
                             <h2 className="h3">Contact Information</h2>
-                            <form id="checkout-form" onSubmit={handleSubmit}>
-                                <div className="form-group">
-                                    <Input
-                                        label="Email Address"
-                                        type="email"
-                                        name="email"
-                                        placeholder="you@example.com"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                    <Input
-                                        label="Phone Number"
-                                        type="tel"
-                                        name="phone"
-                                        placeholder="+8801..."
-                                        value={formData.phone}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                            </form>
+                            <div className="form-group">
+                                <Input
+                                    label="Email Address"
+                                    type="email"
+                                    name="email"
+                                    placeholder="you@example.com"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <Input
+                                    label="Phone Number"
+                                    type="tel"
+                                    name="phone"
+                                    placeholder="+8801..."
+                                    value={formData.phone}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
                         </section>
 
                         <section className="checkout-section">
@@ -203,12 +225,14 @@ const Checkout = () => {
                         </section>
 
                         <div className="checkout-actions">
-                            <Link to="/cart">
-                                <Button variant="ghost">Return to Cart</Button>
+                            <Link to="/shop">
+                                <Button variant="ghost">Continue Shopping</Button>
                             </Link>
-                            <Button variant="primary" size="large" onClick={handleSubmit}>Continue to Payment</Button>
+                            <Button variant="primary" size="large" type="submit" disabled={isSubmitting}>
+                                {isSubmitting ? 'Processing...' : 'Continue to Payment'}
+                            </Button>
                         </div>
-                    </div>
+                    </form>
 
                     {/* Right Column: Order Summary */}
                     <div className="checkout-summary">
