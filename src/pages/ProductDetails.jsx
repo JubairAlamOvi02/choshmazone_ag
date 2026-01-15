@@ -64,7 +64,7 @@ const ProductDetails = () => {
                         <div className="pdp-header">
                             <span className="pdp-category">{product.category}</span>
                             <h1 className="pdp-title">{product.title}</h1>
-                            <div className="pdp-price">${product.price}</div>
+                            <div className="pdp-price">৳{product.price}</div>
                         </div>
 
                         <div className="pdp-description">

@@ -52,6 +52,9 @@
   - [x] **Cash on Delivery (COD)**
     - [x] Option selection logic
     - [x] Order confirmation triggers
+  - [x] **Google Sheets Integration**
+    - [x] Send order data to Google Sheets via Apps Script
+    - [x] Clear cart on successful order
 - [x] **Order Success**
   - [x] "Thank You" page with Order Summary
 

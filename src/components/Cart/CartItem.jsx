@@ -36,7 +36,7 @@ const CartItem = ({ item }) => {
                             <Plus size={14} />
                         </button>
                     </div>
-                    <p className="cart-item-price">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="cart-item-price">৳{(item.price * item.quantity).toFixed(2)}</p>
                 </div>
             </div>
         </div>

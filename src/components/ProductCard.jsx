@@ -28,7 +28,7 @@ const ProductCard = ({ product }) => {
                 <div className="product-info">
                     <span className="product-category">{category}</span>
                     <h3 className="product-title">{title}</h3>
-                    <span className="product-price">${price}</span>
+                    <span className="product-price">৳{price}</span>
                 </div>
             </Link>
         </div>

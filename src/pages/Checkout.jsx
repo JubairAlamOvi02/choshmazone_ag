@@ -195,7 +195,7 @@ const Checkout = () => {
 
                             {formData.paymentMethod === 'bkash' && (
                                 <div className="bkash-details">
-                                    <p className="instruction-text">Please send <strong>${cartTotal.toFixed(2)}</strong> to <strong>017XXXXXXXX</strong> and enter the Transaction ID below.</p>
+                                    <p className="instruction-text">Please send <strong>৳{cartTotal.toFixed(2)}</strong> to <strong>017XXXXXXXX</strong> and enter the Transaction ID below.</p>
                                     <Input
                                         label="bKash Number"
                                         type="text"
@@ -248,14 +248,14 @@ const Checkout = () => {
                                         <p className="summary-item-title">{item.title}</p>
                                         <p className="summary-item-variant">{item.style}</p>
                                     </div>
-                                    <div className="summary-item-price">${(item.price * item.quantity).toFixed(2)}</div>
+                                    <div className="summary-item-price">৳{(item.price * item.quantity).toFixed(2)}</div>
                                 </div>
                             ))}
                         </div>
                         <div className="summary-totals">
                             <div className="summary-row">
                                 <span>Subtotal</span>
-                                <span>${cartTotal.toFixed(2)}</span>
+                                <span>৳{cartTotal.toFixed(2)}</span>
                             </div>
                             <div className="summary-row">
                                 <span>Shipping</span>
@@ -263,7 +263,7 @@ const Checkout = () => {
                             </div>
                             <div className="summary-row total">
                                 <span>Total</span>
-                                <span>${cartTotal.toFixed(2)}</span>
+                                <span>৳{cartTotal.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>

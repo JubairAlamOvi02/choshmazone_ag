@@ -64,8 +64,8 @@ const FilterSidebar = ({ filters, setFilters }) => {
                     className="price-slider"
                 />
                 <div className="price-display">
-                    <span>$0</span>
-                    <span>${filters.maxPrice}</span>
+                    <span>৳0</span>
+                    <span>৳{filters.maxPrice}</span>
                 </div>
             </div>
         </aside>
