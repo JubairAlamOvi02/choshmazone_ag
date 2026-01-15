@@ -14,3 +14,5 @@
 - [x] Add Order ID and organize columns per user request.
     - Updated script reference to match exact header: `Date`, `Time`, `Timestamp`, `Order ID`, `Customer Name`, `Email`, `Phone`, `Address`, `City`, `Zip`, `Payment Method`, `Payment Details`, `Bkash Number`, `Transaction ID`, `Order Items`, `Total Amount`.
     - Implemented logic to split bKash details into separate columns.
+
+**Status**: All additional tasks requested by the user involving Currency and Google Sheets customizations have been implemented and verified.
