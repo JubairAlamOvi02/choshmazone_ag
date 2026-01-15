@@ -43,7 +43,11 @@ const Checkout = () => {
 
         setIsSubmitting(true);
 
+        const now = new Date();
+
         const orderData = {
+            orderDate: now.toLocaleDateString(),
+            orderTime: now.toLocaleTimeString(),
             ...formData,
             items: cartItems.map(item => ({
                 title: item.title,

@@ -2,9 +2,17 @@ function doPost(e) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var data = JSON.parse(e.postData.contents);
 
-    var now = new Date();
-    var date = Utilities.formatDate(now, Session.getScriptTimeZone(), "yyyy-MM-dd");
-    var time = Utilities.formatDate(now, Session.getScriptTimeZone(), "HH:mm:ss");
+    // Use client-provided date/time or fallback to server time
+    var date, time;
+
+    if (data.orderDate && data.orderTime) {
+        date = data.orderDate;
+        time = data.orderTime;
+    } else {
+        var now = new Date();
+        date = Utilities.formatDate(now, Session.getScriptTimeZone(), "yyyy-MM-dd");
+        time = Utilities.formatDate(now, Session.getScriptTimeZone(), "HH:mm:ss");
+    }
 
     // Flatten items for readable format in sheet
     var itemsString = data.items.map(function (item) {

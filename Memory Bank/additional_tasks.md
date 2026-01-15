@@ -9,3 +9,5 @@
     - `src/pages/Checkout.jsx`
     - `src/components/Shop/FilterSidebar.jsx`
 - [x] Create Google Apps Script reference for splitting Timestamp into Date and Time columns (`GoogleAppsScript_Reference.js`)
+    - Updated frontend to send local `orderDate` and `orderTime`.
+    - Updated script reference to use client-provided timestamp.
