@@ -59,7 +59,7 @@ const Checkout = () => {
         };
 
         try {
-            await fetch('https://script.google.com/macros/s/AKfycbxkQrsiZ8TezNG_irJoxGeuY1TDU9xmwd0WjaLdpYTWtUtQlpYlYqCvomWd_vk5rrN9Cw/exec', {
+            await fetch('https://script.google.com/macros/s/AKfycbxzyBRAVOmIeo9DgRjMmySFuZqpPzGqiLSZxczwu5WswdWQKnQEajZPPJv1GXdNr22g0w/exec', {
                 method: 'POST',
                 // Using default Content-Type (text/plain) to avoid CORS preflight issues with Google Apps Script
                 body: JSON.stringify(orderData)
