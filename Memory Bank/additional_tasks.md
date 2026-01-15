@@ -12,4 +12,5 @@
     - Updated frontend to send local `orderDate` and `orderTime`.
     - Updated script reference to use client-provided timestamp.
 - [x] Add Order ID and organize columns per user request.
-    - Updated script reference to match exact header: `Date`, `Time`, `Timestamp`, `Order ID`, `Customer Name`, `Email`, `Phone`, `Address`, `City`, `Zip`, `Payment Method`, `Payment Details`, `Order Items`, `Total Amount`.
+    - Updated script reference to match exact header: `Date`, `Time`, `Timestamp`, `Order ID`, `Customer Name`, `Email`, `Phone`, `Address`, `City`, `Zip`, `Payment Method`, `Payment Details`, `Bkash Number`, `Transaction ID`, `Order Items`, `Total Amount`.
+    - Implemented logic to split bKash details into separate columns.

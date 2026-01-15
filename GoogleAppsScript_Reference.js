@@ -7,7 +7,7 @@ function doPost(e) {
     if (data.orderDate && data.orderTime) {
         date = data.orderDate;
         time = data.orderTime;
-        timestamp = date + " " + time; // Combined for Timestamp column
+        timestamp = date + " " + time;
     } else {
         var now = new Date();
         date = Utilities.formatDate(now, Session.getScriptTimeZone(), "yyyy-MM-dd");
@@ -18,12 +18,20 @@ function doPost(e) {
     // Combine Name
     var customerName = data.firstName + " " + data.lastName;
 
-    // Combine Payment Details
-    var paymentDetails = "";
+    // Logic for separate columns
+    var paymentMethodDisplay = "";
+    var paymentDescription = "";
+    var bkashNumber = "";
+    var trxId = "";
+
     if (data.paymentMethod === 'bkash') {
-        paymentDetails = "Number: " + (data.bkashNumber || "") + ", TrxID: " + (data.bkashTrxId || "");
+        paymentMethodDisplay = "bKash";
+        paymentDescription = "bKash Payment";
+        bkashNumber = "'" + data.bkashNumber; // Adding ' to force text format in Sheets prevents scientific notation or number formatting issues
+        trxId = data.bkashTrxId;
     } else {
-        paymentDetails = "Cash on Delivery";
+        paymentMethodDisplay = "COD";
+        paymentDescription = "Cash on Delivery";
     }
 
     // Flatten items
@@ -31,7 +39,7 @@ function doPost(e) {
         return item.title + " (" + item.style + ") x" + item.quantity;
     }).join(", ");
 
-    // STRICT COLUMN ORDER:
+    // STRICT COLUMN ORDER (User Requested):
     // 1. Date
     // 2. Time
     // 3. Timestamp
@@ -44,8 +52,10 @@ function doPost(e) {
     // 10. Zip
     // 11. Payment Method
     // 12. Payment Details (bKash/COD)
-    // 13. Order Items
-    // 14. Total Amount
+    // 13. Bkash Number (New separate column)
+    // 14. Transaction ID (TrxID) (New separate column)
+    // 15. Order Items
+    // 16. Total Amount
 
     sheet.appendRow([
         date,
@@ -58,8 +68,10 @@ function doPost(e) {
         data.address,
         data.city,
         data.zip,
-        data.paymentMethod,
-        paymentDetails,
+        paymentMethodDisplay,
+        paymentDescription,
+        bkashNumber, // Column 13: Only populated if bKash
+        trxId,       // Column 14: Only populated if bKash
         itemsString,
         data.totalAmount
     ]);
