@@ -1,0 +1,6 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="200" height="60" fill="none"/>
+<path d="M30 30L10 30C10 18.9543 18.9543 10 30 10C41.0457 10 50 18.9543 50 30L30 30Z" fill="black"/>
+<path d="M70 30L90 30C90 18.9543 81.0457 10 70 10C58.9543 10 50 18.9543 50 30L70 30Z" fill="black"/>
+<text x="100" y="38" font-family="Arial, sans-serif" font-weight="bold" font-size="24" fill="black" letter-spacing="2">Choshma Zone</text>
+</svg>

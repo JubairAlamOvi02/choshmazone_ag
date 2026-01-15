@@ -1,0 +1,29 @@
+.success-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--spacing-3xl) 0;
+}
+
+.success-icon {
+    color: var(--color-success);
+    margin-bottom: var(--spacing-xl);
+}
+
+.success-title {
+    margin-bottom: var(--spacing-md);
+}
+
+.success-message {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-lg);
+    color: var(--color-text-main);
+}
+
+.success-details {
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-2xl);
+}

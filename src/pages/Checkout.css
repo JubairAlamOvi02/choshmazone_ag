@@ -1,0 +1,224 @@
+.checkout-layout {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: var(--spacing-3xl);
+    align-items: start;
+}
+
+.checkout-section {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.checkout-section h2 {
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+.checkout-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--spacing-xl);
+}
+
+/* Order Summary */
+.checkout-summary {
+    background-color: var(--color-surface-alt);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    position: sticky;
+    top: 100px;
+    /* Adjust based on navbar height */
+}
+
+.summary-title {
+    margin-bottom: var(--spacing-lg);
+}
+
+.summary-items {
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--spacing-md);
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.summary-item-image-wrapper {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    background-color: white;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.summary-item-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+}
+
+.summary-item-quantity {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: var(--color-text-muted);
+    /* Or a badge color */
+    color: white;
+    font-size: 0.75rem;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.summary-item-details {
+    flex: 1;
+}
+
+.summary-item-title {
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+.summary-item-variant {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+.summary-item-price {
+    font-weight: var(--font-weight-medium);
+}
+
+.summary-totals {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    color: var(--color-text-muted);
+}
+
+.summary-row.total {
+    color: var(--color-text-main);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-xl);
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+}
+
+@media (max-width: 992px) {
+    .checkout-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        /* Summary first on mobile? Usually better form first, but varies */
+        gap: var(--spacing-xl);
+    }
+
+    .checkout-summary {
+        position: static;
+        order: -1;
+        /* Show summary at top on mobile usually safer or bottom */
+        margin-bottom: var(--spacing-xl);
+    }
+}
+
+/* Payment Methods */
+.payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.payment-method-card {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.payment-method-card:hover {
+    border-color: var(--color-primary);
+}
+
+.payment-method-card.selected {
+    border-color: var(--color-primary);
+    background-color: var(--color-surface-alt);
+    box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.payment-radio {
+    accent-color: var(--color-primary);
+    width: 18px;
+    height: 18px;
+}
+
+.payment-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.payment-title {
+    font-weight: var(--font-weight-medium);
+}
+
+.payment-subtitle {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+}
+
+.bkash-details,
+.cod-details {
+    padding: var(--spacing-md);
+    background-color: var(--color-surface-alt);
+    border-radius: var(--radius-md);
+    margin-top: var(--spacing-md);
+    animation: fadeIn 0.3s ease;
+}
+
+.instruction-text {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-md);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
