@@ -44,8 +44,10 @@ const Checkout = () => {
         setIsSubmitting(true);
 
         const now = new Date();
+        const orderId = `ORD-${Date.now()}`;
 
         const orderData = {
+            orderId,
             orderDate: now.toLocaleDateString(),
             orderTime: now.toLocaleTimeString(),
             ...formData,
@@ -59,7 +61,7 @@ const Checkout = () => {
         };
 
         try {
-            await fetch('https://script.google.com/macros/s/AKfycbxzyBRAVOmIeo9DgRjMmySFuZqpPzGqiLSZxczwu5WswdWQKnQEajZPPJv1GXdNr22g0w/exec', {
+            await fetch('https://script.google.com/macros/s/AKfycbzCVsNSBLUxh7yMOCkBcnpaGP1BWCShRlgzn6Eh7EfHsUOpfjEc2hk-RHojktR9paLVxA/exec', {
                 method: 'POST',
                 // Using default Content-Type (text/plain) to avoid CORS preflight issues with Google Apps Script
                 body: JSON.stringify(orderData)
