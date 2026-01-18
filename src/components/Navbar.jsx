@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingBag, Search, Menu, X, User } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import logo from '../assets/logo.svg';
 import './Navbar.css';
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { toggleCart, cartCount } = useCart();
+    const { user, isAdmin, signOut } = useAuth();
 
     return (
         <nav className="navbar">
@@ -41,9 +43,28 @@ const Navbar = () => {
                     <button className="icon-btn" aria-label="Search">
                         <Search size={20} />
                     </button>
-                    <button className="icon-btn" aria-label="Account">
-                        <User size={20} />
-                    </button>
+                    <div className="navbar-auth-dropdown">
+                        {user ? (
+                            <div className="auth-menu-trigger">
+                                <button className="icon-btn" aria-label="Account">
+                                    <User size={20} />
+                                </button>
+                                <div className="auth-dropdown-content">
+                                    <span className="user-email">{user.email}</span>
+                                    {isAdmin && (
+                                        <Link to="/admin/dashboard" className="dropdown-link">Admin Dashboard</Link>
+                                    )}
+                                    <Link to="/profile" className="dropdown-link">My Profile</Link>
+                                    <Link to="/orders" className="dropdown-link">My Orders</Link>
+                                    <button onClick={signOut} className="dropdown-link logout">Logout</button>
+                                </div>
+                            </div>
+                        ) : (
+                            <Link to="/login" className="icon-btn" aria-label="Login">
+                                <User size={20} />
+                            </Link>
+                        )}
+                    </div>
                     <button className="icon-btn cart-btn" aria-label="Cart" onClick={toggleCart}>
                         <ShoppingBag size={20} />
                         {cartCount > 0 && <span className="cart-count">{cartCount}</span>}

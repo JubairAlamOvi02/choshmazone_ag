@@ -1,7 +1,7 @@
 # Project Brief: Sunglasses Ecommerce Website
 
 ## 1. Project Overview
-We are building a basic, stylish ecommerce website dedicated to selling sunglasses. The platform will serve as a digital storefront, allowing users to browse various styles, view detailed product information, and make purchases. The design should reflect a modern, premium aesthetic suitable for a fashion accessory brand.
+We are building a robust, stylish ecommerce website dedicated to selling sunglasses. The platform will serve as a digital storefront, allowing users to browse styles and make purchases, while providing administrators with a powerful dashboard to manage products and orders. The solution leverages **Supabase** for a secure, scalable backend.
 
 ## 2. Objectives
 - **Brand Presence**: Create a visually appealing site that establishes a strong brand identity.
@@ -19,7 +19,16 @@ We are building a basic, stylish ecommerce website dedicated to selling sunglass
 - **Product Catalog**: Grid view with filtering options (Frame Style, Lens Color, Price, Brand).
 - **Product Details Page**: High-resolution image gallery, detailed descriptions, specifications, and "Add to Cart" functionality.
 - **Shopping Cart**: Review selected items, adjust quantities.
-- **Checkout Flow**: Guest checkout, shipping information, and payment integration (Support for **bKash** and **Cash on Delivery**).
+- **Checkout Flow**: Guest/User checkout, shipping information, and payment integration (Support for **bKash** and **Cash on Delivery**).
+- **User Portal**:
+    - Registration and Login system.
+    - View Order History and Profile.
+- **Admin Panel (WordPress-like)**:
+    - Secure Login for Admins.
+    - **Dashboard**: Overview of orders and system status.
+    - **Product Management**: CRUD operations (Create, Read, Update, Delete) for products.
+    - **Inventory Control**: Manage stock levels and active status.
+    - **Database Visibility**: Access to schemas and tables for debugging.
 
 ## 5. Non-Functional Requirements
 - **Responsive Design**: Mobile-first approach to ensure usability on phones and tablets.
@@ -28,4 +37,4 @@ We are building a basic, stylish ecommerce website dedicated to selling sunglass
 
 ## 6. Proposed Tech Stack
 - **Frontend**: HTML5, CSS3 (Custom or Tailwind), JavaScript (Vanilla or Framework like React/Next.js).
-- **Backend/Data**: (To be defined - utilizing local JSON for initial prototype or a headless CMS).
+- **Backend/Data**: **Supabase** (PostgreSQL Database, Authentication, Storage).
