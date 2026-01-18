@@ -72,7 +72,8 @@
   - [x] Create Admin Layout (Sidebar, Navigation)
   - [x] **Product Management**: CRUD operations with Storage integration
   - [x] **Orders Management**: Live list and status updates
-  - [x] **Dynamic Stats**: Sales and Order counts
+  - [x] **Customers Management**: List registered users and view roles
+  - [x] **Dynamic Stats**: Sales, Order counts, and Customer counts
 
 ## Phase 6: Customer Portal
 - [x] **Account Management**
@@ -93,7 +94,8 @@
 - [x] **Error Handling**
   - [x] UUID validation for guest orders
   - [x] RLS policy fixes for multi-table inserts (Orders/Items)
-- [ ] **Final QA**
-  - [ ] Mobile Responsiveness Audit
-  - [ ] Performance Optimization (WebP assets)
+- [x] **Final QA**
+  - [x] Mobile Responsiveness Audit
+  - [x] Performance Optimization (WebP assets)
+  - [x] Server cleanup (port management)
 

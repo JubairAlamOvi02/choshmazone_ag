@@ -90,7 +90,7 @@
 4.  **Admin Access**:
     *   `products`: Full CRUD permissions.
     *   `orders`: Full CRU permissions (Admins manage statuses).
-    *   `profiles`: Read access for user management.
+    *   `profiles`: Read access for user/customer management list.
 
 ### Application Flow
 1.  **Login**: User submits credentials to `/login`.

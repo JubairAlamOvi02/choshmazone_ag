@@ -26,8 +26,10 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
     - View Order History and Profile.
 - **Admin Panel (WordPress-like)**:
     - Secure Login for Admins.
-    - **Dashboard**: Overview of orders and system status.
+    - **Dashboard**: Overview of orders, customers, and system status with live stats.
     - **Product Management**: CRUD operations (Create, Read, Update, Delete) for products.
+    - **Order Management**: Monitor sales and update order statuses.
+    - **Customer Management**: View registered user list and roles.
     - **Inventory Control**: Manage stock levels and active status.
     - **Database Visibility**: Access to schemas and tables for debugging.
 
