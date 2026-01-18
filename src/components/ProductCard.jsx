@@ -10,6 +10,7 @@ const ProductCard = ({ product }) => {
 
     const handleAddToCart = (e) => {
         e.preventDefault();
+        e.stopPropagation();
         addToCart(product);
     };
 

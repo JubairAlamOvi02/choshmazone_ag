@@ -4,20 +4,50 @@ import Footer from '../components/Footer';
 import FilterSidebar from '../components/Shop/FilterSidebar';
 import SortSelect from '../components/Shop/SortSelect';
 import ProductCard from '../components/ProductCard';
-import { products } from '../data/products';
+import { productParams } from '../lib/api/products';
+// import { products } from '../data/products'; // Removed static data
+import { useLocation } from 'react-router-dom';
 import './Shop.css';
 
 const Shop = () => {
-    const [filteredProducts, setFilteredProducts] = useState(products);
+    const location = useLocation();
+    const initialCategory = location.state?.category || "All";
+
+    const [products, setProducts] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({
-        category: "All",
+        category: initialCategory,
         style: "All",
-        maxPrice: 500
+        maxPrice: 10000 // Increased default max price
     });
     const [sortOption, setSortOption] = useState("newest");
 
     useEffect(() => {
-        let result = products;
+        fetchProducts();
+    }, []);
+
+    const fetchProducts = async () => {
+        try {
+            const data = await productParams.fetchAll();
+            // Transform Supabase data to match component expectation if needed
+            // e.g. map 'name' to 'title', 'image_url' to 'image'
+            const formattedData = data.map(p => ({
+                ...p,
+                title: p.name,
+                image: p.image_url
+            }));
+            setProducts(formattedData);
+            setFilteredProducts(formattedData);
+        } catch (error) {
+            console.error("Error fetching products:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        let result = [...products];
 
         // Filter by Category
         if (filters.category !== "All") {
@@ -38,11 +68,11 @@ const Shop = () => {
         } else if (sortOption === "price-high") {
             result.sort((a, b) => b.price - a.price);
         } else if (sortOption === "newest") {
-            result.sort((a, b) => (a.isNew === b.isNew ? 0 : a.isNew ? -1 : 1));
+            result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         }
 
-        setFilteredProducts([...result]);
-    }, [filters, sortOption]);
+        setFilteredProducts(result);
+    }, [filters, sortOption, products]);
 
     return (
         <div className="shop-page">

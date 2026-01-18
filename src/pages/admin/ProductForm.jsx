@@ -12,6 +12,7 @@ const ProductForm = () => {
         price: '',
         description: '',
         category: '',
+        style: '',
         stock_quantity: 0,
         image_url: ''
     });
@@ -69,7 +70,8 @@ const ProductForm = () => {
                 price: parseFloat(formData.price),
                 description: formData.description,
                 stock_quantity: parseInt(formData.stock_quantity),
-                category: formData.category, // Assuming you might add a category field later
+                category: formData.category,
+                style: formData.style,
                 image_url: imageUrl
             };
 
@@ -130,6 +132,44 @@ const ProductForm = () => {
                             style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
                             required
                         />
+                    </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Category</label>
+                        <select
+                            name="category"
+                            value={formData.category}
+                            onChange={handleChange}
+                            style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                        >
+                            <option value="">Select Category</option>
+                            <option value="Men">Men</option>
+                            <option value="Women">Women</option>
+                            <option value="Unisex">Unisex</option>
+                            <option value="Kids">Kids</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Style</label>
+                        <select
+                            name="style"
+                            value={formData.style}
+                            onChange={handleChange}
+                            style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                        >
+                            <option value="">Select Style</option>
+                            <option value="Wayfarer">Wayfarer</option>
+                            <option value="Aviator">Aviator</option>
+                            <option value="Clubmaster">Clubmaster</option>
+                            <option value="Round">Round</option>
+                            <option value="Square">Square</option>
+                            <option value="oversized">Oversized</option>
+                            <option value="Cat Eye">Cat Eye</option>
+                            <option value="Sport">Sport</option>
+                            <option value="Shield">Shield</option>
+                        </select>
                     </div>
                 </div>
 

@@ -40,3 +40,7 @@
 - [x] **Profile & Orders**:
     - [x] Create `UserProfile.jsx`
     - [x] Create `UserOrders.jsx`
+- [x] **Order Synchronization**:
+    - [x] Save Checkout orders to Supabase (`orders` & `order_items`)
+    - [x] Implement live Admin Orders dashboard
+    - [x] Add dynamic stats to Admin Dashboard (Sales, Counts)

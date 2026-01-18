@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
-import { products } from '../data/products';
+import { productParams } from '../lib/api/products';
 import './ProductDetails.css';
 
 const ProductDetails = () => {
@@ -14,10 +14,26 @@ const ProductDetails = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Simulate API fetch
-        const foundProduct = products.find(p => p.id === parseInt(id));
-        setProduct(foundProduct);
-        setLoading(false);
+        const getProduct = async () => {
+            try {
+                setLoading(true);
+                const data = await productParams.fetchById(id);
+                // Map fields to match component expectations
+                setProduct({
+                    ...data,
+                    title: data.name,
+                    image: data.image_url
+                });
+            } catch (error) {
+                console.error("Error fetching product details:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (id) {
+            getProduct();
+        }
     }, [id]);
 
     if (loading) return <div>Loading...</div>;

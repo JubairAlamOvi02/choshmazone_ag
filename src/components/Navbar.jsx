@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ShoppingBag, Search, Menu, X, User } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -8,8 +8,16 @@ import './Navbar.css';
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
     const { toggleCart, cartCount } = useCart();
     const { user, isAdmin, signOut } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        await signOut();
+        setIsProfileOpen(false);
+        navigate('/');
+    };
 
     return (
         <nav className="navbar">
@@ -45,19 +53,30 @@ const Navbar = () => {
                     </button>
                     <div className="navbar-auth-dropdown">
                         {user ? (
-                            <div className="auth-menu-trigger">
-                                <button className="icon-btn" aria-label="Account">
+                            <div className="auth-menu-container">
+                                <button
+                                    className="icon-btn"
+                                    aria-label="Account"
+                                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                >
                                     <User size={20} />
                                 </button>
-                                <div className="auth-dropdown-content">
-                                    <span className="user-email">{user.email}</span>
-                                    {isAdmin && (
-                                        <Link to="/admin/dashboard" className="dropdown-link">Admin Dashboard</Link>
-                                    )}
-                                    <Link to="/profile" className="dropdown-link">My Profile</Link>
-                                    <Link to="/orders" className="dropdown-link">My Orders</Link>
-                                    <button onClick={signOut} className="dropdown-link logout">Logout</button>
-                                </div>
+                                {isProfileOpen && (
+                                    <div className="auth-dropdown-content">
+                                        <span className="user-email">{user.email}</span>
+                                        {isAdmin && (
+                                            <Link to="/admin/dashboard" className="dropdown-link" onClick={() => setIsProfileOpen(false)}>Admin Dashboard</Link>
+                                        )}
+                                        <Link to="/profile" className="dropdown-link" onClick={() => setIsProfileOpen(false)}>My Profile</Link>
+                                        <Link to="/orders" className="dropdown-link" onClick={() => setIsProfileOpen(false)}>My Orders</Link>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="dropdown-link logout"
+                                        >
+                                            Logout
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <Link to="/login" className="icon-btn" aria-label="Login">

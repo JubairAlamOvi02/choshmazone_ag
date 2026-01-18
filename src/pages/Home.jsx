@@ -5,18 +5,33 @@ import FeaturedCollections from '../components/FeaturedCollections';
 import ProductCard from '../components/ProductCard';
 import PromotionalBanner from '../components/PromotionalBanner';
 import Footer from '../components/Footer';
-import product1 from '../assets/product_1.png';
-import product2 from '../assets/product_2.png';
-import product3 from '../assets/product_3.png';
-import product4 from '../assets/product_4.png';
+
+import { productParams } from '../lib/api/products';
 
 const Home = () => {
-    const newArrivals = [
-        { id: 1, title: "Classic Wayfarer", price: 129.99, category: "Best Seller", image: product1 },
-        { id: 2, title: "Luxury Aviator", price: 249.99, category: "New Arrival", image: product2 },
-        { id: 3, title: "Clubmaster Elite", price: 189.99, category: "Trending", image: product3 },
-        { id: 4, title: "Sport Performance", price: 159.99, category: "Sport", image: product4 },
-    ];
+    const [newArrivals, setNewArrivals] = React.useState([]);
+    const [loading, setLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        const fetchNewArrivals = async () => {
+            try {
+                const data = await productParams.fetchAll();
+                // Take the 4 most recent products
+                const formattedData = data.slice(0, 4).map(p => ({
+                    ...p,
+                    title: p.name,
+                    image: p.image_url
+                }));
+                setNewArrivals(formattedData);
+            } catch (error) {
+                console.error("Error fetching new arrivals:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchNewArrivals();
+    }, []);
 
     return (
         <div className="home-page">

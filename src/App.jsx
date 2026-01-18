@@ -8,6 +8,9 @@ import Shop from './pages/Shop';
 import ProductDetails from './pages/ProductDetails';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
+import Collections from './pages/Collections';
+import About from './pages/About';
+import Contact from './pages/Contact';
 // Customer Imports
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -38,6 +41,9 @@ function App() {
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order-success" element={<OrderSuccess />} />
+              <Route path="/collections" element={<Collections />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
 
               {/* Customer Routes */}
               <Route path="/login" element={<Login />} />

@@ -113,12 +113,9 @@
     display: inline-block;
 }
 
-.auth-menu-trigger:hover .auth-dropdown-content {
-    display: block;
-}
-
 .auth-dropdown-content {
-    display: none;
+    display: block;
+    /* Managed by React conditional rendering */
     position: absolute;
     right: 0;
     top: 100%;
@@ -129,6 +126,7 @@
     z-index: 1000;
     padding: 0.5rem 0;
     border: 1px solid #eee;
+    margin-top: 0.5rem;
 }
 
 .user-email {

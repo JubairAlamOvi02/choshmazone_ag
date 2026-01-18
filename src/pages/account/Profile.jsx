@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabaseClient';
 
 const UserProfile = () => {
     const { user, signOut } = useAuth();
+    const navigate = useNavigate();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -54,7 +56,10 @@ const UserProfile = () => {
 
                 <div style={{ borderTop: '1px solid #eee', paddingTop: '1.5rem', marginTop: '2rem' }}>
                     <button
-                        onClick={signOut}
+                        onClick={async () => {
+                            await signOut();
+                            navigate('/');
+                        }}
                         style={{ background: '#d32f2f', color: 'white', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '4px', cursor: 'pointer' }}
                     >
                         Sign Out

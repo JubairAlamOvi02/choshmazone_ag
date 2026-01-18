@@ -57,8 +57,8 @@ const FilterSidebar = ({ filters, setFilters }) => {
                 <input
                     type="range"
                     min="0"
-                    max="500"
-                    step="10"
+                    max="5000"
+                    step="50"
                     value={filters.maxPrice}
                     onChange={(e) => setFilters(prev => ({ ...prev, maxPrice: Number(e.target.value) }))}
                     className="price-slider"

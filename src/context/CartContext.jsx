@@ -1,4 +1,6 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../lib/supabaseClient';
 
 const CartContext = createContext();
 
@@ -10,6 +12,39 @@ export const CartProvider = ({ children }) => {
         return localData ? JSON.parse(localData) : [];
     });
     const [isCartOpen, setIsCartOpen] = useState(false);
+
+    // Validate cart items against database on mount
+    useEffect(() => {
+        const validateCart = async () => {
+            if (cartItems.length === 0) return;
+
+            try {
+                // Get all active product IDs from Supabase
+                const { data: activeProducts, error } = await supabase
+                    .from('products')
+                    .select('id');
+
+                if (error) throw error;
+
+                const activeIds = new Set(activeProducts.map(p => p.id));
+
+                // Filter out items that are no longer in the DB
+                setCartItems(prev => {
+                    const filtered = prev.filter(item => {
+                        // Check if it's a valid UUID
+                        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
+                        if (!isUUID) return false;
+                        return activeIds.has(item.id);
+                    });
+                    return filtered;
+                });
+            } catch (err) {
+                console.error("Cart validation failed:", err);
+            }
+        };
+
+        validateCart();
+    }, []);
 
     useEffect(() => {
         localStorage.setItem('cartItems', JSON.stringify(cartItems));

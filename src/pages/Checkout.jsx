@@ -5,14 +5,17 @@ import Footer from '../components/Footer';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { orderParams } from '../lib/api/orders';
 import './Checkout.css';
 
 const Checkout = () => {
     const { cartItems, cartTotal, clearCart } = useCart();
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
-        email: '',
+        email: user?.email || '',
         phone: '',
         firstName: '',
         lastName: '',
@@ -33,7 +36,7 @@ const Checkout = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Mock validation
+        // Validation
         if (formData.paymentMethod === 'bkash') {
             if (!formData.bkashNumber || !formData.bkashTrxId) {
                 alert('Please enter bKash details');
@@ -43,35 +46,58 @@ const Checkout = () => {
 
         setIsSubmitting(true);
 
-        const now = new Date();
-        const orderId = `ORD-${Date.now()}`;
-
-        const orderData = {
-            orderId,
-            orderDate: now.toLocaleDateString(),
-            orderTime: now.toLocaleTimeString(),
-            ...formData,
-            items: cartItems.map(item => ({
-                title: item.title,
-                quantity: item.quantity,
-                price: item.price,
-                style: item.style
-            })),
-            totalAmount: cartTotal.toFixed(2)
-        };
-
         try {
-            await fetch('https://script.google.com/macros/s/AKfycbwzBtCvO6vpGxuQK3vA8fXGwW8---EZB0Hk5UO44t8Yt239L0p1ktq6kCxiIsD7cWGnIA/exec', {
+            // 1. Prepare Order Data for Supabase
+            const supabaseOrderData = {
+                user_id: user?.id || null, // Primary key if logged in, null for guests
+                total_amount: cartTotal,
+                status: 'pending',
+                payment_method: formData.paymentMethod,
+                shipping_address: {
+                    first_name: formData.firstName,
+                    last_name: formData.lastName,
+                    email: formData.email,
+                    phone: formData.phone,
+                    address: formData.address,
+                    city: formData.city,
+                    zip: formData.zip,
+                    country: formData.country
+                },
+                payment_details: formData.paymentMethod === 'bkash' ? {
+                    bkash_number: formData.bkashNumber,
+                    transaction_id: formData.bkashTrxId
+                } : {}
+            };
+
+            // 2. Save to Supabase
+            await orderParams.create(supabaseOrderData, cartItems);
+
+            // 3. (Optional) Still send to Google Sheets for redundancy if you want
+            const now = new Date();
+            const legacyOrderData = {
+                orderId: `ORD-${Date.now()}`,
+                orderDate: now.toLocaleDateString(),
+                orderTime: now.toLocaleTimeString(),
+                ...formData,
+                items: cartItems.map(item => ({
+                    title: item.title,
+                    quantity: item.quantity,
+                    price: item.price,
+                    style: item.style
+                })),
+                totalAmount: cartTotal.toFixed(2)
+            };
+
+            fetch('https://script.google.com/macros/s/AKfycbwzBtCvO6vpGxuQK3vA8fXGwW8---EZB0Hk5UO44t8Yt239L0p1ktq6kCxiIsD7cWGnIA/exec', {
                 method: 'POST',
-                // Using default Content-Type (text/plain) to avoid CORS preflight issues with Google Apps Script
-                body: JSON.stringify(orderData)
-            });
+                body: JSON.stringify(legacyOrderData)
+            }).catch(err => console.error("Google Sheets Sync Failed:", err)); // Don't block on this
 
             clearCart();
             navigate('/order-success');
         } catch (error) {
             console.error('Error placing order:', error);
-            alert('There was an issue processing your order. Please try again.');
+            alert('There was an issue processing your order: ' + error.message);
         } finally {
             setIsSubmitting(false);
         }

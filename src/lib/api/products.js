@@ -1,5 +1,5 @@
 
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../supabaseClient';
 
 export const productParams = {
     // Fetch all products

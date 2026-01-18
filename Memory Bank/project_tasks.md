@@ -70,23 +70,23 @@
   - [ ] Deploy to host (Netlify/Vercel/GitHub Pages)
 
 ## Phase 6: Admin Panel & Backend Expansion (Supabase)
-- [ ] **Backend Setup (Supabase)**
-  - [ ] Initialize Supabase project
-  - [ ] **Database Schema**: Create tables (`profiles`, `products`, `orders`, `order_items`)
-  - [ ] **Security**: Configure RLS (Row Level Security) policies
-  - [ ] **Storage**: Create bucket for product images
-- [ ] **Authentication**
-  - [ ] Integrate Supabase Auth (Sign Up, Sign In, Sign Out)
-  - [ ] Implement Role-Based Access Control (Admin vs Customer)
-  - [ ] Create `ProtectedRoutes` for Admin pages
-- [ ] **Admin Dashboard**
-  - [ ] Create Admin Layout (Sidebar, Navigation)
-  - [ ] **Product Management**:
-    - [ ] List all products
-    - [ ] "Add Product" form with Image Upload
-    - [ ] "Edit Product" functionality
-    - [ ] Delete/Archive product logic
-- [ ] **User Portal**
-  - [ ] "My Profile" page
-  - [ ] "My Orders" page (Order history)
+- [x] **Backend Setup (Supabase)**
+  - [x] Initialize Supabase project
+  - [x] **Database Schema**: Create tables (`profiles`, `products`, `orders`, `order_items`)
+  - [x] **Security**: Configure RLS (Row Level Security) policies
+  - [x] **Storage**: Create bucket for product images
+- [x] **Authentication**
+  - [x] Integrate Supabase Auth (Sign Up, Sign In, Sign Out)
+  - [x] Implement Role-Based Access Control (Admin vs Customer)
+  - [x] Create `ProtectedRoutes` for Admin pages
+- [x] **Admin Dashboard**
+  - [x] Create Admin Layout (Sidebar, Navigation)
+  - [x] **Product Management**:
+    - [x] List all products
+    - [x] "Add Product" form with Image Upload
+    - [x] "Edit Product" functionality
+    - [x] Delete/Archive product logic
+- [x] **User Portal**
+  - [x] "My Profile" page
+  - [x] "My Orders" page (Order history)
 
