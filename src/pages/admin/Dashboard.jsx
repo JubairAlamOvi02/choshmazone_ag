@@ -7,7 +7,8 @@ const Dashboard = () => {
         totalSales: 0,
         ordersCount: 0,
         productsCount: 0,
-        pendingOrders: 0
+        pendingOrders: 0,
+        customersCount: 0
     });
     const [loading, setLoading] = useState(true);
 
@@ -36,11 +37,19 @@ const Dashboard = () => {
 
             if (productsError) throw productsError;
 
+            // 3. Fetch Customers count
+            const { count: customersCount, error: customersError } = await supabase
+                .from('profiles')
+                .select('*', { count: 'exact', head: true });
+
+            if (customersError) throw customersError;
+
             setStats({
                 totalSales,
                 ordersCount: orders.length,
                 productsCount: productsCount || 0,
-                pendingOrders
+                pendingOrders,
+                customersCount: customersCount || 0
             });
 
         } catch (error) {
@@ -57,7 +66,7 @@ const Dashboard = () => {
             <h1>Dashboard Overview</h1>
             <p>Real-time updates from your database.</p>
 
-            <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>
+            <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>
                 <div className="stat-card" style={{ padding: '1.5rem', background: 'white', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
                     <h3 style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Total Sales</h3>
                     <p style={{ fontSize: '1.75rem', fontWeight: 'bold', margin: 0 }}>৳{stats.totalSales.toFixed(2)}</p>
@@ -78,6 +87,11 @@ const Dashboard = () => {
                 <div className="stat-card" style={{ padding: '1.5rem', background: 'white', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
                     <h3 style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Active Products</h3>
                     <p style={{ fontSize: '1.75rem', fontWeight: 'bold', margin: 0 }}>{stats.productsCount}</p>
+                </div>
+
+                <div className="stat-card" style={{ padding: '1.5rem', background: 'white', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                    <h3 style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Total Customers</h3>
+                    <p style={{ fontSize: '1.75rem', fontWeight: 'bold', margin: 0 }}>{stats.customersCount}</p>
                 </div>
             </div>
 

@@ -25,6 +25,7 @@ import AdminProducts from './pages/admin/Products';
 import AdminProductNew from './pages/admin/ProductNew';
 import ProductForm from './pages/admin/ProductForm';
 import AdminOrders from './pages/admin/Orders';
+import AdminCustomers from './pages/admin/Customers';
 import './App.css';
 
 function App() {
@@ -73,7 +74,7 @@ function App() {
                 <Route path="products/new" element={<AdminProductNew />} />
                 <Route path="products/edit/:id" element={<ProductForm />} />
                 <Route path="orders" element={<AdminOrders />} />
-                {/* <Route path="customers" element={<AdminCustomers />} /> */}
+                <Route path="customers" element={<AdminCustomers />} />
               </Route>
             </Routes>
           </div>

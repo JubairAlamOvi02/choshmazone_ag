@@ -6,7 +6,8 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 ## 2. Objectives
 - **Brand Presence**: Create a visually appealing site that establishes a strong brand identity.
 - **User Experience**: Ensure a smooth, intuitive browsing and checkout process.
-- **Sales Conversion**: optimize product display and call-to-actions to drive sales.
+- **Dynamic Management**: Enable real-time product and order management via a secure Admin Panel.
+- **Sales Conversion**: Optimize product display and call-to-actions to drive sales.
 
 ## 3. Target Audience
 - **Fashion-forward individuals**: Looking for the latest trends.
@@ -35,6 +36,7 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 - **Performance**: Fast loading times for image-heavy pages.
 - **Accessibility**: adherence to basic web accessibility standards (WCAG).
 
-## 6. Proposed Tech Stack
-- **Frontend**: HTML5, CSS3 (Custom or Tailwind), JavaScript (Vanilla or Framework like React/Next.js).
-- **Backend/Data**: **Supabase** (PostgreSQL Database, Authentication, Storage).
+## 6. Chosen Tech Stack
+- **Frontend**: React (Vite), Lucide Icons, Vanilla CSS.
+- **Backend/Data**: **Supabase** (PostgreSQL, Auth, Storage).
+- **Redundancy**: Google Sheets Integration for order backups.

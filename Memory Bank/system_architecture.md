@@ -54,10 +54,12 @@
 #### 3. `orders`
 *Order records.*
 *   `id` (UUID, Primary Key)
-*   `user_id` (UUID, References `profiles.id`)
-*   `status` (Text) - 'pending', 'processing', 'shipped', 'cancelled'
+*   `user_id` (UUID, References `profiles.id`, Nullable for Guests)
+*   `status` (Text) - 'pending', 'processing', 'shipped', 'completed', 'cancelled'
 *   `total_amount` (Numeric)
-*   `shipping_address` (JSONB) - Stores snapshot of address
+*   `payment_method` (Text) - 'bkash' | 'cod'
+*   `shipping_address` (JSONB) - Snapshot of details (name, email, phone, city, address, zip)
+*   `payment_details` (JSONB) - Snapshot for bKash (number, trx_id) or empty for COD.
 *   `created_at` (Timestamp)
 
 #### 4. `order_items`
@@ -80,12 +82,15 @@
 ### Security Policies (RLS)
 1.  **Public Access**:
     *   `products`: SELECT (Read-only) for everyone.
-2.  **Authenticated Data**:
-    *   `orders`: INSERT for authenticated users (checkout). SELECT only for own rows (`auth.uid() == user_id`).
+2.  **Order Placement**:
+    *   `orders`: INSERT for everyone (Guests and Authenticated). SELECT for admins or matching `user_id`.
+    *   `order_items`: INSERT for everyone. SELECT matching parent order.
+3.  **Authenticated Data**:
     *   `profiles`: SELECT/UPDATE own profile.
-3.  **Admin Access**:
-    *   `products`: INSERT, UPDATE, DELETE allowed only if `profiles.role` == 'admin'.
-    *   `orders`: SELECT, UPDATE (status) all rows allowed only if `profiles.role` == 'admin'.
+4.  **Admin Access**:
+    *   `products`: Full CRUD permissions.
+    *   `orders`: Full CRU permissions (Admins manage statuses).
+    *   `profiles`: Read access for user management.
 
 ### Application Flow
 1.  **Login**: User submits credentials to `/login`.
