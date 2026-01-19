@@ -14,8 +14,12 @@
 - [x] Add Order ID and organize columns per user request.
     - Updated script reference to match exact header: `Date`, `Time`, `Timestamp`, `Order ID`, `Customer Name`, `Email`, `Phone`, `Address`, `City`, `Zip`, `Payment Method`, `Payment Details`, `Bkash Number`, `Transaction ID`, `Order Items`, `Total Amount`.
     - Implemented logic to split bKash details into separate columns.
+- [x] Social Media Branding & Links Update:
+    - Removed Twitter logo and links.
+    - Integrated TikTok branding with the profile link: `https://www.tiktok.com/@choshma.zone?_t=ZS-93COQHamGZd`.
+    - Updated Instagram and Facebook links to official profile URLs.
 
-**Status**: All additional tasks requested by the user involving Currency and Google Sheets customizations have been implemented and verified.
+**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, and Social Media branding have been implemented and verified.
 
 ## Next High-Priority Tasks: Admin & Backend
 - [x] **Architecture Design**: Create `system_architecture.md` detailing Schema and Auth flow. (Completed)
