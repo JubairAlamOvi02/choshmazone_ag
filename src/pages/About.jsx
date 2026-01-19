@@ -11,7 +11,7 @@ const About = () => {
                 <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                     <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
                         <h1 className="h1">Our Story</h1>
-                        <p style={{ color: '#666', marginTop: '1rem', fontSize: '1.2rem' }}>Crafting vision and style since 2024.</p>
+                        <p style={{ color: '#666', marginTop: '1rem', fontSize: '1.2rem' }}>Crafting vision and style since 2025.</p>
                     </header>
 
                     <section style={{ marginBottom: '3rem', lineHeight: '1.8' }}>
