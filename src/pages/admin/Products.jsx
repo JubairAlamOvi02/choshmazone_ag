@@ -30,9 +30,28 @@ const AdminProducts = () => {
             await productParams.delete(id);
             setProducts(products.filter(p => p.id !== id));
         } catch (err) {
-            alert('Failed to delete product');
+            console.error('Delete error:', err);
+            let message = 'Failed to delete product.';
+            if (err.code === '23503') {
+                message = 'Cannot delete product because it has associated orders. Try deactivating it instead.';
+            } else if (err.message) {
+                message = `Failed to delete product: ${err.message}`;
+            }
+            alert(message);
         }
     };
+
+    const handleToggleStatus = async (product) => {
+        try {
+            const newStatus = !product.is_active;
+            await productParams.update(product.id, { is_active: newStatus });
+            setProducts(products.map(p => p.id === product.id ? { ...p, is_active: newStatus } : p));
+        } catch (err) {
+            console.error('Toggle error:', err);
+            alert('Failed to update product status');
+        }
+    };
+
 
     if (loading) return <div>Loading products...</div>;
     if (error) return <div className="error-message">{error}</div>;
@@ -54,7 +73,7 @@ const AdminProducts = () => {
                             <th style={{ padding: '1rem' }}>Name</th>
                             <th style={{ padding: '1rem' }}>Price</th>
                             <th style={{ padding: '1rem' }}>Stock</th>
-                            <th style={{ padding: '1rem' }}>Status</th>
+                            <th style={{ padding: '1rem' }}>Active</th>
                             <th style={{ padding: '1rem' }}>Actions</th>
                         </tr>
                     </thead>
@@ -85,14 +104,20 @@ const AdminProducts = () => {
                                             padding: '0.25rem 0.5rem',
                                             borderRadius: '999px',
                                             fontSize: '0.8rem',
-                                            background: product.stock_quantity > 0 ? '#e6f4ea' : '#fce8e6',
-                                            color: product.stock_quantity > 0 ? '#1e7e34' : '#c5221f'
+                                            background: product.is_active !== false ? '#e6f4ea' : '#fce8e6',
+                                            color: product.is_active !== false ? '#1e7e34' : '#c5221f'
                                         }}>
-                                            {product.stock_quantity > 0 ? 'In Stock' : 'Out of Stock'}
+                                            {product.is_active !== false ? 'Active' : 'Inactive'}
                                         </span>
                                     </td>
                                     <td style={{ padding: '1rem' }}>
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <button
+                                                onClick={() => handleToggleStatus(product)}
+                                                style={{ padding: '0.25rem 0.5rem', border: '1px solid #666', borderRadius: '4px', background: 'none', color: '#666', cursor: 'pointer', fontSize: '0.9rem' }}
+                                            >
+                                                {product.is_active !== false ? 'Deactivate' : 'Activate'}
+                                            </button>
                                             <Link
                                                 to={`/admin/products/edit/${product.id}`}
                                                 style={{ padding: '0.25rem 0.5rem', border: '1px solid #ddd', borderRadius: '4px', textDecoration: 'none', color: '#333', fontSize: '0.9rem' }}

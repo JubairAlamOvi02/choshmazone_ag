@@ -4,7 +4,7 @@ import { ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import './ProductCard.css';
 
-const ProductCard = ({ product }) => {
+const ProductCard = React.memo(({ product }) => {
     const { id, title, price, category, image, images } = product;
     const hoverImage = images && images.length > 1 ? images[1] : null;
     const { addToCart } = useCart();
@@ -36,6 +36,6 @@ const ProductCard = ({ product }) => {
             </Link>
         </div>
     );
-};
+});
 
 export default ProductCard;

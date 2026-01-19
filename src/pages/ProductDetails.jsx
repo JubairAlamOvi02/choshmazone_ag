@@ -90,6 +90,7 @@ const ProductDetails = () => {
                             <span className="pdp-category">{product.category}</span>
                             <h1 className="pdp-title">{product.title}</h1>
                             <div className="pdp-price">৳{product.price}</div>
+                            {product.is_active === false && <div className="pdp-unavailable-badge">Currently Unavailable</div>}
                         </div>
 
                         <div className="pdp-description">
@@ -103,7 +104,15 @@ const ProductDetails = () => {
                         </div>
 
                         <div className="pdp-actions">
-                            <Button variant="primary" size="large" style={{ width: '100%' }} onClick={() => addToCart(product)}>Add to Cart</Button>
+                            <Button
+                                variant="primary"
+                                size="large"
+                                style={{ width: '100%' }}
+                                onClick={() => addToCart(product)}
+                                disabled={product.is_active === false}
+                            >
+                                {product.is_active === false ? 'Unavailable' : 'Add to Cart'}
+                            </Button>
                             <Button variant="outline" size="large" style={{ width: '100%' }}>Add to Wishlist</Button>
                         </div>
                     </div>

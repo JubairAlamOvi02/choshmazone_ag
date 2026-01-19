@@ -98,6 +98,11 @@ create policy "Admins can update orders (e.g. status)."
   to authenticated
   using ( exists ( select 1 from profiles where id = auth.uid() and role = 'admin' ) );
 
+create policy "Admins can delete orders."
+  on orders for delete
+  to authenticated
+  using ( exists ( select 1 from profiles where id = auth.uid() and role = 'admin' ) );
+
 -- 4. ORDER ITEMS Table
 create table public.order_items (
   id uuid default uuid_generate_v4() primary key,

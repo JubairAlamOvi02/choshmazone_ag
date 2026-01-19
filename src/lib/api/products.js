@@ -3,11 +3,16 @@ import { supabase } from '../supabaseClient';
 
 export const productParams = {
     // Fetch all products
-    fetchAll: async () => {
-        const { data, error } = await supabase
+    fetchAll: async (activeOnly = false) => {
+        let query = supabase
             .from('products')
-            .select('*')
-            .order('created_at', { ascending: false });
+            .select('*');
+
+        if (activeOnly) {
+            query = query.eq('is_active', true);
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: false });
 
         if (error) throw error;
         return data;
@@ -63,7 +68,8 @@ export const productParams = {
 
     // Upload image to Storage
     uploadImage: async (file) => {
-        const fileName = `${Date.now()}-${file.name}`;
+        const randomStr = Math.random().toString(36).substring(2, 8);
+        const fileName = `${Date.now()}-${randomStr}-${file.name}`;
         const { data, error } = await supabase.storage
             .from('products')
             .upload(fileName, file);

@@ -34,6 +34,18 @@ const AdminOrders = () => {
         }
     };
 
+    const handleDelete = async (orderId) => {
+        if (!window.confirm('Are you sure you want to PERMANENTLY delete this order? This cannot be undone.')) return;
+
+        try {
+            await orderParams.delete(orderId);
+            setOrders(orders.filter(o => o.id !== orderId));
+        } catch (err) {
+            console.error('Delete error:', err);
+            alert('Failed to delete order. ' + (err.message || ''));
+        }
+    };
+
     if (loading) return <div>Loading orders...</div>;
     if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
@@ -84,17 +96,34 @@ const AdminOrders = () => {
                                 {new Date(order.created_at).toLocaleDateString()}
                             </td>
                             <td style={{ padding: '1rem', borderBottom: '1px solid #eee' }}>
-                                <select
-                                    value={order.status}
-                                    onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                                    style={{ padding: '0.25rem', borderRadius: '4px' }}
-                                >
-                                    <option value="pending">Pending</option>
-                                    <option value="processing">Processing</option>
-                                    <option value="shipped">Shipped</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="cancelled">Cancelled</option>
-                                </select>
+                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                    <select
+                                        value={order.status}
+                                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                                        style={{ padding: '0.25rem', borderRadius: '4px', border: '1px solid #ddd' }}
+                                    >
+                                        <option value="pending">Pending</option>
+                                        <option value="processing">Processing</option>
+                                        <option value="shipped">Shipped</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                    <button
+                                        onClick={() => handleDelete(order.id)}
+                                        style={{
+                                            padding: '0.25rem 0.5rem',
+                                            backgroundColor: '#fee2e2',
+                                            color: '#dc2626',
+                                            border: '1px solid #fecaca',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            fontSize: '0.8rem'
+                                        }}
+                                        title="Delete Order"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     ))}

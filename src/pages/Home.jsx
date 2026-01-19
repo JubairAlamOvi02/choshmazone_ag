@@ -15,7 +15,7 @@ const Home = () => {
     React.useEffect(() => {
         const fetchNewArrivals = async () => {
             try {
-                const data = await productParams.fetchAll();
+                const data = await productParams.fetchAll(true);
                 // Take the 4 most recent products
                 const formattedData = data.slice(0, 4).map(p => ({
                     ...p,

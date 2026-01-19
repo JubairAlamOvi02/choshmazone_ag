@@ -3,7 +3,7 @@ import { Minus, Plus, X } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import './CartItem.css';
 
-const CartItem = ({ item }) => {
+const CartItem = React.memo(({ item }) => {
     const { removeFromCart, updateQuantity } = useCart();
 
     return (
@@ -41,6 +41,6 @@ const CartItem = ({ item }) => {
             </div>
         </div>
     );
-};
+});
 
 export default CartItem;

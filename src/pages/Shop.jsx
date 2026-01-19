@@ -29,7 +29,7 @@ const Shop = () => {
 
     const fetchProducts = async () => {
         try {
-            const data = await productParams.fetchAll();
+            const data = await productParams.fetchAll(true);
             // Transform Supabase data to match component expectation if needed
             // e.g. map 'name' to 'title', 'image_url' to 'image'
             const formattedData = data.map(p => ({

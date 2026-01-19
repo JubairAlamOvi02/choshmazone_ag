@@ -83,5 +83,16 @@ export const orderParams = {
 
         if (error) throw error;
         return data;
+    },
+
+    // Delete order (Admin)
+    delete: async (id) => {
+        const { error } = await supabase
+            .from('orders')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+        return true;
     }
 };
