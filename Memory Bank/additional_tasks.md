@@ -58,5 +58,18 @@
     - [x] Create Admin Customers page to list registered users.
     - [x] Add "Total Customers" count to Admin Dashboard stats.
     - [x] Enable the Customers route in Admin Layout and App routes.
+- [x] **Advanced Product Features**:
+    - [x] Multi-image upload support in Admin Panel.
+    - [x] Interactive Image Gallery on Product Details Page.
+    - [x] Dynamic secondary image hover effect on Product Cards.
+    - [x] Safe product deletion with association checks.
+    - [x] Product soft-delete/deactivation toggle (Active vs Inactive).
+- [x] **Storefront UX & Performance**:
+    - [x] Automatic filtering of inactive products on Shop and Home.
+    - [x] Performance bottleneck fix for blocking UI (INP issue) via memoization and transitions.
+    - [x] Unique filename generation for Supabase Storage to prevent 409 Conflict errors.
+- [x] **Administrative Enhancements**:
+    - [x] Admin Order Deletion capability with cascading cleanup.
+    - [x] Improved error handling for database integrity constraints.
 
 **Current Status**: All primary integration and functional requirements for both Admin and Customer portals are **COMPLETED**. The system is fully operational with real-time Supabase synchronization.

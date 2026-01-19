@@ -98,4 +98,10 @@
   - [x] Mobile Responsiveness Audit
   - [x] Performance Optimization (WebP assets)
   - [x] Server cleanup (port management)
+- [x] **Advanced Features (Post-Launch Refinements)**
+  - [x] Multi-image Gallery support (PDP and Shop hover)
+  - [x] Product activation/deactivation system
+  - [x] Administrative Order deletion with cascading cleanup
+  - [x] Performance: Fixed Blocking UI (INP) via memoization and transitions.
+  - [x] Storage: Fixed filename collision (409 Conflict) with random suffixes.
 

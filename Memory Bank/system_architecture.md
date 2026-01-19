@@ -47,8 +47,9 @@
 *   `price` (Numeric)
 *   `stock_quantity` (Integer)
 *   `category` (Text)
-*   `image_url` (Text)
-*   `is_active` (Boolean) - For soft deleting/hiding products
+*   `image_url` (Text) - Main display image
+*   `images` (Text[]) - Support for multiple gallery images
+*   `is_active` (Boolean) - For soft deleting/hiding products (Default: true)
 *   `created_at` (Timestamp)
 
 #### 3. `orders`
@@ -89,7 +90,7 @@
     *   `profiles`: SELECT/UPDATE own profile.
 4.  **Admin Access**:
     *   `products`: Full CRUD permissions.
-    *   `orders`: Full CRU permissions (Admins manage statuses).
+    *   `orders`: Full CRUD permissions (Admins manage statuses and deletion).
     *   `profiles`: Read access for user/customer management list.
 
 ### Application Flow

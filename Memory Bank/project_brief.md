@@ -18,7 +18,7 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 ### Core Features
 - **Homepage**: Hero banner, featured collections, and promotional highlights.
 - **Product Catalog**: Grid view with filtering options (Frame Style, Lens Color, Price, Brand).
-- **Product Details Page**: High-resolution image gallery, detailed descriptions, specifications, and "Add to Cart" functionality.
+- **Product Details Page**: High-resolution interactive image gallery with thumbnail support, detailed descriptions, specifications, and "Add to Cart" functionality.
 - **Shopping Cart**: Review selected items, adjust quantities.
 - **Checkout Flow**: Guest/User checkout, shipping information, and payment integration (Support for **bKash** and **Cash on Delivery**).
 - **User Portal**:
@@ -27,10 +27,10 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 - **Admin Panel (WordPress-like)**:
     - Secure Login for Admins.
     - **Dashboard**: Overview of orders, customers, and system status with live stats.
-    - **Product Management**: CRUD operations (Create, Read, Update, Delete) for products.
-    - **Order Management**: Monitor sales and update order statuses.
+    - **Product Management**: Full CRUD operations + Advanced Multi-Image Upload and Gallery management.
+    - **Order Management**: Monitor sales, update statuses, and administrative deletion.
     - **Customer Management**: View registered user list and roles.
-    - **Inventory Control**: Manage stock levels and active status.
+    - **Inventory Control**: Manage stock levels and dynamic "Active/Inactive" visibility toggle.
     - **Database Visibility**: Access to schemas and tables for debugging.
 
 ## 5. Non-Functional Requirements
