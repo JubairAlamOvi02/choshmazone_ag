@@ -1,5 +1,5 @@
 import React from 'react';
-import { Facebook, Instagram, Twitter } from 'lucide-react';
+import { Facebook, Instagram, Music2 as Tiktok } from 'lucide-react';
 import './Footer.css';
 
 const Footer = () => {
@@ -15,9 +15,9 @@ const Footer = () => {
                             Designed for style, engineered for performance.
                         </p>
                         <div className="social-icons">
-                            <a href="#" aria-label="Instagram"><Instagram size={20} /></a>
-                            <a href="#" aria-label="Facebook"><Facebook size={20} /></a>
-                            <a href="#" aria-label="Twitter"><Twitter size={20} /></a>
+                            <a href="https://www.instagram.com/choshmazone" aria-label="Instagram"><Instagram size={20} /></a>
+                            <a href="https://www.facebook.com/profile.php?id=100066797659136" aria-label="Facebook"><Facebook size={20} /></a>
+                            <a href="https://www.tiktok.com/@choshma.zone?_t=ZS-93COQHamGZd" aria-label="TikTok"><Tiktok size={20} /></a>
                         </div>
                     </div>
 
