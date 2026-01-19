@@ -11,6 +11,7 @@ const ProductDetails = () => {
     const { id } = useParams();
     const { addToCart } = useCart();
     const [product, setProduct] = useState(null);
+    const [mainImage, setMainImage] = useState('');
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -19,11 +20,14 @@ const ProductDetails = () => {
                 setLoading(true);
                 const data = await productParams.fetchById(id);
                 // Map fields to match component expectations
-                setProduct({
+                const formattedProduct = {
                     ...data,
                     title: data.name,
-                    image: data.image_url
-                });
+                    image: data.image_url,
+                    images: data.images && data.images.length > 0 ? data.images : [data.image_url]
+                };
+                setProduct(formattedProduct);
+                setMainImage(formattedProduct.image);
             } catch (error) {
                 console.error("Error fetching product details:", error);
             } finally {
@@ -63,16 +67,21 @@ const ProductDetails = () => {
                     {/* Left: Image Gallery */}
                     <div className="pdp-gallery">
                         <div className="main-image-container">
-                            <img src={product.image} alt={product.title} className="pdp-main-image" />
+                            <img src={mainImage} alt={product.title} className="pdp-main-image" />
                         </div>
-                        <div className="thumbnail-grid">
-                            {/* Placeholder thumbnails (reusing main image for demo) */}
-                            {[1, 2, 3].map((_, index) => (
-                                <div key={index} className="thumbnail-container">
-                                    <img src={product.image} alt="Thumbnail" className="thumbnail-image" />
-                                </div>
-                            ))}
-                        </div>
+                        {product.images.length > 1 && (
+                            <div className="thumbnail-grid">
+                                {product.images.map((img, index) => (
+                                    <div
+                                        key={index}
+                                        className={`thumbnail-container ${mainImage === img ? 'active' : ''}`}
+                                        onClick={() => setMainImage(img)}
+                                    >
+                                        <img src={img} alt={`Thumbnail ${index + 1}`} className="thumbnail-image" />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Right: Product Info */}

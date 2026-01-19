@@ -35,7 +35,8 @@ const Shop = () => {
             const formattedData = data.map(p => ({
                 ...p,
                 title: p.name,
-                image: p.image_url
+                image: p.image_url,
+                images: p.images || []
             }));
             setProducts(formattedData);
             setFilteredProducts(formattedData);

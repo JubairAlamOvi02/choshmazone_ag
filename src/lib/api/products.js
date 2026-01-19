@@ -76,5 +76,11 @@ export const productParams = {
             .getPublicUrl(fileName);
 
         return publicUrl;
+    },
+
+    // Upload multiple images to Storage
+    uploadImages: async (files) => {
+        const uploadPromises = files.map(file => productParams.uploadImage(file));
+        return Promise.all(uploadPromises);
     }
 };

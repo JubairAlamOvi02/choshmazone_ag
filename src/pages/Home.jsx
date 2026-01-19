@@ -20,7 +20,8 @@ const Home = () => {
                 const formattedData = data.slice(0, 4).map(p => ({
                     ...p,
                     title: p.name,
-                    image: p.image_url
+                    image: p.image_url,
+                    images: p.images || []
                 }));
                 setNewArrivals(formattedData);
             } catch (error) {

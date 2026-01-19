@@ -33,7 +33,8 @@ create table public.products (
   price numeric(10,2) not null,
   stock_quantity integer default 0,
   category text,
-  image_url text, -- URL from Supabase Storage
+  image_url text, -- Primary display image
+  images text[], -- Array of additional images (including primary)
   is_active boolean default true,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );

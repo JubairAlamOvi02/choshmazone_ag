@@ -46,7 +46,8 @@
     padding: var(--spacing-xs);
 }
 
-.thumbnail-container:hover {
+.thumbnail-container:hover,
+.thumbnail-container.active {
     border-color: var(--color-primary);
 }
 

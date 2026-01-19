@@ -5,7 +5,8 @@ import { useCart } from '../context/CartContext';
 import './ProductCard.css';
 
 const ProductCard = ({ product }) => {
-    const { id, title, price, category, image } = product;
+    const { id, title, price, category, image, images } = product;
+    const hoverImage = images && images.length > 1 ? images[1] : null;
     const { addToCart } = useCart();
 
     const handleAddToCart = (e) => {
@@ -18,7 +19,8 @@ const ProductCard = ({ product }) => {
         <div className="product-card">
             <Link to={`/product/${id}`} className="product-card-link">
                 <div className="product-image-container">
-                    <img src={image} alt={title} className="product-image" />
+                    <img src={image} alt={title} className="product-image primary" />
+                    {hoverImage && <img src={hoverImage} alt={title} className="product-image secondary" />}
                     <div className="product-overlay">
                         <button className="add-to-cart-btn" onClick={handleAddToCart}>
                             <ShoppingBag size={20} />
