@@ -18,7 +18,7 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-border py-3 md:py-4">
+        <nav className="sticky top-0 z-50 bg-white/50 backdrop-blur-md border-b border-border py-3 md:py-4">
             <div className="container mx-auto flex items-center justify-between gap-2 px-4">
                 {/* Mobile Menu Button */}
                 <button

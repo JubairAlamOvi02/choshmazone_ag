@@ -53,12 +53,16 @@ export const CartProvider = ({ children }) => {
     const addToCart = useCallback((product) => {
         setCartItems(prevItems => {
             const existingItem = prevItems.find(item => item.id === product.id);
+            const quantityToAdd = product.quantity || 1;
+
             if (existingItem) {
                 return prevItems.map(item =>
-                    item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+                    item.id === product.id
+                        ? { ...item, quantity: item.quantity + quantityToAdd }
+                        : item
                 );
             }
-            return [...prevItems, { ...product, quantity: 1 }];
+            return [...prevItems, { ...product, quantity: quantityToAdd }];
         });
 
         // Wrap UI state update in transition to improve INP/responsiveness
