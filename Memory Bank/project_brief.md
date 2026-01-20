@@ -20,7 +20,7 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 - **Product Catalog**: Advanced Grid view with "Premium Tag" filtering (Frame Style, Category, Price) and dynamic active filter chips for effortless navigation.
 - **Product Details Page**: High-resolution interactive image gallery with thumbnail support, detailed descriptions, specifications, and "Add to Cart" functionality.
 - **Shopping Cart**: Review selected items, adjust quantities.
-- **Checkout Flow**: Guest/User checkout, shipping information, and payment integration (Support for **bKash** and **Cash on Delivery**).
+- **Checkout Flow**: Guest/User checkout, shipping information with district-based delivery charges (৳60 for Dhaka, ৳120 for other districts), and payment integration (Support for **bKash** and **Cash on Delivery**).
 - **User Portal**:
     - Registration and Login system.
     - View Order History and Profile.

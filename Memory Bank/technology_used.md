@@ -46,3 +46,4 @@ The application utilizes a **Mobile-First Responsive Strategy**:
 - **Glassmorphism Navigation**: Semi-transparent navbar (50% opacity) with backdrop blur for a modern, layered visual effect.
 - **Enhanced Product Details**: Premium PDP featuring breadcrumbs, quantity selectors, star ratings, collapsible information sections, trust badges, and interactive image galleries with zoom indicators.
 - **Premium CTAs**: Redesigned action buttons with icons, shadow effects, and smooth hover transitions for improved conversion rates.
+- **Smart Delivery System**: District-based delivery charge calculation with dependent location dropdowns (District → Thana) for accurate shipping costs across Bangladesh.

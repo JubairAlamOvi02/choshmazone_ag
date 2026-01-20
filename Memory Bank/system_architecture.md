@@ -61,7 +61,7 @@
 *   `status` (Text) - 'pending', 'processing', 'shipped', 'completed', 'cancelled'
 *   `total_amount` (Numeric)
 *   `payment_method` (Text) - 'bkash' | 'cod'
-*   `shipping_address` (JSONB) - Snapshot of details (name, email, phone, city, address, zip)
+*   `shipping_address` (JSONB) - Snapshot of details (first_name, last_name, email, phone, address, district, thana, city, zip, country)
 *   `payment_details` (JSONB) - Snapshot for bKash (number, trx_id) or empty for COD.
 *   `created_at` (Timestamp)
 

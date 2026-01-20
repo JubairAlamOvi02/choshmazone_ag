@@ -102,5 +102,12 @@
     - [x] Cart now correctly adds the selected quantity instead of always defaulting to 1 item.
 - [x] **Navigation UI Update**:
     - [x] Updated navbar to 50% transparency with backdrop blur for modern glassmorphism effect.
+- [x] **District-Based Delivery Charge System**:
+    - [x] Created comprehensive Bangladesh locations data file with 25+ districts and their thanas.
+    - [x] Added District and Thana dropdown fields to checkout form with dependent logic.
+    - [x] Implemented dynamic delivery charge calculation (৳60 for Dhaka, ৳120 for other districts).
+    - [x] Updated order summary to display delivery charge with district name in real-time.
+    - [x] Modified Supabase and Google Sheets order submissions to include district, thana, and delivery charge.
+    - [x] Enhanced bKash payment instruction to show total amount including delivery charge.
 
 **Current Status**: All primary integration and functional requirements for both Admin and Customer portals are **COMPLETED**. The system is fully operational with real-time Supabase synchronization.

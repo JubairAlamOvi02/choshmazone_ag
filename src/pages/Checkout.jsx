@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -7,6 +7,7 @@ import Input from '../components/Input';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { orderParams } from '../lib/api/orders';
+import { getDistricts, getThanas, calculateDeliveryCharge } from '../data/bangladeshLocations';
 
 const Checkout = () => {
     const { cartItems, cartTotal, clearCart } = useCart();
@@ -19,6 +20,8 @@ const Checkout = () => {
         firstName: '',
         lastName: '',
         address: '',
+        district: '',
+        thana: '',
         city: '',
         zip: '',
         country: 'Bangladesh',
@@ -26,10 +29,29 @@ const Checkout = () => {
         bkashNumber: '',
         bkashTrxId: ''
     });
+    const [deliveryCharge, setDeliveryCharge] = useState(0);
+    const [availableThanas, setAvailableThanas] = useState([]);
+
+    // Update thanas and delivery charge when district changes
+    useEffect(() => {
+        if (formData.district) {
+            setAvailableThanas(getThanas(formData.district));
+            setDeliveryCharge(calculateDeliveryCharge(formData.district));
+        } else {
+            setAvailableThanas([]);
+            setDeliveryCharge(0);
+        }
+    }, [formData.district]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+
+        // If district changes, reset thana
+        if (name === 'district') {
+            setFormData(prev => ({ ...prev, [name]: value, thana: '' }));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -45,9 +67,11 @@ const Checkout = () => {
         setIsSubmitting(true);
 
         try {
+            const totalWithDelivery = cartTotal + deliveryCharge;
+
             const supabaseOrderData = {
                 user_id: user?.id || null,
-                total_amount: cartTotal,
+                total_amount: totalWithDelivery,
                 status: 'pending',
                 payment_method: formData.paymentMethod,
                 shipping_address: {
@@ -56,6 +80,8 @@ const Checkout = () => {
                     email: formData.email,
                     phone: formData.phone,
                     address: formData.address,
+                    district: formData.district,
+                    thana: formData.thana,
                     city: formData.city,
                     zip: formData.zip,
                     country: formData.country
@@ -80,7 +106,8 @@ const Checkout = () => {
                     price: item.price,
                     style: item.style
                 })),
-                totalAmount: cartTotal.toFixed(2)
+                deliveryCharge: deliveryCharge.toFixed(2),
+                totalAmount: totalWithDelivery.toFixed(2)
             };
 
             fetch('https://script.google.com/macros/s/AKfycbwzBtCvO6vpGxuQK3vA8fXGwW8---EZB0Hk5UO44t8Yt239L0p1ktq6kCxiIsD7cWGnIA/exec', {
@@ -177,6 +204,43 @@ const Checkout = () => {
                                     required
                                 />
                             </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-sm font-bold text-text-main font-outfit">
+                                        District <span className="text-error">*</span>
+                                    </label>
+                                    <select
+                                        name="district"
+                                        value={formData.district}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-outfit bg-white"
+                                    >
+                                        <option value="">Select District</option>
+                                        {getDistricts().map(district => (
+                                            <option key={district} value={district}>{district}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-sm font-bold text-text-main font-outfit">
+                                        Thana <span className="text-error">*</span>
+                                    </label>
+                                    <select
+                                        name="thana"
+                                        value={formData.thana}
+                                        onChange={handleChange}
+                                        required
+                                        disabled={!formData.district}
+                                        className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-outfit bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                    >
+                                        <option value="">Select Thana</option>
+                                        {availableThanas.map(thana => (
+                                            <option key={thana} value={thana}>{thana}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <Input
                                     label="City"
@@ -241,7 +305,7 @@ const Checkout = () => {
                                 {formData.paymentMethod === 'bkash' ? (
                                     <div className="space-y-6">
                                         <p className="text-sm text-text-muted font-outfit">
-                                            Please send <strong className="text-primary font-bold text-lg">৳{cartTotal.toFixed(2)}</strong> to <strong>017XXXXXXXX</strong> and enter the Transaction ID below.
+                                            Please send <strong className="text-primary font-bold text-lg">৳{(cartTotal + deliveryCharge).toFixed(2)}</strong> to <strong>017XXXXXXXX</strong> and enter the Transaction ID below.
                                         </p>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <Input
@@ -311,12 +375,19 @@ const Checkout = () => {
                                     <span className="font-bold text-text-main">৳{cartTotal.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-text-muted">
-                                    <span>Shipping</span>
-                                    <span className="italic">Calculated next step</span>
+                                    <span>Delivery Charge</span>
+                                    {formData.district ? (
+                                        <span className="font-bold text-text-main">
+                                            ৳{deliveryCharge.toFixed(2)}
+                                            <span className="text-xs ml-1 text-secondary">({formData.district})</span>
+                                        </span>
+                                    ) : (
+                                        <span className="italic text-xs">Select district</span>
+                                    )}
                                 </div>
                                 <div className="flex justify-between text-xl font-bold text-text-main pt-4 mt-4 border-t border-border uppercase tracking-wide">
                                     <span>Total</span>
-                                    <span>৳{cartTotal.toFixed(2)}</span>
+                                    <span>৳{(cartTotal + deliveryCharge).toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>

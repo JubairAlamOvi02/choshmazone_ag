@@ -54,3 +54,10 @@
   - Updated addToCart function to respect the quantity parameter instead of always adding 1 item.
 - Task 26 (Navigation Enhancement): Completed
   - Updated navbar to 50% transparency with backdrop blur for a modern glassmorphism effect.
+- Task 27 (District-Based Delivery Charges): Completed
+  - Added District and Thana dropdown fields to checkout form.
+  - Implemented dependent dropdown logic (Thana options update based on selected District).
+  - Integrated dynamic delivery charge calculation (৳60 for Dhaka, ৳120 for other districts).
+  - Updated order summary to display delivery charge with district name.
+  - Modified total calculation to include delivery charge in both Supabase and Google Sheets submissions.
+  - Created comprehensive Bangladesh locations data file with all districts and their respective thanas.

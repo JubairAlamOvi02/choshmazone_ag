@@ -133,3 +133,23 @@
   - [x] Cart now correctly adds the selected quantity instead of always adding 1
 - [x] **Navigation Enhancement (Task Id: 514)**:
   - [x] Updated navbar to 50% transparency with backdrop blur for glassmorphism effect
+
+## Phase 11: District-Based Delivery System
+- [x] **Location Data Structure (Task Id: 515)**:
+  - [x] Created comprehensive Bangladesh locations data file
+  - [x] Included all major districts with their respective thanas
+  - [x] Implemented helper functions for district/thana retrieval
+- [x] **Checkout Form Enhancement (Task Id: 516)**:
+  - [x] Added District dropdown with all Bangladesh districts
+  - [x] Implemented dependent Thana dropdown (updates based on selected district)
+  - [x] Added proper validation and disabled states
+- [x] **Dynamic Delivery Charge (Task Id: 517)**:
+  - [x] Implemented district-based delivery charge calculation
+  - [x] Dhaka district: ৳60 delivery charge
+  - [x] All other districts: ৳120 delivery charge
+  - [x] Real-time charge updates when district changes
+- [x] **Order Processing Update (Task Id: 518)**:
+  - [x] Updated Supabase order submission to include district and thana
+  - [x] Modified Google Sheets integration to include delivery charge
+  - [x] Updated total calculation to include delivery charge
+  - [x] Enhanced order summary UI to show delivery charge with district name
