@@ -134,16 +134,28 @@
 @media (max-width: 992px) {
     .checkout-layout {
         grid-template-columns: 1fr;
-        grid-template-rows: auto auto;
-        /* Summary first on mobile? Usually better form first, but varies */
         gap: var(--spacing-xl);
     }
 
     .checkout-summary {
         position: static;
         order: -1;
-        /* Show summary at top on mobile usually safer or bottom */
-        margin-bottom: var(--spacing-xl);
+        padding: var(--spacing-lg);
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .checkout-actions {
+        flex-direction: column-reverse;
+        gap: var(--spacing-md);
+    }
+
+    .checkout-actions button,
+    .checkout-actions a {
+        width: 100%;
     }
 }
 

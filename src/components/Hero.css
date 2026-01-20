@@ -40,7 +40,28 @@
 }
 
 @media (max-width: 768px) {
+    .hero {
+        height: 60vh;
+        min-height: 400px;
+    }
+
+    .hero-overlay {
+        background: rgba(0, 0, 0, 0.4);
+        justify-content: center;
+        text-align: center;
+    }
+
+    .hero-content {
+        max-width: 100%;
+        padding: 0 var(--spacing-md);
+    }
+
     .hero-title {
-        font-size: var(--font-size-3xl);
+        font-size: var(--font-size-2xl);
+    }
+
+    .hero-subtitle {
+        font-size: var(--font-size-base);
+        margin-bottom: var(--spacing-lg);
     }
 }

@@ -37,7 +37,7 @@ const AdminCustomers = () => {
             <h1>Customers</h1>
             <p>Manage registered users and their roles.</p>
 
-            <div style={{ background: 'white', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', overflow: 'hidden', marginTop: '2rem' }}>
+            <div style={{ background: 'white', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', overflowX: 'auto', marginTop: '2rem' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead style={{ background: '#f8f9fa', borderBottom: '1px solid #eee' }}>
                         <tr>

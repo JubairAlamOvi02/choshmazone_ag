@@ -3,20 +3,27 @@
 
 :root {
   /* Color Palette - Modern Luxury */
-  --color-primary: #0a0a0a;       /* Rich Black */
-  --color-secondary: #d4af37;     /* Gold/Bronze */
-  --color-background: #f9f9f9;    /* Off-white/Cream */
-  --color-surface: #ffffff;       /* Pure White */
-  --color-text-main: #333333;     /* Dark Charcoal */
-  --color-text-muted: #666666;    /* Medium Gray */
-  --color-border: #e0e0e0;        /* Light Gray */
+  --color-primary: #0a0a0a;
+  /* Rich Black */
+  --color-secondary: #d4af37;
+  /* Gold/Bronze */
+  --color-background: #f9f9f9;
+  /* Off-white/Cream */
+  --color-surface: #ffffff;
+  /* Pure White */
+  --color-text-main: #333333;
+  /* Dark Charcoal */
+  --color-text-muted: #666666;
+  /* Medium Gray */
+  --color-border: #e0e0e0;
+  /* Light Gray */
 
   --color-success: #2e7d32;
   --color-error: #d32f2f;
 
   /* Typography */
   --font-family-main: 'Outfit', sans-serif;
-  
+
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -52,10 +59,17 @@
   /* Transitions */
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
+
+  /* Elevation */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* Reset & Base Styles */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -70,12 +84,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-img, picture, video, canvas, svg {
+img,
+picture,
+video,
+canvas,
+svg {
   display: block;
   max-width: 100%;
 }
 
-input, button, textarea, select {
+input,
+button,
+textarea,
+select {
   font: inherit;
 }
 
@@ -90,7 +111,8 @@ a {
   text-decoration: none;
 }
 
-ul, ol {
+ul,
+ol {
   list-style: none;
 }
 
@@ -100,8 +122,15 @@ ul, ol {
   max-width: var(--container-width-lg);
   margin-left: auto;
   margin-right: auto;
-  padding-left: var(--spacing-md);
-  padding-right: var(--spacing-md);
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+  }
 }
 
 .flex-center {
@@ -116,27 +145,81 @@ ul, ol {
   justify-content: space-between;
 }
 
-.text-primary { color: var(--color-primary); }
-.text-secondary { color: var(--color-secondary); }
-.bg-primary { background-color: var(--color-primary); color: var(--color-surface); }
-.bg-secondary { background-color: var(--color-secondary); color: var(--color-primary); }
+.text-primary {
+  color: var(--color-primary);
+}
+
+.text-secondary {
+  color: var(--color-secondary);
+}
+
+.bg-primary {
+  background-color: var(--color-primary);
+  color: var(--color-surface);
+}
+
+.bg-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-primary);
+}
 
 /* Typography Utilities */
-.h1 { font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); line-height: 1.1; }
-.h2 { font-size: var(--font-size-3xl); font-weight: var(--font-weight-semibold); line-height: 1.2; }
-.h3 { font-size: var(--font-size-2xl); font-weight: var(--font-weight-medium); line-height: 1.3; }
+.h1 {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+}
+
+.h2 {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+}
+
+.h3 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.3;
+}
+
+@media (max-width: 768px) {
+  .h1 {
+    font-size: var(--font-size-3xl);
+  }
+
+  .h2 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .h3 {
+    font-size: var(--font-size-xl);
+  }
+}
+
+.section-padding {
+  padding: var(--spacing-3xl) 0;
+}
+
+@media (max-width: 768px) {
+  .section-padding {
+    padding: var(--spacing-2xl) 0;
+  }
+}
 
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--color-background);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--color-text-muted);
   border-radius: var(--radius-full);
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-text-main);
 }

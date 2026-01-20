@@ -78,3 +78,21 @@
     align-self: flex-start;
     padding-bottom: 2px;
 }
+
+@media (max-width: 768px) {
+    .collections-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .collection-card {
+        height: 250px;
+    }
+
+    .collection-overlay {
+        padding: var(--spacing-lg);
+    }
+
+    .collection-title {
+        font-size: var(--font-size-xl);
+    }
+}

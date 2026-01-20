@@ -107,10 +107,30 @@
     .pdp-layout {
         grid-template-columns: 1fr;
         gap: var(--spacing-xl);
+        margin-top: 0;
+    }
+
+    .pdp-info {
+        padding-top: 0;
     }
 
     .pdp-title {
-        font-size: var(--font-size-3xl);
+        font-size: var(--font-size-2xl);
+    }
+
+    .pdp-price {
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .thumbnail-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .thumbnail-grid {
+        grid-template-columns: repeat(4, 1fr);
     }
 }
 

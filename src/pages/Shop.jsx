@@ -22,6 +22,7 @@ const Shop = () => {
         maxPrice: 10000 // Increased default max price
     });
     const [sortOption, setSortOption] = useState("newest");
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     useEffect(() => {
         fetchProducts();
@@ -82,10 +83,18 @@ const Shop = () => {
             <main className="container section-padding">
                 <header className="shop-header">
                     <h1 className="h2">Shop All</h1>
-                    <SortSelect sortOption={sortOption} setSortOption={setSortOption} />
+                    <div className="shop-controls">
+                        <button
+                            className="mobile-filter-btn"
+                            onClick={() => setIsFilterOpen(!isFilterOpen)}
+                        >
+                            {isFilterOpen ? 'Hide Filters' : 'Show Filters'}
+                        </button>
+                        <SortSelect sortOption={sortOption} setSortOption={setSortOption} />
+                    </div>
                 </header>
 
-                <div className="shop-layout">
+                <div className={`shop-layout ${isFilterOpen ? 'filter-open' : ''}`}>
                     <FilterSidebar filters={filters} setFilters={setFilters} />
 
                     <div className="shop-grid">
