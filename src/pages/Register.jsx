@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import './Auth.css';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -40,7 +41,7 @@ const Register = () => {
 
             if (error) throw error;
 
-            navigate('/'); // Or to a "Please verify email" page if email confirmation is on
+            navigate('/');
         } catch (err) {
             setError(err.message || 'Failed to create account');
         } finally {
@@ -49,72 +50,105 @@ const Register = () => {
     };
 
     return (
-        <div className="auth-container">
-            <div className="auth-card">
-                <h2>Create Account</h2>
-                <p className="auth-subtitle">Join us for the best eyewear</p>
-
-                {error && <div className="auth-error">{error}</div>}
-
-                <form onSubmit={handleSubmit} className="auth-form">
-                    <div className="form-group">
-                        <label>Full Name</label>
-                        <input
-                            type="text"
-                            name="fullName"
-                            value={formData.fullName}
-                            onChange={handleChange}
-                            required
-                            placeholder="John Doe"
-                        />
+        <div className="min-h-screen bg-white flex flex-col">
+            <Navbar />
+            <main className="flex-1 flex items-center justify-center p-4 py-12 bg-gray-50">
+                <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-[520px] animate-in slide-in-from-bottom-4 duration-500 border border-border/50">
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl font-bold mb-2 text-text-main font-outfit uppercase tracking-wider">Create Account</h2>
+                        <p className="text-text-muted font-outfit">Join Choshma Zone for premium eyewear</p>
                     </div>
 
-                    <div className="form-group">
-                        <label>Email Address</label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            placeholder="john@example.com"
-                        />
+                    {error && (
+                        <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-8 text-sm text-center border border-red-100 font-outfit animate-in fade-in duration-300">
+                            {error}
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="block text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit">
+                                Full Name
+                            </label>
+                            <input
+                                type="text"
+                                name="fullName"
+                                value={formData.fullName}
+                                onChange={handleChange}
+                                required
+                                placeholder="e.g. John Doe"
+                                className="w-full px-4 py-3.5 rounded-lg border border-border focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none transition-all font-outfit text-text-main placeholder:text-text-muted/50"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="block text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit">
+                                Email Address
+                            </label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                                placeholder="john@example.com"
+                                className="w-full px-4 py-3.5 rounded-lg border border-border focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none transition-all font-outfit text-text-main placeholder:text-text-muted/50"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="block text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit">
+                                    Password
+                                </label>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="••••••••"
+                                    minLength={6}
+                                    className="w-full px-4 py-3.5 rounded-lg border border-border focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none transition-all font-outfit text-text-main placeholder:text-text-muted/50"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="block text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit">
+                                    Confirm
+                                </label>
+                                <input
+                                    type="password"
+                                    name="confirmPassword"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="••••••••"
+                                    className="w-full px-4 py-3.5 rounded-lg border border-border focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none transition-all font-outfit text-text-main placeholder:text-text-muted/50"
+                                />
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="w-full py-4 bg-primary text-white font-bold rounded-lg hover:bg-primary/95 hover:-translate-y-0.5 transition-all duration-300 font-outfit uppercase tracking-widest disabled:opacity-50 disabled:translate-y-0 shadow-lg shadow-black/10 mt-4"
+                            disabled={loading}
+                        >
+                            {loading ? 'Creating Account...' : 'Sign Up Now'}
+                        </button>
+                    </form>
+
+                    <div className="mt-10 pt-8 border-t border-border text-center">
+                        <p className="text-text-muted font-outfit">
+                            Already have an account? {' '}
+                            <Link to="/login" className="text-text-main font-bold hover:text-secondary transition-colors underline decoration-2 underline-offset-4">
+                                Sign In
+                            </Link>
+                        </p>
                     </div>
-
-                    <div className="form-group">
-                        <label>Password</label>
-                        <input
-                            type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                            placeholder="Min. 6 characters"
-                            minLength={6}
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Confirm Password</label>
-                        <input
-                            type="password"
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            required
-                            placeholder="Confirm your password"
-                        />
-                    </div>
-
-                    <button type="submit" className="auth-btn primary" disabled={loading}>
-                        {loading ? 'Creating Account...' : 'Sign Up'}
-                    </button>
-                </form>
-
-                <div className="auth-footer">
-                    Already have an account? <Link to="/login">Login</Link>
                 </div>
-            </div>
+            </main>
+            <Footer />
         </div>
     );
 };

@@ -3,22 +3,27 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import FeaturedCollections from '../components/FeaturedCollections';
-import './Shop.css'; // Reusing some shop styles
 
 const Collections = () => {
     return (
-        <div className="collections-page">
+        <div className="min-h-screen bg-white">
             <Navbar />
-            <main className="container section-padding" style={{ minHeight: '60vh' }}>
-                <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                    <h1 className="h2">Our Collections</h1>
-                    <p style={{ color: '#666', marginTop: '1rem' }}>Explore our curated range of premium eyewear.</p>
+            <main className="container mx-auto px-4 py-20 md:py-32">
+                <header className="text-center mb-16 animate-in fade-in slide-in-from-top-4 duration-700">
+                    <h1 className="text-4xl md:text-5xl font-bold font-outfit uppercase tracking-tighter text-text-main mb-4">
+                        Our Collections
+                    </h1>
+                    <p className="text-xl text-text-muted font-outfit">Explore our curated range of premium eyewear.</p>
                 </header>
 
-                <FeaturedCollections />
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+                    <FeaturedCollections />
+                </div>
 
-                <div style={{ marginTop: '4rem', textAlign: 'center' }}>
-                    <p style={{ color: '#888', fontStyle: 'italic' }}>More collections coming soon...</p>
+                <div className="mt-20 pt-12 border-t border-border text-center">
+                    <p className="text-text-muted font-outfit italic opacity-60">
+                        New styles being handcrafted as we speak. More collections coming soon...
+                    </p>
                 </div>
             </main>
             <Footer />

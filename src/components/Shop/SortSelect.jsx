@@ -2,22 +2,17 @@ import React from 'react';
 
 const SortSelect = ({ sortOption, setSortOption }) => {
     return (
-        <div className="sort-select" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <label htmlFor="sort" style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>Sort by:</label>
+        <div className="flex items-center gap-2">
+            <label htmlFor="sort" className="hidden md:block text-sm text-text-muted font-outfit whitespace-nowrap uppercase tracking-widest font-bold">
+                Sort:
+            </label>
             <select
                 id="sort"
                 value={sortOption}
                 onChange={(e) => setSortOption(e.target.value)}
-                style={{
-                    padding: '0.5rem',
-                    borderRadius: '4px',
-                    border: '1px solid var(--color-border)',
-                    backgroundColor: 'var(--color-surface)',
-                    color: 'var(--color-text-main)',
-                    cursor: 'pointer'
-                }}
+                className="p-2 md:px-4 md:py-2 rounded-sm border border-border bg-white text-text-main cursor-pointer text-sm font-outfit focus:outline-none focus:border-primary transition-colors uppercase tracking-widest"
             >
-                <option value="newest">Newest Arrivals</option>
+                <option value="newest">Newest</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
             </select>

@@ -6,7 +6,11 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
     const location = useLocation();
 
     if (loading) {
-        return <div className="loading-spinner">Loading...</div>; // Replace with proper loading component
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+        );
     }
 
     if (!user) {

@@ -35,7 +35,7 @@ const Home = () => {
     }, []);
 
     return (
-        <div className="home-page">
+        <div className="min-h-screen bg-white">
             <Navbar />
 
             <main>
@@ -43,17 +43,25 @@ const Home = () => {
 
                 <FeaturedCollections />
 
-                <section className="container section-padding" style={{ paddingBottom: 'var(--spacing-3xl)' }}>
-                    <h2 className="section-title">New Arrivals</h2>
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                        gap: 'var(--spacing-lg)'
-                    }}>
-                        {newArrivals.map(product => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
+                <section className="container mx-auto px-4 py-16 md:py-24">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl md:text-4xl font-bold relative inline-block pb-3 font-outfit uppercase tracking-wider text-text-main">
+                            New Arrivals
+                            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-1 bg-secondary"></span>
+                        </h2>
                     </div>
+
+                    {loading ? (
+                        <div className="flex justify-center py-20">
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                            {newArrivals.map(product => (
+                                <ProductCard key={product.id} product={product} />
+                            ))}
+                        </div>
+                    )}
                 </section>
 
                 <PromotionalBanner />

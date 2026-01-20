@@ -26,7 +26,7 @@ import AdminProductNew from './pages/admin/ProductNew';
 import ProductForm from './pages/admin/ProductForm';
 import AdminOrders from './pages/admin/Orders';
 import AdminCustomers from './pages/admin/Customers';
-import './App.css';
+// import './App.css'; 
 
 function App() {
   return (

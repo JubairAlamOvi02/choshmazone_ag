@@ -39,6 +39,6 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 - **Accessibility**: adherence to basic web accessibility standards (WCAG).
 
 ## 6. Chosen Tech Stack
-- **Frontend**: React (Vite), Lucide Icons, Vanilla CSS.
+- **Frontend**: React (Vite), Lucide Icons, Tailwind CSS v4.
 - **Backend/Data**: **Supabase** (PostgreSQL, Auth, Storage).
 - **Redundancy**: Google Sheets Integration for order backups.

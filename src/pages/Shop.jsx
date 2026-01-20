@@ -5,9 +5,7 @@ import FilterSidebar from '../components/Shop/FilterSidebar';
 import SortSelect from '../components/Shop/SortSelect';
 import ProductCard from '../components/ProductCard';
 import { productParams } from '../lib/api/products';
-// import { products } from '../data/products'; // Removed static data
 import { useLocation } from 'react-router-dom';
-import './Shop.css';
 
 const Shop = () => {
     const location = useLocation();
@@ -19,7 +17,7 @@ const Shop = () => {
     const [filters, setFilters] = useState({
         category: initialCategory,
         style: "All",
-        maxPrice: 10000 // Increased default max price
+        maxPrice: 10000
     });
     const [sortOption, setSortOption] = useState("newest");
     const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -31,8 +29,6 @@ const Shop = () => {
     const fetchProducts = async () => {
         try {
             const data = await productParams.fetchAll(true);
-            // Transform Supabase data to match component expectation if needed
-            // e.g. map 'name' to 'title', 'image_url' to 'image'
             const formattedData = data.map(p => ({
                 ...p,
                 title: p.name,
@@ -51,20 +47,16 @@ const Shop = () => {
     useEffect(() => {
         let result = [...products];
 
-        // Filter by Category
         if (filters.category !== "All") {
             result = result.filter(product => product.category === filters.category);
         }
 
-        // Filter by Style
         if (filters.style !== "All") {
             result = result.filter(product => product.style === filters.style);
         }
 
-        // Filter by Price
         result = result.filter(product => product.price <= filters.maxPrice);
 
-        // Sorting
         if (sortOption === "price-low") {
             result.sort((a, b) => a.price - b.price);
         } else if (sortOption === "price-high") {
@@ -77,15 +69,17 @@ const Shop = () => {
     }, [filters, sortOption, products]);
 
     return (
-        <div className="shop-page">
+        <div className="min-h-screen bg-white">
             <Navbar />
 
-            <main className="container section-padding">
-                <header className="shop-header">
-                    <h1 className="h2">Shop All</h1>
-                    <div className="shop-controls">
+            <main className="container mx-auto px-4 py-8 md:py-12">
+                <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-4 border-b border-border gap-4">
+                    <h1 className="text-2xl md:text-3xl font-bold font-outfit text-text-main uppercase tracking-wider">
+                        Shop All
+                    </h1>
+                    <div className="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto">
                         <button
-                            className="mobile-filter-btn"
+                            className="lg:hidden px-4 py-2 border border-border bg-white rounded-sm text-sm font-medium hover:bg-background-alt transition-colors font-outfit"
                             onClick={() => setIsFilterOpen(!isFilterOpen)}
                         >
                             {isFilterOpen ? 'Hide Filters' : 'Show Filters'}
@@ -94,18 +88,24 @@ const Shop = () => {
                     </div>
                 </header>
 
-                <div className={`shop-layout ${isFilterOpen ? 'filter-open' : ''}`}>
-                    <FilterSidebar filters={filters} setFilters={setFilters} />
+                <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-8 md:gap-12">
+                    <div className={`${isFilterOpen ? 'block' : 'hidden'} lg:block transition-all duration-300`}>
+                        <FilterSidebar filters={filters} setFilters={setFilters} />
+                    </div>
 
-                    <div className="shop-grid">
-                        {filteredProducts.length > 0 ? (
-                            <div className="products-grid">
+                    <div className="flex-1">
+                        {loading ? (
+                            <div className="flex justify-center py-20">
+                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                            </div>
+                        ) : filteredProducts.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
                                 {filteredProducts.map(product => (
                                     <ProductCard key={product.id} product={product} />
                                 ))}
                             </div>
                         ) : (
-                            <div className="no-results">
+                            <div className="text-center py-20 text-text-muted text-lg font-outfit">
                                 <p>No products found matching your criteria.</p>
                             </div>
                         )}

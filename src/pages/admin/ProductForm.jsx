@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { productParams } from '../../lib/api/products';
+import { ChevronLeft, Upload, X, Plus, Package, DollarSign, Layers, Tag, Eye } from 'lucide-react';
 
 const ProductForm = () => {
-    const { id } = useParams(); // Check if we are in "Edit" mode
+    const { id } = useParams();
     const navigate = useNavigate();
     const isEditMode = !!id;
 
@@ -84,20 +85,15 @@ const ProductForm = () => {
             let imageUrl = formData.image_url;
             let allImages = [...formData.images];
 
-            // Upload main image if selected
             if (imageFile) {
                 imageUrl = await productParams.uploadImage(imageFile);
-                // The main image should also be the first in the 'images' array
-                // If it's a new main image, we might want to update the array too
             }
 
-            // Upload additional images
             if (additionalFiles.length > 0) {
                 const newImageUrls = await productParams.uploadImages(additionalFiles);
                 allImages = [...allImages, ...newImageUrls];
             }
 
-            // Ensure main image is included in 'allImages' if not already there
             if (imageUrl && !allImages.includes(imageUrl)) {
                 allImages = [imageUrl, ...allImages];
             }
@@ -128,157 +124,226 @@ const ProductForm = () => {
         }
     };
 
-    if (loading && isEditMode && !formData.name) return <div>Loading...</div>;
+    if (loading && isEditMode && !formData.name) {
+        return (
+            <div className="flex items-center justify-center min-vh-[400px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
 
     return (
-        <div className="admin-product-form">
-            <h1>{isEditMode ? 'Edit Product' : 'Add New Product'}</h1>
-            {error && <div className="error-message" style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
-
-            <form onSubmit={handleSubmit} style={{ background: 'white', padding: '2rem', borderRadius: '8px', maxWidth: '600px', marginTop: '1rem' }}>
-                <div style={{ marginBottom: '1rem' }}>
-                    <label style={{ display: 'block', marginBottom: '0.5rem' }}>Product Name</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                        required
-                    />
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-4xl">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => navigate('/admin/products')}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-text-muted"
+                    >
+                        <ChevronLeft size={24} />
+                    </button>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Price (৳)</label>
-                        <input
-                            type="number"
-                            name="price"
-                            value={formData.price}
-                            onChange={handleChange}
-                            style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Stock Quantity</label>
-                        <input
-                            type="number"
-                            name="stock_quantity"
-                            value={formData.stock_quantity}
-                            onChange={handleChange}
-                            style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                            required
-                        />
+                        <h1 className="text-3xl font-bold text-text-main font-outfit uppercase tracking-tight">
+                            {isEditMode ? 'Modify Product' : 'Add New Style'}
+                        </h1>
+                        <p className="text-text-muted font-outfit">Detailed information about your inventory item.</p>
                     </div>
                 </div>
+            </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Category</label>
-                        <select
-                            name="category"
-                            value={formData.category}
-                            onChange={handleChange}
-                            style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                        >
-                            <option value="">Select Category</option>
-                            <option value="Men">Men</option>
-                            <option value="Women">Women</option>
-                            <option value="Unisex">Unisex</option>
-                            <option value="Kids">Kids</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Style</label>
-                        <select
-                            name="style"
-                            value={formData.style}
-                            onChange={handleChange}
-                            style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                        >
-                            <option value="">Select Style</option>
-                            <option value="Wayfarer">Wayfarer</option>
-                            <option value="Aviator">Aviator</option>
-                            <option value="Clubmaster">Clubmaster</option>
-                            <option value="Round">Round</option>
-                            <option value="Square">Square</option>
-                            <option value="oversized">Oversized</option>
-                            <option value="Cat Eye">Cat Eye</option>
-                            <option value="Sport">Sport</option>
-                            <option value="Shield">Shield</option>
-                        </select>
-                    </div>
+            {error && (
+                <div className="bg-red-50 border border-red-100 text-red-600 p-4 rounded-xl mb-8 font-outfit text-sm animate-in zoom-in duration-300">
+                    {error}
                 </div>
+            )}
 
-                <div style={{ marginBottom: '1rem' }}>
-                    <label style={{ display: 'block', marginBottom: '0.5rem' }}>Description</label>
-                    <textarea
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px', minHeight: '100px' }}
-                    />
-                </div>
+            <form onSubmit={handleSubmit} className="space-y-8 pb-20">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Left: Product Info */}
+                    <div className="lg:col-span-2 space-y-8">
+                        <section className="bg-white p-8 rounded-3xl border border-border/50 shadow-sm space-y-6">
+                            <h3 className="text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit border-b border-border/50 pb-4 mb-6">General Information</h3>
 
-                <div style={{ marginBottom: '1rem' }}>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Main Display Image (Required)</label>
-                    {formData.image_url && (
-                        <div style={{ marginBottom: '0.5rem' }}>
-                            <img src={formData.image_url} alt="Current" style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '4px' }} />
-                        </div>
-                    )}
-                    <input type="file" onChange={handleImageChange} accept="image/*" />
-                </div>
+                            <div className="space-y-2">
+                                <label className="flex items-center gap-2 text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                    <Tag size={12} />
+                                    Display Name
+                                </label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="e.g. Classic Wayfarer Onyx"
+                                    className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit font-bold"
+                                />
+                            </div>
 
-                <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Additional Images (Optional Gallery)</label>
+                            <div className="space-y-2">
+                                <label className="flex items-center gap-2 text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                    Description
+                                </label>
+                                <textarea
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                    rows={5}
+                                    placeholder="Tell the story behind this product..."
+                                    className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                />
+                            </div>
 
-                    {/* Existing Images from DB */}
-                    {(formData.images && formData.images.length > 0) && (
-                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-                            {formData.images.map((url, idx) => (
-                                <div key={idx} style={{ position: 'relative' }}>
-                                    <img src={url} alt={`Gallery ${idx}`} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', border: url === formData.image_url ? '2px solid #333' : '1px solid #ddd' }} />
-                                    <button
-                                        type="button"
-                                        onClick={() => removeExistingImage(url)}
-                                        style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'red', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', fontSize: '12px', cursor: 'pointer' }}
-                                    >×</button>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-2 text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                        <Package size={12} />
+                                        Collection
+                                    </label>
+                                    <select
+                                        name="category"
+                                        value={formData.category}
+                                        onChange={handleChange}
+                                        className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit font-bold"
+                                    >
+                                        <option value="">Select Category</option>
+                                        <option value="Men">Men</option>
+                                        <option value="Women">Women</option>
+                                        <option value="Unisex">Unisex</option>
+                                        <option value="Kids">Kids</option>
+                                    </select>
                                 </div>
-                            ))}
-                        </div>
-                    )}
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-2 text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                        <Layers size={12} />
+                                        Frame Style
+                                    </label>
+                                    <select
+                                        name="style"
+                                        value={formData.style}
+                                        onChange={handleChange}
+                                        className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit font-bold"
+                                    >
+                                        <option value="">Select Style</option>
+                                        <option value="Wayfarer">Wayfarer</option>
+                                        <option value="Aviator">Aviator</option>
+                                        <option value="Clubmaster">Clubmaster</option>
+                                        <option value="Round">Round</option>
+                                        <option value="Square">Square</option>
+                                        <option value="oversized">Oversized</option>
+                                        <option value="Cat Eye">Cat Eye</option>
+                                        <option value="Sport">Sport</option>
+                                        <option value="Shield">Shield</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </section>
 
-                    {/* New Files to upload */}
-                    {additionalFiles.length > 0 && (
-                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-                            {additionalFiles.map((file, idx) => (
-                                <div key={idx} style={{ position: 'relative' }}>
-                                    <div style={{ width: '80px', height: '80px', background: '#f0f0f0', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', textAlign: 'center', overflow: 'hidden' }}>
-                                        {file.name}
+                        <section className="bg-white p-8 rounded-3xl border border-border/50 shadow-sm space-y-6">
+                            <h3 className="text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit border-b border-border/50 pb-4 mb-6">Pricing & Inventory</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-2 text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                        <DollarSign size={12} />
+                                        Retail Price (BDT)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="price"
+                                        value={formData.price}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit font-bold"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-2 text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                        <Package size={12} />
+                                        Current Stock
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="stock_quantity"
+                                        value={formData.stock_quantity}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit font-bold"
+                                    />
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    {/* Right: Media */}
+                    <div className="space-y-8">
+                        <section className="bg-white p-6 rounded-3xl border border-border/50 shadow-sm space-y-6 sticky top-8">
+                            <h3 className="text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit border-b border-border/50 pb-4 mb-6">Product Media</h3>
+
+                            <div className="space-y-4">
+                                <label className="block text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">Main Cover</label>
+                                {formData.image_url ? (
+                                    <div className="relative group rounded-3xl overflow-hidden aspect-square bg-gray-50 border border-border/50">
+                                        <img src={formData.image_url} alt="Main" className="w-full h-full object-contain mb-multiply" />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                                            <Upload className="text-white" size={32} />
+                                        </div>
                                     </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => removeAdditionalFile(idx)}
-                                        style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'red', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', fontSize: '12px', cursor: 'pointer' }}
-                                    >×</button>
+                                ) : (
+                                    <div className="aspect-square bg-gray-50 border-2 border-dashed border-border rounded-3xl flex flex-col items-center justify-center text-text-muted">
+                                        <Upload size={32} className="mb-2 opacity-20" />
+                                        <span className="text-[10px] font-bold uppercase tracking-widest">Upload Cover</span>
+                                    </div>
+                                )}
+                                <input type="file" onChange={handleImageChange} accept="image/*" className="hidden" id="main-upload" />
+                                <label htmlFor="main-upload" className="block w-full text-center py-3 border border-border rounded-xl text-xs font-bold uppercase tracking-widest font-outfit cursor-pointer hover:bg-gray-50 transition-colors">
+                                    Change Image
+                                </label>
+                            </div>
+
+                            <div className="space-y-4 pt-6 border-t border-border/50">
+                                <label className="block text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">Gallery</label>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {formData.images.filter(url => url !== formData.image_url).map((url, idx) => (
+                                        <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-border/50 bg-gray-50">
+                                            <img src={url} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeExistingImage(url)}
+                                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                                            >
+                                                <X size={10} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {additionalFiles.map((file, idx) => (
+                                        <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-dashed border-primary/50 bg-primary/5 flex items-center justify-center">
+                                            <span className="text-[8px] font-bold text-primary text-center px-1 truncate">{file.name}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeAdditionalFile(idx)}
+                                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full shadow-sm"
+                                            >
+                                                <X size={10} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <label className="aspect-square rounded-xl border-2 border-dashed border-border flex items-center justify-center text-text-muted cursor-pointer hover:bg-gray-50 transition-colors">
+                                        <Plus size={20} className="opacity-30" />
+                                        <input type="file" onChange={handleAdditionalImagesChange} accept="image/*" multiple className="hidden" />
+                                    </label>
                                 </div>
-                            ))}
-                        </div>
-                    )}
+                            </div>
 
-                    <input type="file" onChange={handleAdditionalImagesChange} accept="image/*" multiple />
-                    <p style={{ fontSize: '12px', color: '#666', marginTop: '0.25rem' }}>You can select multiple files at once.</p>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary/95 transition-all shadow-xl shadow-primary/20 font-outfit uppercase tracking-[0.2em] mt-8 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? 'Saving Changes...' : 'Publish Product'}
+                            </button>
+                        </section>
+                    </div>
                 </div>
-
-                <button
-                    type="submit"
-                    disabled={loading}
-                    style={{ padding: '0.75rem 1.5rem', background: '#333', color: 'white', border: 'none', borderRadius: '4px', cursor: loading ? 'wait' : 'pointer', opacity: loading ? 0.7 : 1 }}
-                >
-                    {loading ? 'Saving...' : 'Save Product'}
-                </button>
             </form>
         </div>
     );

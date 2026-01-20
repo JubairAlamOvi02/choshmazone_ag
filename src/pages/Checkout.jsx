@@ -7,7 +7,6 @@ import Input from '../components/Input';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { orderParams } from '../lib/api/orders';
-import './Checkout.css';
 
 const Checkout = () => {
     const { cartItems, cartTotal, clearCart } = useCart();
@@ -36,7 +35,6 @@ const Checkout = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validation
         if (formData.paymentMethod === 'bkash') {
             if (!formData.bkashNumber || !formData.bkashTrxId) {
                 alert('Please enter bKash details');
@@ -47,9 +45,8 @@ const Checkout = () => {
         setIsSubmitting(true);
 
         try {
-            // 1. Prepare Order Data for Supabase
             const supabaseOrderData = {
-                user_id: user?.id || null, // Primary key if logged in, null for guests
+                user_id: user?.id || null,
                 total_amount: cartTotal,
                 status: 'pending',
                 payment_method: formData.paymentMethod,
@@ -69,10 +66,8 @@ const Checkout = () => {
                 } : {}
             };
 
-            // 2. Save to Supabase
             await orderParams.create(supabaseOrderData, cartItems);
 
-            // 3. (Optional) Still send to Google Sheets for redundancy if you want
             const now = new Date();
             const legacyOrderData = {
                 orderId: `ORD-${Date.now()}`,
@@ -91,7 +86,7 @@ const Checkout = () => {
             fetch('https://script.google.com/macros/s/AKfycbwzBtCvO6vpGxuQK3vA8fXGwW8---EZB0Hk5UO44t8Yt239L0p1ktq6kCxiIsD7cWGnIA/exec', {
                 method: 'POST',
                 body: JSON.stringify(legacyOrderData)
-            }).catch(err => console.error("Google Sheets Sync Failed:", err)); // Don't block on this
+            }).catch(err => console.error("Google Sheets Sync Failed:", err));
 
             clearCart();
             navigate('/order-success');
@@ -103,16 +98,34 @@ const Checkout = () => {
         }
     };
 
+    if (cartItems.length === 0) {
+        return (
+            <div className="min-h-screen bg-white">
+                <Navbar />
+                <div className="container mx-auto px-4 py-20 text-center">
+                    <h2 className="text-3xl font-bold mb-4 font-outfit uppercase tracking-wider">Your cart is empty</h2>
+                    <p className="text-text-muted mb-8 font-outfit">Add some products to your cart before checking out.</p>
+                    <Link to="/shop">
+                        <Button variant="primary">Shop Collection</Button>
+                    </Link>
+                </div>
+                <Footer />
+            </div>
+        );
+    }
+
     return (
-        <div className="checkout-page">
+        <div className="min-h-screen bg-white">
             <Navbar />
-            <main className="container section-padding">
-                <div className="checkout-layout">
+            <main className="container mx-auto px-4 py-12 md:py-16">
+                <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-12 lg:gap-20">
                     {/* Left Column: Forms */}
-                    <form className="checkout-form-container" onSubmit={handleSubmit}>
-                        <section className="checkout-section">
-                            <h2 className="h3">Contact Information</h2>
-                            <div className="form-group">
+                    <form onSubmit={handleSubmit} className="flex flex-col">
+                        <div className="mb-12">
+                            <h2 className="text-xl font-bold mb-6 pb-2 border-b border-border font-outfit uppercase tracking-wider text-text-main">
+                                Contact Information
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <Input
                                     label="Email Address"
                                     type="email"
@@ -132,14 +145,15 @@ const Checkout = () => {
                                     required
                                 />
                             </div>
-                        </section>
+                        </div>
 
-                        <section className="checkout-section">
-                            <h2 className="h3">Shipping Address</h2>
-                            <div className="form-row">
+                        <div className="mb-12">
+                            <h2 className="text-xl font-bold mb-6 pb-2 border-b border-border font-outfit uppercase tracking-wider text-text-main">
+                                Shipping Address
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <Input
                                     label="First Name"
-                                    type="text"
                                     name="firstName"
                                     value={formData.firstName}
                                     onChange={handleChange}
@@ -147,26 +161,25 @@ const Checkout = () => {
                                 />
                                 <Input
                                     label="Last Name"
-                                    type="text"
                                     name="lastName"
                                     value={formData.lastName}
                                     onChange={handleChange}
                                     required
                                 />
                             </div>
-                            <Input
-                                label="Address"
-                                type="text"
-                                name="address"
-                                placeholder="Street address, apartment, etc."
-                                value={formData.address}
-                                onChange={handleChange}
-                                required
-                            />
-                            <div className="form-row">
+                            <div className="mb-6">
+                                <Input
+                                    label="Address"
+                                    name="address"
+                                    placeholder="Street address, apartment, etc."
+                                    value={formData.address}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <Input
                                     label="City"
-                                    type="text"
                                     name="city"
                                     value={formData.city}
                                     onChange={handleChange}
@@ -174,128 +187,137 @@ const Checkout = () => {
                                 />
                                 <Input
                                     label="Zip / Postal Code"
-                                    type="text"
                                     name="zip"
                                     value={formData.zip}
                                     onChange={handleChange}
                                     required
                                 />
                             </div>
-                            <Input
-                                label="Country"
-                                type="text"
-                                name="country"
-                                value={formData.country}
-                                onChange={handleChange}
-                                disabled
-                            />
-                        </section>
+                        </div>
 
-                        <section className="checkout-section">
-                            <h2 className="h3">Payment Method</h2>
-                            <div className="payment-methods">
-                                <label className={`payment-method-card ${formData.paymentMethod === 'bkash' ? 'selected' : ''}`}>
+                        <div className="mb-8">
+                            <h2 className="text-xl font-bold mb-6 pb-2 border-b border-border font-outfit uppercase tracking-wider text-text-main">
+                                Payment Method
+                            </h2>
+                            <div className="flex flex-col gap-4 mb-6">
+                                <label className={`
+                                    flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-all duration-200
+                                    ${formData.paymentMethod === 'bkash' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-border hover:border-primary/50'}
+                                `}>
                                     <input
                                         type="radio"
                                         name="paymentMethod"
                                         value="bkash"
                                         checked={formData.paymentMethod === 'bkash'}
                                         onChange={handleChange}
-                                        className="payment-radio"
+                                        className="w-5 h-5 accent-primary"
                                     />
-                                    <div className="payment-content">
-                                        <span className="payment-title">bKash Payment</span>
-                                        <span className="payment-subtitle">Pay via bKash mobile banking</span>
+                                    <div className="flex flex-col">
+                                        <span className="font-bold font-outfit text-text-main">bKash Payment</span>
+                                        <span className="text-xs text-text-muted">Pay via bKash mobile banking</span>
                                     </div>
                                 </label>
 
-                                <label className={`payment-method-card ${formData.paymentMethod === 'cod' ? 'selected' : ''}`}>
+                                <label className={`
+                                    flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-all duration-200
+                                    ${formData.paymentMethod === 'cod' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-border hover:border-primary/50'}
+                                `}>
                                     <input
                                         type="radio"
                                         name="paymentMethod"
                                         value="cod"
                                         checked={formData.paymentMethod === 'cod'}
                                         onChange={handleChange}
-                                        className="payment-radio"
+                                        className="w-5 h-5 accent-primary"
                                     />
-                                    <div className="payment-content">
-                                        <span className="payment-title">Cash on Delivery</span>
-                                        <span className="payment-subtitle">Pay upon receiving your order</span>
+                                    <div className="flex flex-col">
+                                        <span className="font-bold font-outfit text-text-main">Cash on Delivery</span>
+                                        <span className="text-xs text-text-muted">Pay upon receiving your order</span>
                                     </div>
                                 </label>
                             </div>
 
-                            {formData.paymentMethod === 'bkash' && (
-                                <div className="bkash-details">
-                                    <p className="instruction-text">Please send <strong>৳{cartTotal.toFixed(2)}</strong> to <strong>017XXXXXXXX</strong> and enter the Transaction ID below.</p>
-                                    <Input
-                                        label="bKash Number"
-                                        type="text"
-                                        name="bkashNumber"
-                                        placeholder="017XXXXXXXX"
-                                        value={formData.bkashNumber}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                    <Input
-                                        label="Transaction ID (TrxID)"
-                                        type="text"
-                                        name="bkashTrxId"
-                                        placeholder="8N7..."
-                                        value={formData.bkashTrxId}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                            )}
+                            <div className="bg-gray-50 p-6 rounded-xl border border-border/50 animate-in fade-in slide-in-from-top-2">
+                                {formData.paymentMethod === 'bkash' ? (
+                                    <div className="space-y-6">
+                                        <p className="text-sm text-text-muted font-outfit">
+                                            Please send <strong className="text-primary font-bold text-lg">৳{cartTotal.toFixed(2)}</strong> to <strong>017XXXXXXXX</strong> and enter the Transaction ID below.
+                                        </p>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <Input
+                                                label="bKash Number"
+                                                name="bkashNumber"
+                                                placeholder="017XXXXXXXX"
+                                                value={formData.bkashNumber}
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                            <Input
+                                                label="Transaction ID (TrxID)"
+                                                name="bkashTrxId"
+                                                placeholder="8N7..."
+                                                value={formData.bkashTrxId}
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-text-muted font-outfit">
+                                        You can pay in cash when our courier delivers your package.
+                                    </p>
+                                )}
+                            </div>
+                        </div>
 
-                            {formData.paymentMethod === 'cod' && (
-                                <div className="cod-details">
-                                    <p className="instruction-text">You can pay in cash when our courier delivers your package.</p>
-                                </div>
-                            )}
-                        </section>
-
-                        <div className="checkout-actions">
-                            <Link to="/shop">
-                                <Button variant="ghost">Continue Shopping</Button>
+                        <div className="flex flex-col-reverse md:flex-row justify-between items-center gap-4 mt-8 pt-8 border-t border-border">
+                            <Link to="/shop" className="w-full md:w-auto">
+                                <Button variant="outline" className="w-full md:w-auto">Back to Shop</Button>
                             </Link>
-                            <Button variant="primary" size="large" type="submit" disabled={isSubmitting}>
-                                {isSubmitting ? 'Processing...' : 'Continue to Payment'}
+                            <Button variant="primary" size="large" type="submit" className="w-full md:w-auto min-w-[240px]" disabled={isSubmitting}>
+                                {isSubmitting ? 'Processing Order...' : 'Confirm Order'}
                             </Button>
                         </div>
                     </form>
 
                     {/* Right Column: Order Summary */}
-                    <div className="checkout-summary">
-                        <h3 className="h4 summary-title">Order Summary</h3>
-                        <div className="summary-items">
-                            {cartItems.map(item => (
-                                <div key={item.id} className="summary-item">
-                                    <div className="summary-item-image-wrapper">
-                                        <img src={item.image} alt={item.title} className="summary-item-image" />
-                                        <span className="summary-item-quantity">{item.quantity}</span>
+                    <div className="lg:sticky lg:top-24 h-fit">
+                        <div className="bg-gray-50 p-6 md:p-8 rounded-xl border border-border shadow-sm">
+                            <h3 className="text-lg font-bold mb-6 font-outfit uppercase tracking-widest text-text-main">
+                                Order Summary
+                            </h3>
+                            <div className="space-y-4 mb-6 pb-6 border-b border-border max-h-[400px] overflow-y-auto pr-2 scrollbar-thin">
+                                {cartItems.map(item => (
+                                    <div key={item.id} className="flex gap-4 items-center">
+                                        <div className="w-16 h-16 bg-white rounded-lg border border-border flex items-center justify-center shrink-0 relative p-1">
+                                            <img src={item.image} alt={item.title} className="w-full h-full object-contain mix-blend-multiply" />
+                                            <span className="absolute -top-2 -right-2 w-6 h-6 bg-primary text-white text-[10px] flex items-center justify-center rounded-full font-bold shadow-sm">
+                                                {item.quantity}
+                                            </span>
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-sm font-bold text-text-main font-outfit leading-tight mb-1">{item.title}</p>
+                                            <p className="text-xs text-text-muted font-outfit opacity-80">{item.style}</p>
+                                        </div>
+                                        <div className="text-sm font-bold text-text-main font-outfit ml-auto">
+                                            ৳{(item.price * item.quantity).toFixed(2)}
+                                        </div>
                                     </div>
-                                    <div className="summary-item-details">
-                                        <p className="summary-item-title">{item.title}</p>
-                                        <p className="summary-item-variant">{item.style}</p>
-                                    </div>
-                                    <div className="summary-item-price">৳{(item.price * item.quantity).toFixed(2)}</div>
+                                ))}
+                            </div>
+                            <div className="space-y-3 font-outfit">
+                                <div className="flex justify-between text-sm text-text-muted">
+                                    <span>Subtotal</span>
+                                    <span className="font-bold text-text-main">৳{cartTotal.toFixed(2)}</span>
                                 </div>
-                            ))}
-                        </div>
-                        <div className="summary-totals">
-                            <div className="summary-row">
-                                <span>Subtotal</span>
-                                <span>৳{cartTotal.toFixed(2)}</span>
-                            </div>
-                            <div className="summary-row">
-                                <span>Shipping</span>
-                                <span>Calculated next step</span>
-                            </div>
-                            <div className="summary-row total">
-                                <span>Total</span>
-                                <span>৳{cartTotal.toFixed(2)}</span>
+                                <div className="flex justify-between text-sm text-text-muted">
+                                    <span>Shipping</span>
+                                    <span className="italic">Calculated next step</span>
+                                </div>
+                                <div className="flex justify-between text-xl font-bold text-text-main pt-4 mt-4 border-t border-border uppercase tracking-wide">
+                                    <span>Total</span>
+                                    <span>৳{cartTotal.toFixed(2)}</span>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -4,10 +4,10 @@ This document outlines the core technologies and tools used in the Choshmazone e
 
 ## Project Overview Summary
 Choshmazone is a modern e-commerce platform built with a robust and scalable technology stack:
-*   **Frontend**: React 19, Vite, and custom Vanilla CSS.
+*   **Frontend**: React 19, Vite, and Tailwind CSS v4.
 *   **Backend**: Supabase (PostgreSQL, Auth, Storage, and RLS).
 *   **Integrations**: Google Sheets for order tracking and bKash/COD for payments.
-*   **Architecture**: Role-based access and responsive design.
+*   **Architecture**: Role-based access and Tailwind-powered responsive design.
 
 ---
 
@@ -16,7 +16,7 @@ Choshmazone is a modern e-commerce platform built with a robust and scalable tec
 *   **Build Tool**: [Vite](https://vitejs.dev/) - A fast development environment and bundler.
 *   **Routing**: [React Router 7](https://reactrouter.com/) - For client-side navigation and protected admin/user routes.
 *   **State Management**: **React Context API** - Used for managing the Shopping Cart and Authentication state.
-*   **Styling**: **Vanilla CSS** - Custom CSS for a unique, flexible, and high-performance design system.
+*   **Styling**: **Tailwind CSS v4** - A utility-first CSS framework for rapid UI development and high-performance designs.
 *   **Icons**: [Lucide React](https://lucide.dev/) - A library of beautiful, consistent icons.
 
 ## 2. Backend & Database (Supabase)
@@ -36,3 +36,9 @@ The project utilizes [Supabase](https://supabase.com/) as a Comprehensive Backen
 *   **Role-Based Access Control (RBAC)**: Distinct permissions for 'Admin' and 'Customer' users.
 *   **Responsive Design**: Mobile-first approach ensuring compatibility across all device sizes.
 *   **SEO Optimized**: Semantic HTML structure and meta-tag management.
+## 5. Mobile Design System
+The application utilizes a **Mobile-First Responsive Strategy**:
+- **Dynamic Drawers**: Custom-built side-drawer navigation for both public and admin interfaces.
+- **Responsive Flex/Grid**: Intelligent layout stacking (e.g., PD gallery and Checkout flows).
+- **Narrow-Device Optimization**: Explicit `flex-shrink` and `min-width` management for high-density, narrow mobile displays (e.g., OnePlus, iPhone Pro models).
+- **Touch-First Elements**: Optimized tap targets (min 40x40px) and smooth CSS transitions.

@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { orderParams } from '../../lib/api/orders';
+import { Trash2, ExternalLink, Filter, Search, MoreVertical } from 'lucide-react';
 
 const AdminOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -46,62 +46,80 @@ const AdminOrders = () => {
         }
     };
 
-    if (loading) return <div>Loading orders...</div>;
-    if (error) return <div style={{ color: 'red' }}>{error}</div>;
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
+
+    if (error) return (
+        <div className="p-8 bg-red-50 text-red-600 rounded-2xl border border-red-100 font-outfit text-center">
+            {error}
+        </div>
+    );
 
     return (
-        <div className="admin-orders">
-            <h1>All Orders</h1>
+        <div className="animate-in fade-in duration-700">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                <div>
+                    <h1 className="text-3xl font-bold text-text-main font-outfit uppercase tracking-tight">Order Management</h1>
+                    <p className="text-text-muted font-outfit">Review and manage all customer transactions.</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <button className="p-3 bg-white border border-border rounded-xl text-text-muted hover:text-text-main transition-colors">
+                        <Search size={20} />
+                    </button>
+                    <button className="flex items-center gap-2 px-6 py-3 bg-white border border-border rounded-xl text-sm font-bold text-text-main hover:bg-gray-50 transition-all font-outfit uppercase tracking-widest shadow-sm">
+                        <Filter size={16} />
+                        Filter
+                    </button>
+                </div>
+            </div>
 
-            <div style={{ overflowX: 'auto', background: 'white', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', marginTop: '2rem' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', background: 'white' }}>
-                    <thead style={{ background: '#f8f9fa' }}>
-                        <tr>
-                            <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #eee' }}>Order ID</th>
-                            <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #eee' }}>Customer</th>
-                            <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #eee' }}>Amount</th>
-                            <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #eee' }}>Method</th>
-                            <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #eee' }}>Status</th>
-                            <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #eee' }}>Date</th>
-                            <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #eee' }}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {orders.map(order => (
-                            <tr key={order.id}>
-                                <td style={{ padding: '1rem', borderBottom: '1px solid #eee' }}>
-                                    <span style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{order.id.slice(0, 8)}...</span>
-                                </td>
-                                <td style={{ padding: '1rem', borderBottom: '1px solid #eee' }}>
-                                    <div>{order.shipping_address?.first_name} {order.shipping_address?.last_name}</div>
-                                    <div style={{ fontSize: '0.8rem', color: '#666' }}>{order.shipping_address?.email}</div>
-                                </td>
-                                <td style={{ padding: '1rem', borderBottom: '1px solid #eee', fontWeight: 'bold' }}>
-                                    ৳{order.total_amount}
-                                </td>
-                                <td style={{ padding: '1rem', borderBottom: '1px solid #eee', textTransform: 'uppercase' }}>
-                                    {order.payment_method}
-                                </td>
-                                <td style={{ padding: '1rem', borderBottom: '1px solid #eee' }}>
-                                    <span style={{
-                                        padding: '0.25rem 0.5rem',
-                                        borderRadius: '4px',
-                                        fontSize: '0.8rem',
-                                        backgroundColor: getStatusColor(order.status),
-                                        color: 'white'
-                                    }}>
-                                        {order.status}
-                                    </span>
-                                </td>
-                                <td style={{ padding: '1rem', borderBottom: '1px solid #eee' }}>
-                                    {new Date(order.created_at).toLocaleDateString()}
-                                </td>
-                                <td style={{ padding: '1rem', borderBottom: '1px solid #eee' }}>
-                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <div className="bg-white rounded-3xl border border-border/50 shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-gray-50/50 border-b border-border/50">
+                                <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Order ID</th>
+                                <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Customer</th>
+                                <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Amount</th>
+                                <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Status</th>
+                                <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Date</th>
+                                <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/30">
+                            {orders.map(order => (
+                                <tr key={order.id} className="hover:bg-gray-50/30 transition-colors group">
+                                    <td className="px-6 py-5">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-mono font-bold text-text-main uppercase">#{order.id.slice(0, 8)}</span>
+                                            <ExternalLink size={14} className="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-5">
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-bold text-text-main font-outfit">{order.shipping_address?.first_name} {order.shipping_address?.last_name}</span>
+                                            <span className="text-xs text-text-muted font-outfit">{order.shipping_address?.email}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-5">
+                                        <div className="flex flex-col">
+                                            <span className="text-base font-bold text-primary font-outfit">৳{order.total_amount.toLocaleString()}</span>
+                                            <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest">{order.payment_method}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-5">
                                         <select
                                             value={order.status}
                                             onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                                            style={{ padding: '0.25rem', borderRadius: '4px', border: '1px solid #ddd' }}
+                                            className={`
+                                                text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border-none outline-none cursor-pointer
+                                                ${getStatusStyles(order.status)}
+                                            `}
                                         >
                                             <option value="pending">Pending</option>
                                             <option value="processing">Processing</option>
@@ -109,40 +127,44 @@ const AdminOrders = () => {
                                             <option value="completed">Completed</option>
                                             <option value="cancelled">Cancelled</option>
                                         </select>
-                                        <button
-                                            onClick={() => handleDelete(order.id)}
-                                            style={{
-                                                padding: '0.25rem 0.5rem',
-                                                backgroundColor: '#fee2e2',
-                                                color: '#dc2626',
-                                                border: '1px solid #fecaca',
-                                                borderRadius: '4px',
-                                                cursor: 'pointer',
-                                                fontSize: '0.8rem'
-                                            }}
-                                            title="Delete Order"
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                                    </td>
+                                    <td className="px-6 py-5">
+                                        <span className="text-sm text-text-main font-outfit">
+                                            {new Date(order.created_at).toLocaleDateString(undefined, { dateStyle: 'medium' })}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-5 text-right">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <button
+                                                onClick={() => handleDelete(order.id)}
+                                                className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                                title="Delete Order"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                            <button className="p-2 text-gray-400 hover:text-text-main hover:bg-gray-100 rounded-lg transition-all">
+                                                <MoreVertical size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );
 };
 
-const getStatusColor = (status) => {
+const getStatusStyles = (status) => {
     switch (status) {
-        case 'pending': return '#ffc107';
-        case 'processing': return '#17a2b8';
-        case 'shipped': return '#007bff';
-        case 'completed': return '#28a745';
-        case 'cancelled': return '#dc3545';
-        default: return '#6c757d';
+        case 'pending': return 'bg-amber-100 text-amber-700';
+        case 'processing': return 'bg-blue-100 text-blue-700';
+        case 'shipped': return 'bg-indigo-100 text-indigo-700';
+        case 'completed': return 'bg-green-100 text-green-700';
+        case 'cancelled': return 'bg-red-100 text-red-700';
+        default: return 'bg-gray-100 text-gray-700';
     }
 };
 

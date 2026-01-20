@@ -19,6 +19,8 @@
 *   **State Management**: React Context (for Auth State and Cart)
 *   **Data Fetching**: `@supabase/supabase-js` client library
 *   **Routing**: `react-router-dom` with Protected Routes
+*   **Design Tokens**: Managed via **Tailwind CSS v4 `@theme`** block for cross-device consistency and a unified design system.
+*   **UI Strategy**: Mobile-first utility-class approach utilizing modern flexbox/grid and full-screen mobile drawers.
 
 ### Backend (Supabase)
 *   **Auth Service**: Manages Users (JWTs).
@@ -113,3 +115,4 @@
 4.  **Admin Layout**: Create a sidebar layout specifically for admin routes.
 5.  **Product Management**: Build forms for creating/editing products and uploading images to Supabase Storage.
 6.  **User Portal**: Build "My Orders" page fetching data from `orders` table.
+7.  **Responsive Polishing**: Implemented mobile drawers, responsive grids, and narrow-device visibility fixes.

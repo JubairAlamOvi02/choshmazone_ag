@@ -5,7 +5,6 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
 import { productParams } from '../lib/api/products';
-import './ProductDetails.css';
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -19,7 +18,6 @@ const ProductDetails = () => {
             try {
                 setLoading(true);
                 const data = await productParams.fetchById(id);
-                // Map fields to match component expectations
                 const formattedProduct = {
                     ...data,
                     title: data.name,
@@ -40,15 +38,25 @@ const ProductDetails = () => {
         }
     }, [id]);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-white">
+                <Navbar />
+                <div className="flex justify-center items-center min-h-[60vh]">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+                <Footer />
+            </div>
+        );
+    }
 
     if (!product) {
         return (
-            <div className="product-not-found">
+            <div className="min-h-screen bg-white">
                 <Navbar />
-                <div className="container section-padding text-center">
-                    <h2 className="h2">Product Not Found</h2>
-                    <p>The product you are looking for does not exist.</p>
+                <div className="container mx-auto px-4 py-20 text-center">
+                    <h2 className="text-3xl font-bold mb-4 font-outfit">Product Not Found</h2>
+                    <p className="text-text-muted mb-8 font-outfit">The product you are looking for does not exist.</p>
                     <Link to="/shop">
                         <Button variant="primary">Back to Shop</Button>
                     </Link>
@@ -59,25 +67,25 @@ const ProductDetails = () => {
     }
 
     return (
-        <div className="product-details-page">
+        <div className="min-h-screen bg-white">
             <Navbar />
 
-            <main className="container section-padding">
-                <div className="pdp-layout">
+            <main className="container mx-auto px-4 py-12 md:py-20">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
                     {/* Left: Image Gallery */}
-                    <div className="pdp-gallery">
-                        <div className="main-image-container">
-                            <img src={mainImage} alt={product.title} className="pdp-main-image" />
+                    <div className="flex flex-col gap-6">
+                        <div className="bg-gray-50 rounded-xl overflow-hidden aspect-square flex items-center justify-center border border-border shadow-sm">
+                            <img src={mainImage} alt={product.title} className="w-full h-full object-contain mix-blend-multiply" />
                         </div>
                         {product.images.length > 1 && (
-                            <div className="thumbnail-grid">
+                            <div className="grid grid-cols-4 sm:grid-cols-5 gap-4">
                                 {product.images.map((img, index) => (
                                     <div
                                         key={index}
-                                        className={`thumbnail-container ${mainImage === img ? 'active' : ''}`}
+                                        className={`p-2 bg-white border rounded-lg aspect-square cursor-pointer transition-all duration-200 ${mainImage === img ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-text-muted'}`}
                                         onClick={() => setMainImage(img)}
                                     >
-                                        <img src={img} alt={`Thumbnail ${index + 1}`} className="thumbnail-image" />
+                                        <img src={img} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-contain mix-blend-multiply" />
                                     </div>
                                 ))}
                             </div>
@@ -85,17 +93,27 @@ const ProductDetails = () => {
                     </div>
 
                     {/* Right: Product Info */}
-                    <div className="pdp-info">
-                        <div className="pdp-header">
-                            <span className="pdp-category">{product.category}</span>
-                            <h1 className="pdp-title">{product.title}</h1>
-                            <div className="pdp-price">৳{product.price}</div>
-                            {product.is_active === false && <div className="pdp-unavailable-badge">Currently Unavailable</div>}
+                    <div className="flex flex-col">
+                        <div className="mb-8">
+                            <span className="text-xs md:text-sm font-bold uppercase tracking-widest text-text-muted mb-2 block font-outfit">
+                                {product.category}
+                            </span>
+                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-main mb-4 font-outfit leading-tight">
+                                {product.title}
+                            </h1>
+                            <div className="text-2xl md:text-3xl font-bold text-secondary font-outfit">
+                                ৳{product.price}
+                            </div>
+                            {product.is_active === false && (
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 mt-4 uppercase tracking-tighter">
+                                    Currently Unavailable
+                                </span>
+                            )}
                         </div>
 
-                        <div className="pdp-description">
+                        <div className="mb-10 text-text-muted leading-relaxed font-outfit space-y-4">
                             <p>Experience premium vision with our handcrafted {product.style} sunglasses. Designed for ultimate comfort and durability, these frames feature high-quality materials and 100% UV protection lenses.</p>
-                            <ul className="pdp-features">
+                            <ul className="space-y-2 list-disc pl-5">
                                 <li>Premium Acetate Frame</li>
                                 <li>Polarized Lenses</li>
                                 <li>100% UV400 Protection</li>
@@ -103,17 +121,19 @@ const ProductDetails = () => {
                             </ul>
                         </div>
 
-                        <div className="pdp-actions">
+                        <div className="flex flex-col gap-4 mt-auto">
                             <Button
                                 variant="primary"
                                 size="large"
-                                style={{ width: '100%' }}
+                                className="w-full"
                                 onClick={() => addToCart(product)}
                                 disabled={product.is_active === false}
                             >
                                 {product.is_active === false ? 'Unavailable' : 'Add to Cart'}
                             </Button>
-                            <Button variant="outline" size="large" style={{ width: '100%' }}>Add to Wishlist</Button>
+                            <Button variant="outline" size="large" className="w-full">
+                                Add to Wishlist
+                            </Button>
                         </div>
                     </div>
                 </div>
