@@ -17,7 +17,7 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 ## 4. Functional Requirements
 ### Core Features
 - **Homepage**: Hero banner, featured collections, and promotional highlights.
-- **Product Catalog**: Grid view with filtering options (Frame Style, Lens Color, Price, Brand).
+- **Product Catalog**: Advanced Grid view with "Premium Tag" filtering (Frame Style, Category, Price) and dynamic active filter chips for effortless navigation.
 - **Product Details Page**: High-resolution interactive image gallery with thumbnail support, detailed descriptions, specifications, and "Add to Cart" functionality.
 - **Shopping Cart**: Review selected items, adjust quantities.
 - **Checkout Flow**: Guest/User checkout, shipping information, and payment integration (Support for **bKash** and **Cash on Delivery**).

@@ -41,4 +41,5 @@ The application utilizes a **Mobile-First Responsive Strategy**:
 - **Dynamic Drawers**: Custom-built side-drawer navigation for both public and admin interfaces.
 - **Responsive Flex/Grid**: Intelligent layout stacking (e.g., PD gallery and Checkout flows).
 - **Narrow-Device Optimization**: Explicit `flex-shrink` and `min-width` management for high-density, narrow mobile displays (e.g., OnePlus, iPhone Pro models).
-- **Touch-First Elements**: Optimized tap targets (min 40x40px) and smooth CSS transitions.
+- **Touch-First Elements**: Optimized tap targets (min 40x40px).
+- **Premium Filter System**: Modern "Premium Tag" filtering with pulsing active indicators and dynamic chips for a fluid mobile-first and desktop exploration experience.

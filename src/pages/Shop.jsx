@@ -6,6 +6,7 @@ import SortSelect from '../components/Shop/SortSelect';
 import ProductCard from '../components/ProductCard';
 import { productParams } from '../lib/api/products';
 import { useLocation } from 'react-router-dom';
+import { X } from 'lucide-react';
 
 const Shop = () => {
     const location = useLocation();
@@ -75,7 +76,7 @@ const Shop = () => {
             <main className="container mx-auto px-4 py-8 md:py-12">
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-4 border-b border-border gap-4">
                     <h1 className="text-2xl md:text-3xl font-bold font-outfit text-text-main uppercase tracking-wider">
-                        Shop All
+                        {filters.category === "All" ? "Shop All" : `Shop ${filters.category}`}
                     </h1>
                     <div className="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto">
                         <button
@@ -94,6 +95,45 @@ const Shop = () => {
                     </div>
 
                     <div className="flex-1">
+                        {/* Active Filter Chips */}
+                        {(filters.category !== "All" || filters.style !== "All") && (
+                            <div className="flex flex-wrap items-center gap-3 mb-8 animate-in fade-in slide-in-from-left-4 duration-500">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted">Filtering:</span>
+                                {filters.category !== "All" && (
+                                    <div className="group flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest font-outfit shadow-md ring-2 ring-primary/5">
+                                        <span className="w-1 h-1 rounded-full bg-secondary"></span>
+                                        <span>{filters.category}</span>
+                                        <button
+                                            onClick={() => setFilters(prev => ({ ...prev, category: "All" }))}
+                                            className="ml-2 hover:text-secondary transition-colors cursor-pointer border-l border-white/20 pl-2"
+                                            title="Remove Category"
+                                        >
+                                            <X size={10} strokeWidth={4} />
+                                        </button>
+                                    </div>
+                                )}
+                                {filters.style !== "All" && (
+                                    <div className="group flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest font-outfit shadow-md ring-2 ring-primary/5">
+                                        <span className="w-1 h-1 rounded-full bg-secondary"></span>
+                                        <span>{filters.style}</span>
+                                        <button
+                                            onClick={() => setFilters(prev => ({ ...prev, style: "All" }))}
+                                            className="ml-2 hover:text-secondary transition-colors cursor-pointer border-l border-white/20 pl-2"
+                                            title="Remove Style"
+                                        >
+                                            <X size={10} strokeWidth={4} />
+                                        </button>
+                                    </div>
+                                )}
+                                <button
+                                    onClick={() => setFilters({ category: "All", style: "All", maxPrice: 10000 })}
+                                    className="text-[10px] font-bold uppercase tracking-widest text-text-muted hover:text-primary transition-all hover:tracking-[0.15em]"
+                                >
+                                    Reset Filters
+                                </button>
+                            </div>
+                        )}
+
                         {loading ? (
                             <div className="flex justify-center py-20">
                                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
