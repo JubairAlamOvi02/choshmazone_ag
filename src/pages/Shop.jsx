@@ -7,7 +7,7 @@ import ProductCard from '../components/ProductCard';
 import { productParams } from '../lib/api/products';
 import { useLocation } from 'react-router-dom';
 import { X } from 'lucide-react';
-import { ProductCardSkeleton } from '../components/Skeleton';
+
 
 const Shop = () => {
     const location = useLocation();
@@ -49,19 +49,6 @@ const Shop = () => {
     useEffect(() => {
         let result = [...products];
 
-        // Handle URL search parameter
-        const searchParams = new URLSearchParams(location.search);
-        const searchQuery = searchParams.get('search');
-        if (searchQuery) {
-            const query = searchQuery.toLowerCase();
-            result = result.filter(product =>
-                (product.title || '').toLowerCase().includes(query) ||
-                (product.category || '').toLowerCase().includes(query) ||
-                (product.style || '').toLowerCase().includes(query) ||
-                (product.description || '').toLowerCase().includes(query)
-            );
-        }
-
         if (filters.category !== "All") {
             result = result.filter(product => product.category === filters.category);
         }
@@ -81,7 +68,7 @@ const Shop = () => {
         }
 
         setFilteredProducts(result);
-    }, [filters, sortOption, products, location.search]);
+    }, [filters, sortOption, products]);
 
     return (
         <div className="min-h-screen bg-white">
@@ -149,10 +136,8 @@ const Shop = () => {
                         )}
 
                         {loading ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
-                                {[...Array(6)].map((_, i) => (
-                                    <ProductCardSkeleton key={i} />
-                                ))}
+                            <div className="flex justify-center items-center h-64">
+                                <p className="text-lg font-outfit text-text-muted">Loading products...</p>
                             </div>
                         ) : filteredProducts.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">

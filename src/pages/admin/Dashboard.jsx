@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { TrendingUp, ShoppingBag, Clock, Glasses, Users, RefreshCcw, ArrowUpRight } from 'lucide-react';
-import { StatCardSkeleton } from '../../components/Skeleton';
-import DashboardCharts from '../../components/Admin/DashboardCharts';
 
 const Dashboard = () => {
     const [stats, setStats] = useState({
@@ -103,7 +101,7 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 {loading ? (
                     <>
-                        {[...Array(5)].map((_, i) => <StatCardSkeleton key={i} />)}
+                        <div className="col-span-full py-12 text-center text-text-muted">Loading stats...</div>
                     </>
                 ) : (
                     <>
@@ -147,8 +145,7 @@ const Dashboard = () => {
                 )}
             </div>
 
-            {/* Charts Section */}
-            {!loading && <DashboardCharts orders={orders} />}
+
 
             <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Recent Orders Feature Placeholder - Functional upgrade candidate */}
@@ -158,7 +155,7 @@ const Dashboard = () => {
                         <TrendingUp size={20} className="text-text-muted" />
                     </div>
                     <div className="space-y-4">
-                        <p className="text-text-muted text-sm font-outfit">Performance snapshots and trend analysis are active in the charts above.</p>
+                        <p className="text-text-muted text-sm font-outfit">Detailed performance metrics coming soon.</p>
                     </div>
                 </div>
 

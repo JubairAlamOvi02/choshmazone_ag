@@ -2,10 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import OptimizedImage from './OptimizedImage';
 
-const ProductCard = React.memo(({ product }) => {
-    const { id, title, price, category, image, images } = product;
+const ProductCard = ({ product }) => {
+    const { id, title, price, image, images } = product;
     const hoverImage = images && images.length > 1 ? images[1] : null;
     const { addToCart } = useCart();
 
@@ -19,23 +18,19 @@ const ProductCard = React.memo(({ product }) => {
         <div className="flex flex-col transition-transform duration-300 bg-surface rounded-md overflow-hidden hover:-translate-y-1 group">
             <Link to={`/product/${id}`} className="no-underline text-inherit">
                 <div className="relative aspect-square overflow-hidden bg-gray-100">
-                    {/* Primary Image - Optimized */}
-                    <OptimizedImage
+                    {/* Primary Image */}
+                    <img
                         src={image}
                         alt={title}
-                        className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:opacity-0"
-                        containerClassName="absolute inset-0"
-                        aspectRatio="1/1"
+                        className="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:opacity-0"
                     />
 
-                    {/* Hover Image - Optimized */}
+                    {/* Hover Image */}
                     {hoverImage && (
-                        <OptimizedImage
+                        <img
                             src={hoverImage}
                             alt={`${title} - alternate view`}
-                            className="w-full h-full object-cover transition-all duration-500 opacity-0 group-hover:opacity-100 group-hover:scale-105"
-                            containerClassName="absolute inset-0"
-                            aspectRatio="1/1"
+                            className="absolute inset-0 w-full h-full object-cover transition-all duration-500 opacity-0 group-hover:opacity-100 group-hover:scale-105"
                         />
                     )}
 
@@ -57,8 +52,6 @@ const ProductCard = React.memo(({ product }) => {
             </Link>
         </div>
     );
-});
-
-ProductCard.displayName = 'ProductCard';
+};
 
 export default ProductCard;

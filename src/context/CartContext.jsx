@@ -1,8 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect, useMemo, startTransition, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { useToast } from './ToastContext';
-
 const CartContext = createContext();
 
 export const useCart = () => useContext(CartContext);
@@ -13,7 +11,6 @@ export const CartProvider = ({ children }) => {
         return localData ? JSON.parse(localData) : [];
     });
     const [isCartOpen, setIsCartOpen] = useState(false);
-    const toast = useToast();
 
     // Validate cart items against database on mount
     useEffect(() => {
@@ -41,7 +38,7 @@ export const CartProvider = ({ children }) => {
 
                     // Notify if items were removed
                     if (filtered.length < prev.length) {
-                        toast.warning('Some items were removed from your cart as they are no longer available.');
+                        console.warn('Some items were removed from your cart as they are no longer available.');
                     }
 
                     return filtered;
@@ -59,7 +56,6 @@ export const CartProvider = ({ children }) => {
     }, [cartItems]);
 
     const addToCart = useCallback((product) => {
-        const productName = product.title || product.name || 'Item';
         const quantityToAdd = product.quantity || 1;
 
         setCartItems(prevItems => {
@@ -75,22 +71,15 @@ export const CartProvider = ({ children }) => {
             return [...prevItems, { ...product, quantity: quantityToAdd }];
         });
 
-        // Show toast notification
-        toast.success(
-            `${productName} ${quantityToAdd > 1 ? `(x${quantityToAdd})` : ''} added to cart`,
-            'Added to Cart'
-        );
-
         // Wrap UI state update in transition to improve INP/responsiveness
         startTransition(() => {
             setIsCartOpen(true);
         });
-    }, [toast]);
+    }, []);
 
-    const removeFromCart = useCallback((id, productName = 'Item') => {
+    const removeFromCart = useCallback((id) => {
         setCartItems(prevItems => prevItems.filter(item => item.id !== id));
-        toast.info(`${productName} removed from cart`, 'Removed');
-    }, [toast]);
+    }, []);
 
     const updateQuantity = useCallback((id, amount) => {
         setCartItems(prevItems => prevItems.map(item => {

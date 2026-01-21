@@ -5,8 +5,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { Package, Clock, CheckCircle2, ChevronRight } from 'lucide-react';
-import { OrderRowSkeleton } from '../../components/Skeleton';
-import OrderTimeline from '../../components/OrderTimeline';
+
 
 const UserOrders = () => {
     const { user } = useAuth();
@@ -52,8 +51,8 @@ const UserOrders = () => {
                     </div>
 
                     {loading ? (
-                        <div className="space-y-6">
-                            {[...Array(3)].map((_, i) => <OrderRowSkeleton key={i} />)}
+                        <div className="py-20 text-center">
+                            <p className="text-text-muted font-outfit">Loading your orders...</p>
                         </div>
                     ) : orders.length === 0 ? (
                         <div className="bg-white p-12 md:p-20 text-center rounded-3xl border border-border/50 shadow-sm animate-in fade-in zoom-in duration-500">
@@ -90,11 +89,6 @@ const UserOrders = () => {
                                                 {order.status === 'completed' ? <CheckCircle2 size={14} /> : <Clock size={14} />}
                                                 {order.status}
                                             </div>
-                                        </div>
-
-                                        {/* Order Progress Timeline */}
-                                        <div className="mb-10 px-4">
-                                            <OrderTimeline currentStatus={order.status} />
                                         </div>
 
                                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-6 border-t border-border/10">

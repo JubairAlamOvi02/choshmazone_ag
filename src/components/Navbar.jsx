@@ -3,7 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ShoppingBag, Menu, X, User } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import SearchBar from './SearchBar';
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -59,8 +58,6 @@ const Navbar = () => {
 
                 {/* Actions */}
                 <div className="flex items-center shrink-0 min-w-[120px] justify-end">
-                    {/* Search Bar Component */}
-                    <SearchBar />
 
                     <div className="relative flex items-center shrink-0 z-10">
                         {user ? (
