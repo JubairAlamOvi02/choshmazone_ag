@@ -6,6 +6,7 @@ import { ToastProvider } from './context/ToastContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import CartDrawer from './components/Cart/CartDrawer';
 
+
 // Loading Fallback Component
 const PageLoader = () => (
   <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
@@ -112,9 +113,8 @@ function App() {
           </AuthProvider>
         </Router>
       </ToastProvider>
-    </ErrorBoundary>
+    </ErrorBoundary >
   )
 }
 
 export default App
-

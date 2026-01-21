@@ -129,7 +129,11 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signOut = async () => {
-        return supabase.auth.signOut();
+        const { error } = await supabase.auth.signOut();
+        // Force clear state regardless of potential network error
+        setUser(null);
+        setRole(null);
+        return { error };
     };
 
     const value = {
