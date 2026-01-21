@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 const AuthContext = createContext();
@@ -7,41 +7,88 @@ export const useAuth = () => {
     return useContext(AuthContext);
 };
 
+// Loading Spinner Component
+const LoadingSpinner = () => (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-primary"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+                <div className="h-8 w-8 rounded-full bg-white"></div>
+            </div>
+        </div>
+        <p className="mt-4 text-gray-600 font-medium animate-pulse">Loading...</p>
+    </div>
+);
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [role, setRole] = useState(null); // 'admin' | 'customer' | null
     const [loading, setLoading] = useState(true);
+    const [authError, setAuthError] = useState(null);
+    const initializationComplete = useRef(false);
 
     useEffect(() => {
+        // Timeout protection: if auth takes more than 10 seconds, stop loading
+        const timeoutId = setTimeout(() => {
+            if (loading && !initializationComplete.current) {
+                console.warn('Auth initialization timeout - proceeding without auth');
+                setLoading(false);
+                setAuthError('Authentication timed out');
+            }
+        }, 10000);
+
         // Check active session
         const getSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
 
-            if (session?.user) {
-                setUser(session.user);
-                await fetchUserRole(session.user.id);
-            } else {
+                if (error) {
+                    console.error('Error getting session:', error);
+                    setAuthError(error.message);
+                    setUser(null);
+                    setRole(null);
+                } else if (session?.user) {
+                    setUser(session.user);
+                    await fetchUserRole(session.user.id);
+                } else {
+                    setUser(null);
+                    setRole(null);
+                }
+            } catch (err) {
+                console.error('Unexpected error in getSession:', err);
+                setAuthError(err.message);
                 setUser(null);
                 setRole(null);
+            } finally {
+                initializationComplete.current = true;
+                setLoading(false);
             }
-            setLoading(false);
         };
 
         getSession();
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            if (session?.user) {
-                setUser(session.user);
-                await fetchUserRole(session.user.id);
-            } else {
-                setUser(null);
-                setRole(null);
+            // Don't set loading to true here to avoid blank screens during auth state changes
+            try {
+                if (session?.user) {
+                    setUser(session.user);
+                    await fetchUserRole(session.user.id);
+                } else {
+                    setUser(null);
+                    setRole(null);
+                }
+                setAuthError(null);
+            } catch (err) {
+                console.error('Error in auth state change:', err);
+                setAuthError(err.message);
             }
-            setLoading(false);
         });
 
-        return () => subscription.unsubscribe();
+        return () => {
+            clearTimeout(timeoutId);
+            subscription.unsubscribe();
+        };
     }, []);
 
     const fetchUserRole = async (userId) => {
@@ -92,12 +139,18 @@ export const AuthProvider = ({ children }) => {
         signIn,
         signUp,
         signOut,
-        loading
+        loading,
+        authError
     };
+
+    // Show a loading spinner instead of nothing during auth initialization
+    if (loading) {
+        return <LoadingSpinner />;
+    }
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 };
