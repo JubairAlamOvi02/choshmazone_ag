@@ -16,10 +16,17 @@
 
 ### Frontend
 *   **Framework**: React (Vite)
-*   **State Management**: React Context (for Auth State and Cart)
-*   **Data Fetching**: `@supabase/supabase-js` client library
-*   **Routing**: `react-router-dom` with Protected Routes
-*   **Design Tokens**: Managed via **Tailwind CSS v4 `@theme`** block for cross-device consistency and a unified design system.
+*   **State Management**: React Context (`AuthProvider`, `CartProvider`, `ToastProvider`)
+*   **Data Fetching**: `@supabase/supabase-js` client library with an integrated `DataCache` layer.
+*   **Routing**: `react-router-dom` with Protected Routes and Route-based Code Splitting (`React.lazy`).
+*   **Performance & Analytics Components**: 
+    *   `OptimizedImage`: Lazy loading and blur-up effects.
+    *   `Skeleton`: Global shimmering placeholder system for smooth loading transitions.
+    *   `DashboardCharts`: Real-time data visualization using Recharts.
+    *   `OrderTimeline`: State-driven progress tracking for fulfillment.
+    *   `SearchBar`: Debounced multi-field filtering.
+    *   `ErrorBoundary`: Global crash protection.
+*   **PWA**: Service Worker with offline caching for assets and images.
 *   **UI Strategy**: Mobile-first utility-class approach utilizing modern flexbox/grid and full-screen mobile drawers.
 
 ### Backend (Supabase)

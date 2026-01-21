@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { Package, Clock, CheckCircle2, ChevronRight } from 'lucide-react';
+import { OrderRowSkeleton } from '../../components/Skeleton';
+import OrderTimeline from '../../components/OrderTimeline';
 
 const UserOrders = () => {
     const { user } = useAuth();
@@ -50,8 +52,8 @@ const UserOrders = () => {
                     </div>
 
                     {loading ? (
-                        <div className="flex justify-center py-20">
-                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                        <div className="space-y-6">
+                            {[...Array(3)].map((_, i) => <OrderRowSkeleton key={i} />)}
                         </div>
                     ) : orders.length === 0 ? (
                         <div className="bg-white p-12 md:p-20 text-center rounded-3xl border border-border/50 shadow-sm animate-in fade-in zoom-in duration-500">
@@ -65,7 +67,7 @@ const UserOrders = () => {
                             </Link>
                         </div>
                     ) : (
-                        <div className="space-y-6">
+                        <div className="space-y-8">
                             {orders.map(order => (
                                 <div key={order.id} className="bg-white rounded-2xl border border-border/50 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group">
                                     <div className="p-6 md:p-8">
@@ -90,12 +92,17 @@ const UserOrders = () => {
                                             </div>
                                         </div>
 
-                                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                        {/* Order Progress Timeline */}
+                                        <div className="mb-10 px-4">
+                                            <OrderTimeline currentStatus={order.status} />
+                                        </div>
+
+                                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-6 border-t border-border/10">
                                             <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
                                                 <div>
                                                     <span className="text-xs font-bold text-text-muted uppercase tracking-widest block mb-1">Items</span>
                                                     <span className="text-base font-bold text-text-main">
-                                                        {order.shipping_address?.items_count || 'N/A'} Products
+                                                        {order.shipping_address?.items_count || order.total_items || 'N/A'} Products
                                                     </span>
                                                 </div>
                                                 <div>

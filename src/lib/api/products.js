@@ -1,33 +1,58 @@
 
 import { supabase } from '../supabaseClient';
+import { dataCache, CACHE_KEYS, CACHE_TTL } from '../cache';
 
 export const productParams = {
-    // Fetch all products
-    fetchAll: async (activeOnly = false) => {
-        let query = supabase
-            .from('products')
-            .select('*');
+    // Fetch all products (with caching)
+    fetchAll: async (activeOnly = false, forceRefresh = false) => {
+        const cacheKey = activeOnly ? CACHE_KEYS.PRODUCTS_ACTIVE : CACHE_KEYS.PRODUCTS_ALL;
 
-        if (activeOnly) {
-            query = query.eq('is_active', true);
-        }
+        return dataCache.fetchWithCache(
+            cacheKey,
+            async () => {
+                let query = supabase
+                    .from('products')
+                    .select('*');
 
-        const { data, error } = await query.order('created_at', { ascending: false });
+                if (activeOnly) {
+                    query = query.eq('is_active', true);
+                }
 
-        if (error) throw error;
-        return data;
+                const { data, error } = await query.order('created_at', { ascending: false });
+
+                if (error) throw error;
+                return data;
+            },
+            {
+                ttl: CACHE_TTL.MEDIUM, // 5 minutes
+                staleTime: CACHE_TTL.SHORT, // 30 seconds
+                forceRefresh,
+            }
+        );
     },
 
-    // Fetch single product by ID
-    fetchById: async (id) => {
-        const { data, error } = await supabase
-            .from('products')
-            .select('*')
-            .eq('id', id)
-            .single();
+    // Fetch single product by ID (with caching)
+    fetchById: async (id, forceRefresh = false) => {
+        const cacheKey = CACHE_KEYS.PRODUCT_BY_ID(id);
 
-        if (error) throw error;
-        return data;
+        return dataCache.fetchWithCache(
+            cacheKey,
+            async () => {
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (error) throw error;
+                return data;
+            },
+            {
+                ttl: CACHE_TTL.MEDIUM,
+                staleTime: CACHE_TTL.SHORT,
+                forceRefresh,
+            }
+        );
     },
 
     // Create new product (Admin only via RLS)
@@ -39,6 +64,10 @@ export const productParams = {
             .single();
 
         if (error) throw error;
+
+        // Invalidate products cache after creation
+        dataCache.invalidatePattern('products:');
+
         return data;
     },
 
@@ -52,6 +81,11 @@ export const productParams = {
             .single();
 
         if (error) throw error;
+
+        // Invalidate caches after update
+        dataCache.invalidate(CACHE_KEYS.PRODUCT_BY_ID(id));
+        dataCache.invalidatePattern('products:');
+
         return data;
     },
 
@@ -63,6 +97,11 @@ export const productParams = {
             .eq('id', id);
 
         if (error) throw error;
+
+        // Invalidate caches after deletion
+        dataCache.invalidate(CACHE_KEYS.PRODUCT_BY_ID(id));
+        dataCache.invalidatePattern('products:');
+
         return true;
     },
 
@@ -88,5 +127,10 @@ export const productParams = {
     uploadImages: async (files) => {
         const uploadPromises = files.map(file => productParams.uploadImage(file));
         return Promise.all(uploadPromises);
+    },
+
+    // Force refresh products cache
+    refreshCache: () => {
+        dataCache.invalidatePattern('products:');
     }
 };

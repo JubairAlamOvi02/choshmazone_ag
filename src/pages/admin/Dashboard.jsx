@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { TrendingUp, ShoppingBag, Clock, Glasses, Users, RefreshCcw, ArrowUpRight } from 'lucide-react';
+import { StatCardSkeleton } from '../../components/Skeleton';
+import DashboardCharts from '../../components/Admin/DashboardCharts';
 
 const Dashboard = () => {
     const [stats, setStats] = useState({
@@ -10,6 +12,7 @@ const Dashboard = () => {
         pendingOrders: 0,
         customersCount: 0
     });
+    const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -21,14 +24,18 @@ const Dashboard = () => {
             setLoading(true);
 
             // 1. Fetch Orders and calculate Sales
-            const { data: orders, error: ordersError } = await supabase
+            const { data: allOrders, error: ordersError } = await supabase
                 .from('orders')
-                .select('total_amount, status');
+                .select('*')
+                .order('created_at', { ascending: false });
 
             if (ordersError) throw ordersError;
 
-            const totalSales = orders.reduce((sum, order) => sum + Number(order.total_amount), 0);
-            const pendingOrders = orders.filter(o => o.status === 'pending').length;
+            setOrders(allOrders);
+
+            const activeOrders = allOrders.filter(o => o.status !== 'cancelled');
+            const totalSales = activeOrders.reduce((sum, order) => sum + Number(order.total_amount), 0);
+            const pendingOrders = allOrders.filter(o => o.status === 'pending').length;
 
             // 2. Fetch Products count
             const { count: productsCount, error: productsError } = await supabase
@@ -46,7 +53,7 @@ const Dashboard = () => {
 
             setStats({
                 totalSales,
-                ordersCount: orders.length,
+                ordersCount: allOrders.length,
                 productsCount: productsCount || 0,
                 pendingOrders,
                 customersCount: customersCount || 0
@@ -58,14 +65,6 @@ const Dashboard = () => {
             setLoading(false);
         }
     };
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-            </div>
-        );
-    }
 
     const StatCard = ({ title, value, icon: Icon, bgColor, textColor, trend }) => (
         <div className="bg-white p-6 rounded-2xl border border-border/50 shadow-sm hover:shadow-md transition-all duration-300">
@@ -102,61 +101,73 @@ const Dashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                <StatCard
-                    title="Total Sales"
-                    value={`৳${stats.totalSales.toLocaleString()}`}
-                    icon={TrendingUp}
-                    bgColor="bg-green-50"
-                    textColor="text-green-600"
-                    trend="+12.5%"
-                />
-                <StatCard
-                    title="Total Orders"
-                    value={stats.ordersCount}
-                    icon={ShoppingBag}
-                    bgColor="bg-indigo-50"
-                    textColor="text-indigo-600"
-                />
-                <StatCard
-                    title="Pending"
-                    value={stats.pendingOrders}
-                    icon={Clock}
-                    bgColor="bg-amber-50"
-                    textColor="text-amber-600"
-                />
-                <StatCard
-                    title="Products"
-                    value={stats.productsCount}
-                    icon={Glasses}
-                    bgColor="bg-sky-50"
-                    textColor="text-sky-600"
-                />
-                <StatCard
-                    title="Customers"
-                    value={stats.customersCount}
-                    icon={Users}
-                    bgColor="bg-slate-50"
-                    textColor="text-slate-600"
-                />
+                {loading ? (
+                    <>
+                        {[...Array(5)].map((_, i) => <StatCardSkeleton key={i} />)}
+                    </>
+                ) : (
+                    <>
+                        <StatCard
+                            title="Total Sales"
+                            value={`৳${stats.totalSales.toLocaleString()}`}
+                            icon={TrendingUp}
+                            bgColor="bg-green-50"
+                            textColor="text-green-600"
+                            trend="+12.5%"
+                        />
+                        <StatCard
+                            title="Total Orders"
+                            value={stats.ordersCount}
+                            icon={ShoppingBag}
+                            bgColor="bg-indigo-50"
+                            textColor="text-indigo-600"
+                        />
+                        <StatCard
+                            title="Pending"
+                            value={stats.pendingOrders}
+                            icon={Clock}
+                            bgColor="bg-amber-50"
+                            textColor="text-amber-600"
+                        />
+                        <StatCard
+                            title="Products"
+                            value={stats.productsCount}
+                            icon={Glasses}
+                            bgColor="bg-sky-50"
+                            textColor="text-sky-600"
+                        />
+                        <StatCard
+                            title="Customers"
+                            value={stats.customersCount}
+                            icon={Users}
+                            bgColor="bg-slate-50"
+                            textColor="text-slate-600"
+                        />
+                    </>
+                )}
             </div>
 
+            {/* Charts Section */}
+            {!loading && <DashboardCharts orders={orders} />}
+
             <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-white p-8 rounded-3xl border border-border/50 shadow-sm min-h-[300px] flex flex-col items-center justify-center text-center">
-                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                        <TrendingUp size={32} className="text-gray-300" />
+                {/* Recent Orders Feature Placeholder - Functional upgrade candidate */}
+                <div className="bg-white p-8 rounded-3xl border border-border/50 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-bold text-text-main font-outfit uppercase tracking-tight">Top Performance</h3>
+                        <TrendingUp size={20} className="text-text-muted" />
                     </div>
-                    <h3 className="text-lg font-bold text-text-main font-outfit mb-2">Sales Analytics</h3>
-                    <p className="text-text-muted text-sm font-outfit">Visualize your sales performance over time.</p>
-                    <p className="mt-4 text-xs font-bold text-secondary uppercase tracking-[0.2em]">Chart module coming soon</p>
+                    <div className="space-y-4">
+                        <p className="text-text-muted text-sm font-outfit">Performance snapshots and trend analysis are active in the charts above.</p>
+                    </div>
                 </div>
 
                 <div className="bg-white p-8 rounded-3xl border border-border/50 shadow-sm min-h-[300px] flex flex-col items-center justify-center text-center">
                     <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                         <ShoppingBag size={32} className="text-gray-300" />
                     </div>
-                    <h3 className="text-lg font-bold text-text-main font-outfit mb-2">Recent Orders</h3>
-                    <p className="text-text-muted text-sm font-outfit">Quick access to the latest customer orders.</p>
-                    <p className="mt-4 text-xs font-bold text-secondary uppercase tracking-[0.2em]">Order list module coming soon</p>
+                    <h3 className="text-lg font-bold text-text-main font-outfit mb-2">Order Management</h3>
+                    <p className="text-text-muted text-sm font-outfit">Detailed order management available in the sidebar.</p>
                 </div>
             </div>
         </div>
