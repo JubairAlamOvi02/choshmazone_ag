@@ -115,7 +115,12 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signIn = async (email, password) => {
-        return supabase.auth.signInWithPassword({ email, password });
+        const result = await supabase.auth.signInWithPassword({ email, password });
+        if (result.data?.user) {
+            setUser(result.data.user);
+            await fetchUserRole(result.data.user.id);
+        }
+        return result;
     };
 
     const signUp = async (email, password, metadata = {}) => {

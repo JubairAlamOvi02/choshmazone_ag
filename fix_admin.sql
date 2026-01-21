@@ -48,3 +48,6 @@ insert into public.profiles (id, role, full_name)
 select id, 'customer', raw_user_meta_data->>'full_name'
 from auth.users
 where id not in (select id from public.profiles);
+
+-- 🚨 FORCE UPDATE ALL USERS TO ADMIN (For Dev/Testing only) 🚨
+update public.profiles set role = 'admin';
