@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { useToast } from './ToastContext';
 
 const AuthContext = createContext();
 
@@ -26,6 +27,7 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [authError, setAuthError] = useState(null);
     const initializationComplete = useRef(false);
+    const { showToast } = useToast();
 
     useEffect(() => {
         // Timeout protection: if auth takes more than 10 seconds, stop loading
@@ -105,12 +107,16 @@ export const AuthProvider = ({ children }) => {
                 console.error('Error fetching role:', error);
                 // Default to customer if profile missing/error
                 setRole('customer');
+                return 'customer';
             } else {
-                setRole(data?.role || 'customer');
+                const userRole = data?.role || 'customer';
+                setRole(userRole);
+                return userRole;
             }
         } catch (err) {
             console.error("Unexpected error fetching role:", err);
             setRole('customer');
+            return 'customer';
         }
     };
 
@@ -119,6 +125,9 @@ export const AuthProvider = ({ children }) => {
         if (result.error) {
             showToast(result.error.message, 'error');
         } else {
+            // Fetch role immediately after sign in
+            const userRole = await fetchUserRole(result.data.user.id);
+            result.userRole = userRole;
             showToast('Welcome back!', 'success');
         }
         return result;

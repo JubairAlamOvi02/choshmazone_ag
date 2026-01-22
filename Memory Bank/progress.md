@@ -82,3 +82,6 @@
   - Redesigned the Hero section with high-resolution cinematic assets.
   - Implemented slow-zoom background effects and staggered text entry transitions (Fade-in-Up).
   - Enhanced visual hierarchy and accessibility contrasts for a luxury brand experience.
+- Task 33 (User Role Adjustment): Completed
+  - Downgraded user 'Ovi2' from 'admin' to 'customer' in Supabase.
+  - Verified profile access levels in the database.

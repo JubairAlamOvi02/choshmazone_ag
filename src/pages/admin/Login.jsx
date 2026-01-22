@@ -9,9 +9,43 @@ const AdminLogin = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const { signIn } = useAuth();
+    const { signIn, user, isAdmin, signOut, loading: authLoading } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
+
+    if (user && isAdmin) {
+        return (
+            <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 text-white">
+                <div className="bg-slate-900 border border-slate-800 p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-[440px] text-center">
+                    <div className="w-16 h-16 bg-primary/20 text-primary rounded-2xl flex items-center justify-center mx-auto mb-6 border border-primary/30 animate-pulse">
+                        <ShieldCheck size={32} />
+                    </div>
+                    <h2 className="text-2xl font-bold font-outfit uppercase tracking-[0.2em] mb-4">Portal Access Active</h2>
+                    <p className="text-slate-400 text-sm mb-8 font-outfit uppercase tracking-widest opacity-60">
+                        Logged in: <span className="text-white opacity-100">{user.email}</span>
+                    </p>
+
+                    <div className="space-y-4">
+                        <button
+                            onClick={() => navigate('/admin/dashboard')}
+                            className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all font-outfit uppercase tracking-[0.2em]"
+                        >
+                            Open Dashboard
+                        </button>
+                        <button
+                            onClick={async () => {
+                                await signOut();
+                                navigate('/admin/login');
+                            }}
+                            className="w-full py-4 border border-slate-800 text-slate-400 font-bold rounded-xl hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 transition-all font-outfit uppercase tracking-[0.2em]"
+                        >
+                            Log Out & Switch
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -19,8 +53,13 @@ const AdminLogin = () => {
         setLoading(true);
 
         try {
-            const { error } = await signIn(email, password);
+            const { error, userRole } = await signIn(email, password);
             if (error) throw error;
+
+            if (userRole !== 'admin') {
+                setError('Unauthorized. Only administrators are permitted to enter this console.');
+                return;
+            }
 
             const from = location.state?.from?.pathname || "/admin/dashboard";
             navigate(from, { replace: true });
