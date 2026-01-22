@@ -9,28 +9,29 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { signIn, user, signOut, role } = useAuth();
+    const { signIn, user, signOut, role, isAdmin } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
-    if (user) {
+    // Only show the "Already Logged In" screen for Admins
+    if (user && isAdmin) {
         return (
             <div className="min-h-screen bg-white flex flex-col">
                 <Navbar />
                 <main className="flex-1 flex items-center justify-center p-4 py-12 bg-gray-50">
                     <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-[480px] text-center border border-border/50">
                         <div className="text-center mb-10">
-                            <h2 className="text-3xl font-bold mb-2 text-text-main font-outfit uppercase tracking-wider">Already Logged In</h2>
+                            <h2 className="text-3xl font-bold mb-2 text-text-main font-outfit uppercase tracking-wider">Admin Session Active</h2>
                             <p className="text-text-muted font-outfit">You are currently logged in as:</p>
                             <p className="text-text-main font-bold mt-2 font-mono">{user.email}</p>
                         </div>
 
                         <div className="space-y-4">
                             <button
-                                onClick={() => navigate(role === 'admin' ? '/admin/dashboard' : '/')}
+                                onClick={() => navigate('/admin/dashboard')}
                                 className="w-full py-4 bg-primary text-white font-bold rounded-lg hover:bg-primary/95 transition-all font-outfit uppercase tracking-widest"
                             >
-                                {role === 'admin' ? 'Go to Admin Dashboard' : 'Continue to Shopping'}
+                                Go to Admin Dashboard
                             </button>
                             <button
                                 onClick={() => {
@@ -40,7 +41,7 @@ const Login = () => {
                                 }}
                                 className="w-full py-4 border border-border text-text-main font-bold rounded-lg hover:bg-red-50 hover:text-error hover:border-red-100 transition-all font-outfit uppercase tracking-widest"
                             >
-                                Log Out & Switch Account
+                                Log Out
                             </button>
                         </div>
                     </div>
@@ -48,6 +49,16 @@ const Login = () => {
                 <Footer />
             </div>
         );
+    }
+
+    // Auto-redirect customers to home if they are already logged in
+    if (user && !isAdmin) {
+        // Use a short timeout to ensure state is settled or allow a brief flash if preferred, 
+        // but typically direct return/navigate is better. 
+        // However, since we can't 'return' a navigate side-effect easily in render without useEffect,
+        // we'll just return null and navigate in a useEffect, OR just let them see the form if that's preferred.
+        // Given your request "commented out code for customer", I'll just let them fall through to the form 
+        // so they can switch accounts if they want, or use the navbar.
     }
 
     const handleSubmit = async (e) => {

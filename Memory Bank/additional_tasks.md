@@ -145,4 +145,14 @@
     - [x] **Sales Analytics**: Integrated Recharts in Admin Dashboard for revenue visualization.
     - [x] **Order Timeline**: Created visual progress tracker and order details page (`OrderDetails.jsx`).
 
-**Current Status**: The application features a premium UI/UX suite including real-time search, global toast notifications, cinematic animations, and professional loading states. Core stability and performance (Route splitting, Error Boundaries) are fully implemented. Future work focuses on PWAs.
+**Current Status**: The application features a premium UI/UX suite including real-time search, global toast notifications, cinematic animations, and professional loading states. Core stability and performance (Route splitting, Error Boundaries) are fully implemented.
+
+- [x] **Persistent Login Fix**:
+    - [x] Implemented `SESSION_VERSION` to handle cache invalidation.
+    - [x] Added nuclear logout option to clear all storage and cookies.
+    - [x] Updated Login page to separate Admin (restricted) from Customer (allowed) active session screens.
+- [x] **Wishlist Functionality**:
+    - [x] Created `wishlist` schema in Supabase.
+    - [x] Implemented global `WishlistContext`.
+    - [x] Added Heart toggle button/icon to Product Cards, Product Details, and Navbar.
+    - [x] Built responsive "My Wishlist" page.
