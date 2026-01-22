@@ -89,3 +89,8 @@
   - **Skeleton Loaders**: Replaced basic loading spinners with polished shimmering placeholders for Shop (`ProductCardSkeleton`) and Admin Dashboard (`DashboardSkeleton`).
   - **Order Timeline**: Created `OrderDetails.jsx` with a visual progress tracker (Pending -> Processing -> Shipped -> Delivered) and registered the new route.
   - **Sales Analytics**: Verified implementation of Recharts-based revenue visualization in the Admin Dashboard.
+- Task 35 (Persistent Login Logic Fix): Completed
+  - Implemented version-based session invalidation (`SESSION_VERSION`) to force clean slates on updates.
+  - Added "Nuclear Option" to `signOut` that clears all local storage, session storage, and cookies.
+  - Added race-conditions to prevent `signOut` from hanging indefinitely.
+  - Updated `Login.jsx` to show a "Session Active" screen with clear options to Continue or Switch Account.
