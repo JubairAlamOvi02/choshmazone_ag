@@ -26,8 +26,13 @@
     *   `OrderTimeline`: State-driven progress tracking for fulfillment.
     *   `SearchBar`: Debounced multi-field filtering.
     *   `ErrorBoundary`: Global crash protection.
-*   **PWA**: Service Worker with offline caching for assets and images.
-*   **UI Strategy**: Mobile-first utility-class approach utilizing modern flexbox/grid and full-screen mobile drawers.
+*   **PWA** (Planned): Service Worker with offline caching for assets and images.
+*   **Performance Optimization**: 
+    - **Code Splitting**: Route-level granularity via `React.lazy` and `Suspense`.
+    - **Asset Priority**: `fetchpriority="high"` for critical path Above-The-Fold (ATF) images.
+    - **Asset Lazy Loading**: `loading="lazy"` for below-the-fold content.
+    - **Build Pipeline**: Custom manual chunks for vendor caching and Terser minification.
+    - **UI Strategy**: Mobile-first utility-class approach utilizing modern flexbox/grid and full-screen mobile drawers.
 
 ### Backend (Supabase)
 *   **Auth Service**: Manages Users (JWTs).

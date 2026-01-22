@@ -1,11 +1,14 @@
 
 import React, { createContext, useContext, useState, useEffect, useMemo, startTransition, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { useToast } from './ToastContext';
+
 const CartContext = createContext();
 
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
+    const { showToast } = useToast();
     const [cartItems, setCartItems] = useState(() => {
         const localData = localStorage.getItem('cartItems');
         return localData ? JSON.parse(localData) : [];
@@ -38,7 +41,7 @@ export const CartProvider = ({ children }) => {
 
                     // Notify if items were removed
                     if (filtered.length < prev.length) {
-                        console.warn('Some items were removed from your cart as they are no longer available.');
+                        showToast('Some items were removed from your cart as they are no longer available.', 'warning', 5000);
                     }
 
                     return filtered;
@@ -71,15 +74,24 @@ export const CartProvider = ({ children }) => {
             return [...prevItems, { ...product, quantity: quantityToAdd }];
         });
 
+        // Show toast
+        showToast(`${product.name || product.title} added to your bag!`, 'success');
+
         // Wrap UI state update in transition to improve INP/responsiveness
         startTransition(() => {
             setIsCartOpen(true);
         });
-    }, []);
+    }, [showToast]);
 
     const removeFromCart = useCallback((id) => {
-        setCartItems(prevItems => prevItems.filter(item => item.id !== id));
-    }, []);
+        setCartItems(prevItems => {
+            const itemToRemove = prevItems.find(item => item.id === id);
+            if (itemToRemove) {
+                showToast(`${itemToRemove.name || itemToRemove.title} removed from bag.`, 'info');
+            }
+            return prevItems.filter(item => item.id !== id);
+        });
+    }, [showToast]);
 
     const updateQuantity = useCallback((id, amount) => {
         setCartItems(prevItems => prevItems.map(item => {
@@ -93,7 +105,8 @@ export const CartProvider = ({ children }) => {
 
     const clearCart = useCallback(() => {
         setCartItems([]);
-    }, []);
+        showToast('Cart cleared.', 'info');
+    }, [showToast]);
 
     const toggleCart = useCallback(() => {
         startTransition(() => {

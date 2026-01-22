@@ -1,93 +1,105 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import CartDrawer from './components/Cart/CartDrawer';
+import ProtectedRoute from './components/ProtectedRoute';
+
+// Loading Component
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+  </div>
+);
 
 // Pages
-import Home from './pages/Home';
-import Shop from './pages/Shop';
-import ProductDetails from './pages/ProductDetails';
-import Collections from './pages/Collections';
-import About from './pages/About';
-import Contact from './pages/Contact';
+const Home = lazy(() => import('./pages/Home'));
+const Shop = lazy(() => import('./pages/Shop'));
+const ProductDetails = lazy(() => import('./pages/ProductDetails'));
+const Collections = lazy(() => import('./pages/Collections'));
+const About = lazy(() => import('./pages/About'));
+const Contact = lazy(() => import('./pages/Contact'));
 
 // Checkout
-import Checkout from './pages/Checkout';
-import OrderSuccess from './pages/OrderSuccess';
+const Checkout = lazy(() => import('./pages/Checkout'));
+const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
 
 // Auth
-import Login from './pages/Login';
-import Register from './pages/Register';
-import UserProfile from './pages/account/Profile';
-import UserOrders from './pages/account/Orders';
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const UserProfile = lazy(() => import('./pages/account/Profile'));
+const UserOrders = lazy(() => import('./pages/account/Orders'));
 
 // Admin
-import AdminLogin from './pages/admin/Login';
-import AdminLayout from './layouts/AdminLayout';
-import AdminDashboard from './pages/admin/Dashboard';
-import AdminProducts from './pages/admin/Products';
-import AdminProductNew from './pages/admin/ProductNew';
-import ProductForm from './pages/admin/ProductForm';
-import AdminOrders from './pages/admin/Orders';
-import AdminCustomers from './pages/admin/Customers';
+const AdminLogin = lazy(() => import('./pages/admin/Login'));
+const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
+const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
+const AdminProducts = lazy(() => import('./pages/admin/Products'));
+const AdminProductNew = lazy(() => import('./pages/admin/ProductNew'));
+const ProductForm = lazy(() => import('./pages/admin/ProductForm'));
+const AdminOrders = lazy(() => import('./pages/admin/Orders'));
+const AdminCustomers = lazy(() => import('./pages/admin/Customers'));
 
-import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
     <ErrorBoundary>
       <Router>
-        <AuthProvider>
-          <CartProvider>
-            <div className="app">
-              <CartDrawer />
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Home />} />
-                <Route path="/shop" element={<Shop />} />
-                <Route path="/product/:id" element={<ProductDetails />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/order-success" element={<OrderSuccess />} />
-                <Route path="/collections" element={<Collections />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
+        <ToastProvider>
+          <AuthProvider>
+            <CartProvider>
+              <div className="app">
+                <CartDrawer />
+                <Suspense fallback={<PageLoader />}>
+                  <Routes>
+                    {/* Public Routes */}
+                    <Route path="/" element={<Home />} />
+                    <Route path="/shop" element={<Shop />} />
+                    <Route path="/product/:id" element={<ProductDetails />} />
+                    <Route path="/checkout" element={<Checkout />} />
+                    <Route path="/order-success" element={<OrderSuccess />} />
+                    <Route path="/collections" element={<Collections />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/contact" element={<Contact />} />
 
-                {/* Customer Routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/profile" element={
-                  <ProtectedRoute>
-                    <UserProfile />
-                  </ProtectedRoute>
-                } />
-                <Route path="/orders" element={
-                  <ProtectedRoute>
-                    <UserOrders />
-                  </ProtectedRoute>
-                } />
+                    {/* Customer Routes */}
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/profile" element={
+                      <ProtectedRoute>
+                        <UserProfile />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/orders" element={
+                      <ProtectedRoute>
+                        <UserOrders />
+                      </ProtectedRoute>
+                    } />
 
-                {/* Admin Routes */}
-                <Route path="/admin/login" element={<AdminLogin />} />
+                    {/* Admin Routes */}
+                    <Route path="/admin/login" element={<AdminLogin />} />
 
-                <Route path="/admin" element={
-                  <ProtectedRoute requireAdmin={true}>
-                    <AdminLayout />
-                  </ProtectedRoute>
-                }>
-                  <Route index element={<Navigate to="dashboard" replace />} />
-                  <Route path="dashboard" element={<AdminDashboard />} />
-                  <Route path="products" element={<AdminProducts />} />
-                  <Route path="products/new" element={<AdminProductNew />} />
-                  <Route path="products/edit/:id" element={<ProductForm />} />
-                  <Route path="orders" element={<AdminOrders />} />
-                  <Route path="customers" element={<AdminCustomers />} />
-                </Route>
-              </Routes>
-            </div>
-          </CartProvider>
-        </AuthProvider>
+                    <Route path="/admin" element={
+                      <ProtectedRoute requireAdmin={true}>
+                        <AdminLayout />
+                      </ProtectedRoute>
+                    }>
+                      <Route index element={<Navigate to="dashboard" replace />} />
+                      <Route path="dashboard" element={<AdminDashboard />} />
+                      <Route path="products" element={<AdminProducts />} />
+                      <Route path="products/new" element={<AdminProductNew />} />
+                      <Route path="products/edit/:id" element={<ProductForm />} />
+                      <Route path="orders" element={<AdminOrders />} />
+                      <Route path="customers" element={<AdminCustomers />} />
+                    </Route>
+                  </Routes>
+                </Suspense>
+              </div>
+            </CartProvider>
+          </AuthProvider>
+        </ToastProvider>
       </Router>
     </ErrorBoundary>
   )

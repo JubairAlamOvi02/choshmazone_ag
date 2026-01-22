@@ -12,6 +12,7 @@ import { X } from 'lucide-react';
 const Shop = () => {
     const location = useLocation();
     const initialCategory = location.state?.category || "All";
+    const initialSearch = location.state?.searchQuery || "";
 
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
@@ -21,8 +22,15 @@ const Shop = () => {
         style: "All",
         maxPrice: 10000
     });
+    const [searchQuery, setSearchQuery] = useState(initialSearch);
     const [sortOption, setSortOption] = useState("newest");
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+    useEffect(() => {
+        if (location.state?.searchQuery) {
+            setSearchQuery(location.state.searchQuery);
+        }
+    }, [location.state?.searchQuery]);
 
     useEffect(() => {
         fetchProducts();
@@ -49,6 +57,7 @@ const Shop = () => {
     useEffect(() => {
         let result = [...products];
 
+        // Apply Category/Style Filters
         if (filters.category !== "All") {
             result = result.filter(product => product.category === filters.category);
         }
@@ -59,6 +68,17 @@ const Shop = () => {
 
         result = result.filter(product => product.price <= filters.maxPrice);
 
+        // Apply Search Filter
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            result = result.filter(product =>
+                product.name.toLowerCase().includes(q) ||
+                product.category.toLowerCase().includes(q) ||
+                product.style.toLowerCase().includes(q)
+            );
+        }
+
+        // Apply Sorting
         if (sortOption === "price-low") {
             result.sort((a, b) => a.price - b.price);
         } else if (sortOption === "price-high") {
@@ -68,7 +88,7 @@ const Shop = () => {
         }
 
         setFilteredProducts(result);
-    }, [filters, sortOption, products]);
+    }, [filters, sortOption, products, searchQuery]);
 
     return (
         <div className="min-h-screen bg-white">
@@ -77,7 +97,7 @@ const Shop = () => {
             <main className="container mx-auto px-4 py-8 md:py-12">
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-4 border-b border-border gap-4">
                     <h1 className="text-2xl md:text-3xl font-bold font-outfit text-text-main uppercase tracking-wider">
-                        {filters.category === "All" ? "Shop All" : `Shop ${filters.category}`}
+                        {searchQuery ? `Results for "${searchQuery}"` : (filters.category === "All" ? "Shop All" : `Shop ${filters.category}`)}
                     </h1>
                     <div className="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto">
                         <button
@@ -97,9 +117,24 @@ const Shop = () => {
 
                     <div className="flex-1">
                         {/* Active Filter Chips */}
-                        {(filters.category !== "All" || filters.style !== "All") && (
+                        {(filters.category !== "All" || filters.style !== "All" || searchQuery) && (
                             <div className="flex flex-wrap items-center gap-3 mb-8 animate-in fade-in slide-in-from-left-4 duration-500">
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted">Filtering:</span>
+
+                                {searchQuery && (
+                                    <div className="group flex items-center gap-2 bg-secondary text-white px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest font-outfit shadow-md ring-2 ring-secondary/5">
+                                        <span className="w-1 h-1 rounded-full bg-white animate-pulse"></span>
+                                        <span>Search: {searchQuery}</span>
+                                        <button
+                                            onClick={() => setSearchQuery("")}
+                                            className="ml-2 hover:text-primary transition-colors cursor-pointer border-l border-white/20 pl-2"
+                                            title="Clear Search"
+                                        >
+                                            <X size={10} strokeWidth={4} />
+                                        </button>
+                                    </div>
+                                )}
+
                                 {filters.category !== "All" && (
                                     <div className="group flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest font-outfit shadow-md ring-2 ring-primary/5">
                                         <span className="w-1 h-1 rounded-full bg-secondary"></span>
@@ -127,10 +162,13 @@ const Shop = () => {
                                     </div>
                                 )}
                                 <button
-                                    onClick={() => setFilters({ category: "All", style: "All", maxPrice: 10000 })}
+                                    onClick={() => {
+                                        setFilters({ category: "All", style: "All", maxPrice: 10000 });
+                                        setSearchQuery("");
+                                    }}
                                     className="text-[10px] font-bold uppercase tracking-widest text-text-muted hover:text-primary transition-all hover:tracking-[0.15em]"
                                 >
-                                    Reset Filters
+                                    Reset All
                                 </button>
                             </div>
                         )}

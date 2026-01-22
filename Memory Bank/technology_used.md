@@ -53,5 +53,10 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **Recharts Integration**: Professional-grade data visualization for sales and order trends in the admin panel.
     - **Skeleton Shimmering Loaders**: High-end perceived performance using a centralized skeleton system for all primary pages.
     - **Fulfillment Tracking**: Dynamic visual timeline for customer order status (Placed → Processing → Shipped → Delivered).
-    - **Resource Optimization**: Route-based lazy loading, image intersection observer, and TTL-based data caching.
-- **Resilience**: Comprehensive Error Boundaries and Auth timeout protection to prevent blank screens.
+    - **Resilience**: Comprehensive Error Boundaries and Auth timeout protection to prevent blank screens.
+- **Elite Performance**: 
+    - **Route-Based Splitting**: Uses `React.lazy` and `Suspense` for on-demand chunk loading, reducing initial payload.
+    - **Build Optimization**: Custom `manualChunks` in Vite for vendor library caching.
+    - **Minification**: Integrated Terser for aggressive code reduction.
+    - **LCP Tuning**: Optimized critical path images with `fetchpriority="high"` and eager loading.
+    - **Lazy Rendering**: Asynchronous decoding and lazy loading for off-screen product assets.

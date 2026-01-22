@@ -115,17 +115,29 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signIn = async (email, password) => {
-        return supabase.auth.signInWithPassword({ email, password });
+        const result = await supabase.auth.signInWithPassword({ email, password });
+        if (result.error) {
+            showToast(result.error.message, 'error');
+        } else {
+            showToast('Welcome back!', 'success');
+        }
+        return result;
     };
 
     const signUp = async (email, password, metadata = {}) => {
-        return supabase.auth.signUp({
+        const result = await supabase.auth.signUp({
             email,
             password,
             options: {
                 data: metadata, // e.g. full_name
             },
         });
+        if (result.error) {
+            showToast(result.error.message, 'error');
+        } else {
+            showToast('Account created! Please check your email for verification.', 'success', 6000);
+        }
+        return result;
     };
 
     const signOut = async () => {
@@ -133,6 +145,7 @@ export const AuthProvider = ({ children }) => {
         // Force clear state regardless of potential network error
         setUser(null);
         setRole(null);
+        showToast('Successfully logged out.', 'info');
         return { error };
     };
 

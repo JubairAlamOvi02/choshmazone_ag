@@ -22,6 +22,8 @@ const ProductCard = ({ product }) => {
                     <img
                         src={image}
                         alt={title}
+                        loading="lazy"
+                        decoding="async"
                         className="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:opacity-0"
                     />
 
@@ -30,6 +32,8 @@ const ProductCard = ({ product }) => {
                         <img
                             src={hoverImage}
                             alt={`${title} - alternate view`}
+                            loading="lazy"
+                            decoding="async"
                             className="absolute inset-0 w-full h-full object-cover transition-all duration-500 opacity-0 group-hover:opacity-100 group-hover:scale-105"
                         />
                     )}
