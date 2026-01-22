@@ -13,7 +13,7 @@ const AdminLogin = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    if (user && isAdmin) {
+    if (user && isAdmin && !loading) {
         return (
             <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 text-white">
                 <div className="bg-slate-900 border border-slate-800 p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-[440px] text-center">

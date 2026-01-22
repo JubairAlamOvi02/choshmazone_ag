@@ -38,8 +38,7 @@ export const AuthProvider = ({ children }) => {
             supabase.auth.signOut().then(() => {
                 localStorage.clear();
                 localStorage.setItem('cz_session_version', SESSION_VERSION);
-                // Only reload if we actually cleared a stale session
-                if (storedVersion) window.location.reload();
+                // Do not force reload, just let state update naturally to avoid loops
             });
         }
     }, []);
@@ -77,6 +76,8 @@ export const AuthProvider = ({ children }) => {
                 setAuthError(err.message);
                 setUser(null);
                 setRole(null);
+                // If we hit an error here, it might be a corrupted session. Clear it.
+                localStorage.clear();
             } finally {
                 initializationComplete.current = true;
                 setLoading(false);
@@ -86,9 +87,14 @@ export const AuthProvider = ({ children }) => {
         getSession();
 
         // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            console.log(`[Auth] Auth state changed: ${event}`);
             try {
-                if (session?.user) {
+                if (event === 'SIGNED_OUT') {
+                    setUser(null);
+                    setRole(null);
+                    localStorage.clear();
+                } else if (session?.user) {
                     setUser(session.user);
                     await fetchUserRole(session.user.id, session.user.email);
                 } else {
@@ -129,11 +135,11 @@ export const AuthProvider = ({ children }) => {
                 .from('profiles')
                 .select('role')
                 .eq('id', userId)
-                .single();
+                .maybeSingle(); // Use maybeSingle to avoid 406 error if row missing
 
             if (error) {
                 console.error('Error fetching role:', error);
-                // Graceful fallback: check if user metadata has role (backup)
+                // Graceful fallback
                 setRole('customer');
                 return 'customer';
             } else {
@@ -178,16 +184,38 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signOut = async () => {
+        console.log('[Auth] SignOut initiated');
         try {
-            await supabase.auth.signOut();
+            // Prevent hanging: Race Supabase signOut against a 1-second timeout
+            await Promise.race([
+                supabase.auth.signOut(),
+                new Promise((resolve) => setTimeout(() => resolve('timeout'), 1000))
+            ]);
+            console.log('[Auth] Supabase signOut attempted');
         } catch (err) {
-            console.error("SignOut error:", err);
+            console.error("[Auth] SignOut error:", err);
         } finally {
+            console.log('[Auth] Clearing local state');
             setUser(null);
             setRole(null);
+
+            // Nuclear option: Clear everything
+            localStorage.clear();
+            sessionStorage.clear();
+
+            // Clear all cookies
+            document.cookie.split(";").forEach((c) => {
+                document.cookie = c
+                    .replace(/^ +/, "")
+                    .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+            });
+
             showToast('Successfully logged out.', 'info');
-            // Optional: Hard refresh to clear any residual memory state
-            window.location.href = '/';
+
+            // Short delay to allow toast to appear and state to settle before hard refresh
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 500);
         }
     };
 
@@ -202,7 +230,8 @@ export const AuthProvider = ({ children }) => {
         authError
     };
 
-    if (loading) return <LoadingSpinner />;
+    // Simplified loading check to prevent flash of loading content
+    if (loading && !initializationComplete.current) return <LoadingSpinner />;
 
     return (
         <AuthContext.Provider value={value}>

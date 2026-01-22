@@ -4,6 +4,7 @@ import Footer from '../components/Footer';
 import FilterSidebar from '../components/Shop/FilterSidebar';
 import SortSelect from '../components/Shop/SortSelect';
 import ProductCard from '../components/ProductCard';
+import ProductCardSkeleton from '../components/ui/ProductCardSkeleton';
 import { productParams } from '../lib/api/products';
 import { useLocation } from 'react-router-dom';
 import { X } from 'lucide-react';
@@ -182,8 +183,10 @@ const Shop = () => {
                         )}
 
                         {loading ? (
-                            <div className="flex justify-center items-center h-64">
-                                <p className="text-lg font-outfit text-text-muted">Loading products...</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
+                                {[...Array(6)].map((_, index) => (
+                                    <ProductCardSkeleton key={index} />
+                                ))}
                             </div>
                         ) : filteredProducts.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">

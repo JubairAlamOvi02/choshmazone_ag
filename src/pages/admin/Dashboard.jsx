@@ -6,6 +6,7 @@ import { TrendingUp, ShoppingBag, Clock, Glasses, Users, RefreshCcw, ArrowUpRigh
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
+import DashboardSkeleton from '../../components/ui/DashboardSkeleton';
 
 const Dashboard = () => {
     const [stats, setStats] = useState({
@@ -102,6 +103,10 @@ const Dashboard = () => {
         </div>
     );
 
+    if (loading) {
+        return <DashboardSkeleton />;
+    }
+
     return (
         <div className="animate-in fade-in duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
@@ -119,54 +124,42 @@ const Dashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                {loading ? (
-                    Array(5).fill(0).map((_, i) => (
-                        <div key={i} className="bg-white p-6 rounded-2xl border border-border/50 shadow-sm animate-pulse">
-                            <div className="w-10 h-10 bg-gray-100 rounded-xl mb-4"></div>
-                            <div className="w-20 h-4 bg-gray-100 rounded mb-2"></div>
-                            <div className="w-12 h-6 bg-gray-100 rounded"></div>
-                        </div>
-                    ))
-                ) : (
-                    <>
-                        <StatCard
-                            title="Total Sales"
-                            value={`৳${stats.totalSales.toLocaleString()}`}
-                            icon={TrendingUp}
-                            bgColor="bg-green-50"
-                            textColor="text-green-600"
-                            trend="+12.5%"
-                        />
-                        <StatCard
-                            title="Total Orders"
-                            value={stats.ordersCount}
-                            icon={ShoppingBag}
-                            bgColor="bg-indigo-50"
-                            textColor="text-indigo-600"
-                        />
-                        <StatCard
-                            title="Pending"
-                            value={stats.pendingOrders}
-                            icon={Clock}
-                            bgColor="bg-amber-50"
-                            textColor="text-amber-600"
-                        />
-                        <StatCard
-                            title="Products"
-                            value={stats.productsCount}
-                            icon={Glasses}
-                            bgColor="bg-sky-50"
-                            textColor="text-sky-600"
-                        />
-                        <StatCard
-                            title="Customers"
-                            value={stats.customersCount}
-                            icon={Users}
-                            bgColor="bg-slate-50"
-                            textColor="text-slate-600"
-                        />
-                    </>
-                )}
+                <StatCard
+                    title="Total Sales"
+                    value={`৳${stats.totalSales.toLocaleString()}`}
+                    icon={TrendingUp}
+                    bgColor="bg-green-50"
+                    textColor="text-green-600"
+                    trend="+12.5%"
+                />
+                <StatCard
+                    title="Total Orders"
+                    value={stats.ordersCount}
+                    icon={ShoppingBag}
+                    bgColor="bg-indigo-50"
+                    textColor="text-indigo-600"
+                />
+                <StatCard
+                    title="Pending"
+                    value={stats.pendingOrders}
+                    icon={Clock}
+                    bgColor="bg-amber-50"
+                    textColor="text-amber-600"
+                />
+                <StatCard
+                    title="Products"
+                    value={stats.productsCount}
+                    icon={Glasses}
+                    bgColor="bg-sky-50"
+                    textColor="text-sky-600"
+                />
+                <StatCard
+                    title="Customers"
+                    value={stats.customersCount}
+                    icon={Users}
+                    bgColor="bg-slate-50"
+                    textColor="text-slate-600"
+                />
             </div>
 
             <div className="mt-12 grid grid-cols-1 lg:grid-cols-[2fr_1.2fr] gap-8">

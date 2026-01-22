@@ -13,14 +13,8 @@ const Navbar = () => {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
-        try {
-            await signOut();
-        } catch (error) {
-            console.error("Logout error:", error);
-        } finally {
-            setIsProfileOpen(false);
-            navigate('/');
-        }
+        setIsProfileOpen(false);
+        await signOut();
     };
 
     return (

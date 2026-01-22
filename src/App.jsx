@@ -31,6 +31,7 @@ const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const UserProfile = lazy(() => import('./pages/account/Profile'));
 const UserOrders = lazy(() => import('./pages/account/Orders'));
+const UserOrderDetails = lazy(() => import('./pages/account/OrderDetails'));
 
 // Admin
 const AdminLogin = lazy(() => import('./pages/admin/Login'));
@@ -75,6 +76,11 @@ function App() {
                     <Route path="/orders" element={
                       <ProtectedRoute>
                         <UserOrders />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/account/orders/:id" element={
+                      <ProtectedRoute>
+                        <UserOrderDetails />
                       </ProtectedRoute>
                     } />
 

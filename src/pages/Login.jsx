@@ -33,9 +33,10 @@ const Login = () => {
                                 {role === 'admin' ? 'Go to Admin Dashboard' : 'Continue to Shopping'}
                             </button>
                             <button
-                                onClick={async () => {
-                                    await signOut();
-                                    navigate('/login');
+                                onClick={() => {
+                                    signOut();
+                                    // Force reload backup in case signOut hangs
+                                    setTimeout(() => window.location.href = '/', 1000);
                                 }}
                                 className="w-full py-4 border border-border text-text-main font-bold rounded-lg hover:bg-red-50 hover:text-error hover:border-red-100 transition-all font-outfit uppercase tracking-widest"
                             >
@@ -62,8 +63,12 @@ const Login = () => {
             if (userRole === 'admin' || email.toLowerCase().trim() === 'ovi.extra@gmail.com') {
                 navigate('/admin/dashboard', { replace: true });
             } else {
+                // Default to home page if no history
                 const from = location.state?.from?.pathname || "/";
-                navigate(from, { replace: true });
+
+                // If the user was trying to go to login, send them to home instead to avoid loops
+                const target = from === "/login" ? "/" : from;
+                navigate(target, { replace: true });
             }
         } catch (err) {
             setError(err.message || 'Failed to login');
