@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef, memo } from 'react';
 import { Search, X, Loader2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { productParams } from '../lib/api/products';
 
 const SearchBar = memo(({ className = '' }) => {
@@ -12,6 +12,7 @@ const SearchBar = memo(({ className = '' }) => {
     const [allProducts, setAllProducts] = useState([]);
     const inputRef = useRef(null);
     const containerRef = useRef(null);
+    const navigate = useNavigate();
 
     // Load products once when search is opened
     useEffect(() => {
@@ -99,6 +100,13 @@ const SearchBar = memo(({ className = '' }) => {
         setResults([]);
     };
 
+    const handleSearch = (e) => {
+        if (e.key === 'Enter' && query.trim()) {
+            navigate(`/shop?search=${encodeURIComponent(query.trim())}`);
+            handleResultClick();
+        }
+    };
+
     return (
         <div ref={containerRef} className={`relative ${className}`}>
             {/* Search Toggle Button */}
@@ -121,6 +129,7 @@ const SearchBar = memo(({ className = '' }) => {
                             type="text"
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
+                            onKeyDown={handleSearch}
                             placeholder="Search for sunglasses..."
                             className="flex-1 outline-none text-text-main placeholder:text-text-muted text-sm bg-transparent"
                         />

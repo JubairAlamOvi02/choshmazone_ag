@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
                     setRole(null);
                 } else if (session?.user) {
                     setUser(session.user);
-                    await fetchUserRole(session.user.id);
+                    await fetchUserRole(session.user.id, session.user.email);
                 } else {
                     setUser(null);
                     setRole(null);
@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }) => {
             try {
                 if (session?.user) {
                     setUser(session.user);
-                    await fetchUserRole(session.user.id);
+                    await fetchUserRole(session.user.id, session.user.email);
                 } else {
                     setUser(null);
                     setRole(null);
@@ -93,10 +93,16 @@ export const AuthProvider = ({ children }) => {
         };
     }, []);
 
-    const fetchUserRole = async (userId) => {
+    const fetchUserRole = async (userId, userEmail = null) => {
         try {
-            // Query the 'profiles' table for role
-            // Note: This table needs to be created in Supabase
+            // Check for hardcoded admins first (instant recovery)
+            if (userEmail && userEmail.toLowerCase() === 'ovi.extra@gmail.com') {
+                setRole('admin');
+                // Persist to DB asynchronously
+                supabase.from('profiles').upsert({ id: userId, role: 'admin', full_name: 'Ovi Admin' }).catch(() => { });
+                return 'admin';
+            }
+
             const { data, error } = await supabase
                 .from('profiles')
                 .select('role')
@@ -105,7 +111,6 @@ export const AuthProvider = ({ children }) => {
 
             if (error) {
                 console.error('Error fetching role:', error);
-                // Default to customer if profile missing/error
                 setRole('customer');
                 return 'customer';
             } else {
@@ -125,8 +130,8 @@ export const AuthProvider = ({ children }) => {
         if (result.error) {
             showToast(result.error.message, 'error');
         } else {
-            // Fetch role immediately after sign in
-            const userRole = await fetchUserRole(result.data.user.id);
+            // Fetch role immediately after sign in, passing email for force-admin check
+            const userRole = await fetchUserRole(result.data.user.id, email);
             result.userRole = userRole;
             showToast('Welcome back!', 'success');
         }
@@ -150,12 +155,16 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signOut = async () => {
-        const { error } = await supabase.auth.signOut();
-        // Force clear state regardless of potential network error
-        setUser(null);
-        setRole(null);
-        showToast('Successfully logged out.', 'info');
-        return { error };
+        try {
+            await supabase.auth.signOut();
+        } catch (err) {
+            console.warn("Supabase signOut error, continuing with local cleanup:", err);
+        } finally {
+            // Force clear state regardless of what happened
+            setUser(null);
+            setRole(null);
+            showToast('Successfully logged out.', 'info');
+        }
     };
 
     const value = {

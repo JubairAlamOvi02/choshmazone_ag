@@ -14,8 +14,44 @@ const Register = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const { signUp } = useAuth();
+    const { signUp, user, signOut } = useAuth();
     const navigate = useNavigate();
+
+    if (user) {
+        return (
+            <div className="min-h-screen bg-white flex flex-col">
+                <Navbar />
+                <main className="flex-1 flex items-center justify-center p-4 py-12 bg-gray-50">
+                    <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-[520px] text-center border border-border/50">
+                        <div className="text-center mb-10">
+                            <h2 className="text-3xl font-bold mb-2 text-text-main font-outfit uppercase tracking-wider">Session Active</h2>
+                            <p className="text-text-muted font-outfit">You are already signed in as:</p>
+                            <p className="text-text-main font-bold mt-2 font-mono uppercase tracking-tight">{user.email}</p>
+                        </div>
+
+                        <div className="space-y-4">
+                            <button
+                                onClick={() => navigate('/')}
+                                className="w-full py-4 bg-primary text-white font-bold rounded-lg hover:bg-primary/95 transition-all font-outfit uppercase tracking-widest"
+                            >
+                                Return to Shop
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    await signOut();
+                                    navigate('/register');
+                                }}
+                                className="w-full py-4 border border-border text-text-main font-bold rounded-lg hover:bg-red-50 hover:text-error hover:border-red-100 transition-all font-outfit uppercase tracking-widest"
+                            >
+                                Log Out & Create New Account
+                            </button>
+                        </div>
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
 
     const handleChange = (e) => {
         setFormData({

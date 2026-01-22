@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import { Users, Search, Mail, Shield, ShieldCheck, Filter, MoreHorizontal } from 'lucide-react';
+import { Users, Search, Mail, Shield, ShieldCheck, Filter, MoreHorizontal, Trash2 } from 'lucide-react';
 
 const AdminCustomers = () => {
     const [customers, setCustomers] = useState([]);
@@ -100,23 +100,64 @@ const AdminCustomers = () => {
                                     </td>
                                     <td className="px-6 py-5">
                                         <div className="flex items-center gap-2">
-                                            {customer.role === 'admin' ? (
-                                                <div className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary rounded-full">
-                                                    <ShieldCheck size={12} />
-                                                    <span className="text-[10px] font-bold uppercase tracking-widest">Administrator</span>
-                                                </div>
-                                            ) : (
-                                                <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-600 rounded-full">
-                                                    <Users size={12} />
-                                                    <span className="text-[10px] font-bold uppercase tracking-widest">Customer</span>
-                                                </div>
-                                            )}
+                                            <select
+                                                value={customer.role}
+                                                onChange={async (e) => {
+                                                    const newRole = e.target.value;
+                                                    try {
+                                                        const { error } = await supabase
+                                                            .from('profiles')
+                                                            .update({ role: newRole })
+                                                            .eq('id', customer.id);
+
+                                                        if (error) throw error;
+
+                                                        // Update local state
+                                                        setCustomers(customers.map(c =>
+                                                            c.id === customer.id ? { ...c, role: newRole } : c
+                                                        ));
+                                                    } catch (err) {
+                                                        alert('Failed to update user role. You may need higher database permissions.');
+                                                    }
+                                                }}
+                                                className={`
+                                                    text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border-none outline-none cursor-pointer
+                                                    ${customer.role === 'admin' ? 'bg-primary/10 text-primary' : 'bg-slate-100 text-slate-600'}
+                                                `}
+                                            >
+                                                <option value="customer">Customer</option>
+                                                <option value="admin">Administrator</option>
+                                            </select>
                                         </div>
                                     </td>
                                     <td className="px-6 py-5 text-right">
-                                        <button className="p-2 text-gray-400 hover:text-text-main hover:bg-gray-100 rounded-lg transition-all">
-                                            <MoreHorizontal size={18} />
-                                        </button>
+                                        <div className="flex items-center justify-end gap-2">
+                                            <button
+                                                onClick={async () => {
+                                                    if (!window.confirm(`Are you sure you want to delete ${customer.full_name || 'this user'}? This will remove their profile data.`)) return;
+
+                                                    try {
+                                                        const { error } = await supabase
+                                                            .from('profiles')
+                                                            .delete()
+                                                            .eq('id', customer.id);
+
+                                                        if (error) throw error;
+
+                                                        setCustomers(customers.filter(c => c.id !== customer.id));
+                                                    } catch (err) {
+                                                        alert('Failed to delete user: ' + err.message);
+                                                    }
+                                                }}
+                                                className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                                title="Delete User"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                            <button className="p-2 text-gray-400 hover:text-text-main hover:bg-gray-100 rounded-lg transition-all">
+                                                <MoreHorizontal size={18} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

@@ -27,10 +27,18 @@ const Shop = () => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     useEffect(() => {
+        // Check for state-based search
         if (location.state?.searchQuery) {
             setSearchQuery(location.state.searchQuery);
         }
-    }, [location.state?.searchQuery]);
+
+        // Check for URL-based search
+        const params = new URLSearchParams(location.search);
+        const urlSearch = params.get('search');
+        if (urlSearch) {
+            setSearchQuery(urlSearch);
+        }
+    }, [location.state?.searchQuery, location.search]);
 
     useEffect(() => {
         fetchProducts();
