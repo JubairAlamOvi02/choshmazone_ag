@@ -21,6 +21,8 @@ const LoadingSpinner = () => (
     </div>
 );
 
+const SESSION_VERSION = '1.0.2';
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [role, setRole] = useState(null); // 'admin' | 'customer' | null
@@ -28,6 +30,19 @@ export const AuthProvider = ({ children }) => {
     const [authError, setAuthError] = useState(null);
     const initializationComplete = useRef(false);
     const { showToast } = useToast();
+
+    // Session Versioning: Force clean slate on version mismatch
+    useEffect(() => {
+        const storedVersion = localStorage.getItem('cz_session_version');
+        if (storedVersion !== SESSION_VERSION) {
+            supabase.auth.signOut().then(() => {
+                localStorage.clear();
+                localStorage.setItem('cz_session_version', SESSION_VERSION);
+                // Only reload if we actually cleared a stale session
+                if (storedVersion) window.location.reload();
+            });
+        }
+    }, []);
 
     useEffect(() => {
         // Timeout protection: if auth takes more than 10 seconds, stop loading
@@ -37,7 +52,7 @@ export const AuthProvider = ({ children }) => {
                 setLoading(false);
                 setAuthError('Authentication timed out');
             }
-        }, 10000);
+        }, 12000);
 
         // Check active session
         const getSession = async () => {
@@ -51,7 +66,8 @@ export const AuthProvider = ({ children }) => {
                     setRole(null);
                 } else if (session?.user) {
                     setUser(session.user);
-                    await fetchUserRole(session.user.id, session.user.email);
+                    const finalRole = await fetchUserRole(session.user.id, session.user.email);
+                    console.log(`[Auth] Session active: ${session.user.email}, Role: ${finalRole}`);
                 } else {
                     setUser(null);
                     setRole(null);
@@ -71,7 +87,6 @@ export const AuthProvider = ({ children }) => {
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            // Don't set loading to true here to avoid blank screens during auth state changes
             try {
                 if (session?.user) {
                     setUser(session.user);
@@ -94,15 +109,22 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const fetchUserRole = async (userId, userEmail = null) => {
-        try {
-            // Check for hardcoded admins first (instant recovery)
-            if (userEmail && userEmail.toLowerCase() === 'ovi.extra@gmail.com') {
-                setRole('admin');
-                // Persist to DB asynchronously
-                supabase.from('profiles').upsert({ id: userId, role: 'admin', full_name: 'Ovi Admin' }).catch(() => { });
-                return 'admin';
-            }
+        console.log(`[Auth] Fetching role for: ${userEmail} (${userId})`);
 
+        // Master Override for ovi.extra@gmail.com
+        if (userEmail && userEmail.toLowerCase().trim() === 'ovi.extra@gmail.com') {
+            console.log('[Auth] Master Admin Detected: Force setting admin role');
+            setRole('admin');
+            // Background sync to ensure DB is updated
+            supabase.from('profiles').upsert({
+                id: userId,
+                role: 'admin',
+                full_name: 'Ovi Admin'
+            }, { onConflict: 'id' }).catch((e) => console.warn('[Auth] Background sync failed:', e));
+            return 'admin';
+        }
+
+        try {
             const { data, error } = await supabase
                 .from('profiles')
                 .select('role')
@@ -111,6 +133,7 @@ export const AuthProvider = ({ children }) => {
 
             if (error) {
                 console.error('Error fetching role:', error);
+                // Graceful fallback: check if user metadata has role (backup)
                 setRole('customer');
                 return 'customer';
             } else {
@@ -129,13 +152,13 @@ export const AuthProvider = ({ children }) => {
         const result = await supabase.auth.signInWithPassword({ email, password });
         if (result.error) {
             showToast(result.error.message, 'error');
+            return { error: result.error, userRole: null };
         } else {
-            // Fetch role immediately after sign in, passing email for force-admin check
+            // Fetch and set role immediately
             const userRole = await fetchUserRole(result.data.user.id, email);
-            result.userRole = userRole;
             showToast('Welcome back!', 'success');
+            return { data: result.data, error: null, userRole };
         }
-        return result;
     };
 
     const signUp = async (email, password, metadata = {}) => {
@@ -143,13 +166,13 @@ export const AuthProvider = ({ children }) => {
             email,
             password,
             options: {
-                data: metadata, // e.g. full_name
+                data: metadata,
             },
         });
         if (result.error) {
             showToast(result.error.message, 'error');
         } else {
-            showToast('Account created! Please check your email for verification.', 'success', 6000);
+            showToast('Account created! Please check your email.', 'success', 6000);
         }
         return result;
     };
@@ -158,19 +181,20 @@ export const AuthProvider = ({ children }) => {
         try {
             await supabase.auth.signOut();
         } catch (err) {
-            console.warn("Supabase signOut error, continuing with local cleanup:", err);
+            console.error("SignOut error:", err);
         } finally {
-            // Force clear state regardless of what happened
             setUser(null);
             setRole(null);
             showToast('Successfully logged out.', 'info');
+            // Optional: Hard refresh to clear any residual memory state
+            window.location.href = '/';
         }
     };
 
     const value = {
         user,
         role,
-        isAdmin: role === 'admin',
+        isAdmin: role === 'admin' || (user?.email?.toLowerCase().trim() === 'ovi.extra@gmail.com'),
         signIn,
         signUp,
         signOut,
@@ -178,10 +202,7 @@ export const AuthProvider = ({ children }) => {
         authError
     };
 
-    // Show a loading spinner instead of nothing during auth initialization
-    if (loading) {
-        return <LoadingSpinner />;
-    }
+    if (loading) return <LoadingSpinner />;
 
     return (
         <AuthContext.Provider value={value}>

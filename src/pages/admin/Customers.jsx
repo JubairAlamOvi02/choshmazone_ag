@@ -23,7 +23,7 @@ const AdminCustomers = () => {
             setCustomers(data);
         } catch (err) {
             console.error(err);
-            setError('Failed to fetch customers');
+            setError('Failed to fetch customers: ' + (err.message || 'Unknown error'));
         } finally {
             setLoading(false);
         }

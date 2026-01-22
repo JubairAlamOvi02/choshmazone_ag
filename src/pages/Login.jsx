@@ -9,7 +9,7 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { signIn, user, signOut } = useAuth();
+    const { signIn, user, signOut, role } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -27,10 +27,10 @@ const Login = () => {
 
                         <div className="space-y-4">
                             <button
-                                onClick={() => navigate('/')}
+                                onClick={() => navigate(role === 'admin' ? '/admin/dashboard' : '/')}
                                 className="w-full py-4 bg-primary text-white font-bold rounded-lg hover:bg-primary/95 transition-all font-outfit uppercase tracking-widest"
                             >
-                                Continue to Shopping
+                                {role === 'admin' ? 'Go to Admin Dashboard' : 'Continue to Shopping'}
                             </button>
                             <button
                                 onClick={async () => {
@@ -55,11 +55,16 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const { error } = await signIn(email, password);
+            const { error, userRole } = await signIn(email, password);
             if (error) throw error;
 
-            const from = location.state?.from?.pathname || "/";
-            navigate(from, { replace: true });
+            // Role-based redirection - Master Override for Ovi
+            if (userRole === 'admin' || email.toLowerCase().trim() === 'ovi.extra@gmail.com') {
+                navigate('/admin/dashboard', { replace: true });
+            } else {
+                const from = location.state?.from?.pathname || "/";
+                navigate(from, { replace: true });
+            }
         } catch (err) {
             setError(err.message || 'Failed to login');
         } finally {
