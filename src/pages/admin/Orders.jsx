@@ -18,7 +18,7 @@ const AdminOrders = () => {
             setOrders(data);
         } catch (err) {
             console.error(err);
-            setError('Failed to fetch orders');
+            setError('Failed to fetch orders: ' + (err.message || 'Unknown error'));
         } finally {
             setLoading(false);
         }
