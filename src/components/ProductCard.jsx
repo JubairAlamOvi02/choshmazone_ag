@@ -1,17 +1,26 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 
 const ProductCard = ({ product }) => {
     const { id, title, price, image, images } = product;
     const hoverImage = images && images.length > 1 ? images[1] : null;
     const { addToCart } = useCart();
+    const { isInWishlist, toggleWishlist } = useWishlist();
+    const isWishlisted = isInWishlist(id);
 
     const handleAddToCart = (e) => {
         e.preventDefault();
         e.stopPropagation();
         addToCart(product);
+    };
+
+    const handleWaitlist = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleWishlist(product);
     };
 
     return (
@@ -26,6 +35,15 @@ const ProductCard = ({ product }) => {
                         decoding="async"
                         className="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:opacity-0"
                     />
+
+                    {/* Wishlist Button */}
+                    <button
+                        onClick={handleWaitlist}
+                        className={`absolute top-2 right-2 z-20 p-2 rounded-full transition-all duration-300 ${isWishlisted ? 'bg-error text-white' : 'bg-white/80 text-text-muted hover:bg-white hover:text-error'}`}
+                        title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+                    >
+                        <Heart size={16} className={isWishlisted ? "fill-current" : ""} />
+                    </button>
 
                     {/* Hover Image */}
                     {hoverImage && (

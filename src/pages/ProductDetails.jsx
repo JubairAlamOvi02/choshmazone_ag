@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
@@ -10,8 +11,12 @@ import { ChevronRight, ShieldCheck, Truck, RotateCcw, Plus, Minus, Star, Heart, 
 const ProductDetails = () => {
     const { id } = useParams();
     const { addToCart } = useCart();
+    const { isInWishlist, toggleWishlist } = useWishlist();
     const [product, setProduct] = useState(null);
     const [mainImage, setMainImage] = useState('');
+
+    // Derived state, safe to use even if product is null initially (will just be false)
+    const isWishlisted = product ? isInWishlist(product.id) : false;
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState('description');
@@ -195,8 +200,12 @@ const ProductDetails = () => {
                                             <ShoppingBag size={20} strokeWidth={2.5} />
                                             <span>{product.is_active === false ? 'Out of Stock' : 'Add to Shopping Bag'}</span>
                                         </button>
-                                        <button className="h-14 w-14 border-2 border-border rounded-lg flex items-center justify-center hover:bg-error/10 hover:border-error transition-all duration-300 group">
-                                            <Heart size={20} className="text-text-muted group-hover:text-error group-hover:fill-error transition-all" />
+                                        <button
+                                            onClick={() => toggleWishlist(product)}
+                                            className={`h-14 w-14 border-2 rounded-lg flex items-center justify-center transition-all duration-300 group ${isWishlisted ? 'border-error bg-error/5' : 'border-border hover:bg-error/10 hover:border-error'}`}
+                                            title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+                                        >
+                                            <Heart size={20} className={`${isWishlisted ? 'text-error fill-error' : 'text-text-muted group-hover:text-error group-hover:fill-error'} transition-all`} />
                                         </button>
                                     </div>
                                 </div>
@@ -267,10 +276,10 @@ const ProductDetails = () => {
                         </div>
                     </div>
                 </div>
-            </main>
+            </main >
 
             <Footer />
-        </div>
+        </div >
     );
 };
 

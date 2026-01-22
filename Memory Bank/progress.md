@@ -94,3 +94,9 @@
   - Added "Nuclear Option" to `signOut` that clears all local storage, session storage, and cookies.
   - Added race-conditions to prevent `signOut` from hanging indefinitely.
   - Updated `Login.jsx` to show a "Session Active" screen with clear options to Continue or Switch Account.
+- Task 36 (Wishlist Feature): Completed
+  - Created `wishlist` schema and RLS policies for Supabase.
+  - Implemented `WishlistContext` for global state management.
+  - Integrated "Heart" toggle button in `ProductCard` and `ProductDetails`.
+  - Created responsive `Wishlist.jsx` page to view saved items.
+  - Added navigation links to Wishlist in `Navbar`.

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ShoppingBag, Menu, X, User, Search } from 'lucide-react';
+import { ShoppingBag, Menu, X, User, Search, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useWishlist } from '../context/WishlistContext';
 import SearchBar from './SearchBar';
 
 const Navbar = () => {
@@ -10,6 +11,7 @@ const Navbar = () => {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const { toggleCart, cartCount } = useCart();
     const { user, isAdmin, signOut } = useAuth();
+    const { wishlist } = useWishlist();
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -73,6 +75,8 @@ const Navbar = () => {
                                             <Link to="/admin/dashboard" className="block px-4 py-2 text-text-main no-underline text-sm hover:bg-background-alt transition-colors" onClick={() => setIsProfileOpen(false)}>Admin Dashboard</Link>
                                         )}
                                         <Link to="/profile" className="block px-4 py-2 text-text-main no-underline text-sm hover:bg-background-alt transition-colors" onClick={() => setIsProfileOpen(false)}>My Profile</Link>
+                                        <Link to="/profile" className="block px-4 py-2 text-text-main no-underline text-sm hover:bg-background-alt transition-colors" onClick={() => setIsProfileOpen(false)}>My Profile</Link>
+                                        <Link to="/wishlist" className="block px-4 py-2 text-text-main no-underline text-sm hover:bg-background-alt transition-colors" onClick={() => setIsProfileOpen(false)}>My Wishlist</Link>
                                         <Link to="/orders" className="block px-4 py-2 text-text-main no-underline text-sm hover:bg-background-alt transition-colors" onClick={() => setIsProfileOpen(false)}>My Orders</Link>
                                         <button
                                             onClick={handleLogout}
@@ -94,6 +98,11 @@ const Navbar = () => {
                         <ShoppingBag size={20} />
                         {cartCount > 0 && <span className="absolute top-0 right-0 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold pointer-events-none">{cartCount}</span>}
                     </button>
+
+                    <Link to="/wishlist" className="relative flex items-center justify-center p-2 text-text-main rounded-full hover:bg-black/5 transition-colors shrink-0 min-w-[40px] min-h-[40px]" aria-label="Wishlist">
+                        <Heart size={20} />
+                        {wishlist.length > 0 && <span className="absolute top-0 right-0 bg-secondary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold pointer-events-none">{wishlist.length}</span>}
+                    </Link>
                 </div>
             </div>
         </nav>
