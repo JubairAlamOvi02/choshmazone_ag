@@ -9,7 +9,7 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { signIn, user, signOut, role, isAdmin } = useAuth();
+    const { signIn, user, signOut, isAdmin } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 

@@ -26,7 +26,7 @@
     *   `OrderTimeline`: State-driven progress tracking for fulfillment.
     *   `SearchBar`: Debounced multi-field filtering.
     *   `ErrorBoundary`: Global crash protection.
-*   **PWA** (Planned): Service Worker with offline caching for assets and images.
+*   **PWA** (Implemented): Service Worker (`sw.js`) with offline caching for assets/images and Manifest support.
 *   **Performance Optimization**: 
     - **Code Splitting**: Route-level granularity via `React.lazy` and `Suspense`.
     - **Asset Priority**: `fetchpriority="high"` for critical path Above-The-Fold (ATF) images.

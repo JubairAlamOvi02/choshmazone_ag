@@ -8,35 +8,37 @@ import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
 import Button from '../components/Button';
 
+const EmptyWishlist = ({ user }) => (
+    <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+            <Heart size={32} className="text-gray-300 fill-gray-100" />
+        </div>
+        <h2 className="text-2xl font-bold font-outfit uppercase tracking-wider mb-2 text-text-main">
+            Your wishlist is empty
+        </h2>
+        <p className="text-text-muted font-outfit mb-8 max-w-md mx-auto">
+            {user
+                ? "Looks like you haven't saved any items yet. Browse our collection and save your favorites!"
+                : "Login to save your favorites and access them from any device."}
+        </p>
+        <div className="flex gap-4">
+            <Link to="/shop">
+                <Button variant="primary">Start Shopping</Button>
+            </Link>
+            {!user && (
+                <Link to="/login">
+                    <Button variant="outline">Login Account</Button>
+                </Link>
+            )}
+        </div>
+    </div>
+);
+
 const Wishlist = () => {
     const { wishlist, loading } = useWishlist();
     const { user } = useAuth();
 
-    const EmptyWishlist = () => (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
-                <Heart size={32} className="text-gray-300 fill-gray-100" />
-            </div>
-            <h2 className="text-2xl font-bold font-outfit uppercase tracking-wider mb-2 text-text-main">
-                Your wishlist is empty
-            </h2>
-            <p className="text-text-muted font-outfit mb-8 max-w-md mx-auto">
-                {user
-                    ? "Looks like you haven't saved any items yet. Browse our collection and save your favorites!"
-                    : "Login to save your favorites and access them from any device."}
-            </p>
-            <div className="flex gap-4">
-                <Link to="/shop">
-                    <Button variant="primary">Start Shopping</Button>
-                </Link>
-                {!user && (
-                    <Link to="/login">
-                        <Button variant="outline">Login Account</Button>
-                    </Link>
-                )}
-            </div>
-        </div>
-    );
+
 
     return (
         <div className="min-h-screen bg-white flex flex-col">
@@ -71,7 +73,7 @@ const Wishlist = () => {
                         ))}
                     </div>
                 ) : (
-                    <EmptyWishlist />
+                    <EmptyWishlist user={user} />
                 )}
             </main>
 

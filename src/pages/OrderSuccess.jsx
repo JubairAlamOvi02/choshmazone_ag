@@ -7,7 +7,7 @@ import Button from '../components/Button';
 
 const OrderSuccess = () => {
     // Generate a random order ID for display
-    const orderId = Math.floor(100000 + Math.random() * 900000);
+    const [orderId] = React.useState(() => Math.floor(100000 + Math.random() * 900000));
 
     return (
         <div className="min-h-screen bg-white">

@@ -80,7 +80,7 @@ export const WishlistProvider = ({ children }) => {
         setWishlist(prev => [newFormattedItem, ...prev]);
 
         try {
-            const { data, error } = await supabase
+            const { error } = await supabase
                 .from('wishlist')
                 .insert([{ user_id: user.id, product_id: product.id }])
                 .select()

@@ -100,3 +100,14 @@
   - Integrated "Heart" toggle button in `ProductCard` and `ProductDetails`.
   - Created responsive `Wishlist.jsx` page to view saved items.
   - Added navigation links to Wishlist in `Navbar`.
+- Task 37 (PWA Integration): Completed
+  - Created `manifest.json` for installability (Standalone mode, icons).
+  - Implemented `sw.js` Service Worker for offline asset caching (Cache-First strategy).
+  - Registered Service Worker in `main.jsx`.
+- Task 38 (Advanced Performance Suite): Completed
+  - **Lazy Loading**: Created `OptimizedImage` component with IntersectionObserver and blur-up placeholders.
+  - **Caching**: Implemented `cacheManager` with LocalStorage-based TTL (5-minute expiry) for API responses.
+  - **API Optimization**: integrated caching layer into `products.js` to minimize Supabase requests.
+  - **Build**: Verified production build with correct asset chunking.
+- Task 39 (Navbar UI Fix): Completed
+  - Removed duplicate "My Profile" link in the user account dropdown.

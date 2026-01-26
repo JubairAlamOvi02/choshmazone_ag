@@ -47,7 +47,8 @@ The application utilizes a **Mobile-First Responsive Strategy**:
 - **Enhanced Product Details**: Premium PDP featuring breadcrumbs, quantity selectors, star ratings, collapsible information sections, trust badges, and interactive image galleries with zoom indicators.
 - **Premium CTAs**: Redesigned action buttons with icons, shadow effects, and smooth hover transitions for improved conversion rates.
 - **Smart Delivery System**: District-based delivery charge calculation with dependent location dropdowns (District → Thana) for accurate shipping costs across Bangladesh.
-- **Progressive Web App (PWA)**: Full manifest support and service worker caching for offline-ready performance.
+- **Progressive Web App (PWA)**: Full manifest support (`manifest.json`) and service worker (`sw.js`) caching for offline-ready performance and installability.
+- **Client-Side Caching**: Custom `cacheManager` utilizing LocalStorage with TTL for optimized API performance.
 - **Advanced UX System**: Global toast notification system and real-time product search with debounced filtering.
 - **Elite Performance & Analytics**: 
     - **Recharts Integration**: Professional-grade data visualization for sales and order trends in the admin panel.

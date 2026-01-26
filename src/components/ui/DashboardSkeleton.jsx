@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Skeleton from './Skeleton';
 
 const DashboardSkeleton = () => {
@@ -40,8 +40,8 @@ const DashboardSkeleton = () => {
                     </div>
                     {/* Fake Chart Bars/Area */}
                     <div className="h-[300px] w-full flex items-end justify-between gap-2 px-4 pb-4">
-                        {[...Array(7)].map((_, i) => (
-                            <Skeleton key={i} className={`w-full rounded-t-lg mx-1`} style={{ height: `${Math.random() * 60 + 20}%` }} />
+                        {useMemo(() => Array.from({ length: 7 }, () => Math.random() * 60 + 20), []).map((height, i) => (
+                            <Skeleton key={i} className={`w-full rounded-t-lg mx-1`} style={{ height: `${height}%` }} />
                         ))}
                     </div>
                 </div>

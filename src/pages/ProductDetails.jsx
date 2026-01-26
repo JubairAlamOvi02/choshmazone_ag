@@ -7,6 +7,7 @@ import Footer from '../components/Footer';
 import Button from '../components/Button';
 import { productParams } from '../lib/api/products';
 import { ChevronRight, ShieldCheck, Truck, RotateCcw, Plus, Minus, Star, Heart, ShoppingBag } from 'lucide-react';
+import OptimizedImage from '../components/ui/OptimizedImage';
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -106,9 +107,10 @@ const ProductDetails = () => {
                     {/* Left: Image Gallery */}
                     <div className="flex flex-col gap-6 sticky top-24 h-fit">
                         <div className="relative group bg-background-alt rounded-2xl overflow-hidden aspect-square flex items-center justify-center border border-border/50 shadow-sm transition-all duration-500 hover:shadow-xl">
-                            <img
+                            <OptimizedImage
                                 src={mainImage}
                                 alt={product.title}
+                                priority={true}
                                 className="w-full h-full object-contain p-8 mix-blend-multiply transform transition-transform duration-700 group-hover:scale-110"
                             />
                             {/* Zoom Indicator */}
@@ -276,10 +278,10 @@ const ProductDetails = () => {
                         </div>
                     </div>
                 </div>
-            </main >
+            </main>
 
             <Footer />
-        </div >
+        </div>
     );
 };
 

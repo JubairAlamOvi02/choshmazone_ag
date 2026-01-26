@@ -8,6 +8,24 @@ import {
 } from 'recharts';
 import DashboardSkeleton from '../../components/ui/DashboardSkeleton';
 
+const StatCard = ({ title, value, icon: Icon, bgColor, textColor, trend }) => (
+    <div className="bg-white p-6 rounded-2xl border border-border/50 shadow-sm hover:shadow-md transition-all duration-300">
+        <div className="flex items-start justify-between mb-4">
+            <div className={`p-3 rounded-xl ${bgColor}`}>
+                <Icon size={24} className={textColor} />
+            </div>
+            {trend && (
+                <div className="flex items-center gap-1 text-green-500 text-xs font-bold font-outfit">
+                    <ArrowUpRight size={14} />
+                    {trend}
+                </div>
+            )}
+        </div>
+        <h3 className="text-sm font-bold text-text-muted uppercase tracking-widest mb-1 font-outfit">{title}</h3>
+        <p className="text-2xl font-bold text-text-main font-outfit">{value}</p>
+    </div>
+);
+
 const Dashboard = () => {
     const [stats, setStats] = useState({
         totalSales: 0,
@@ -85,23 +103,7 @@ const Dashboard = () => {
         }
     };
 
-    const StatCard = ({ title, value, icon: Icon, bgColor, textColor, trend }) => (
-        <div className="bg-white p-6 rounded-2xl border border-border/50 shadow-sm hover:shadow-md transition-all duration-300">
-            <div className="flex items-start justify-between mb-4">
-                <div className={`p-3 rounded-xl ${bgColor}`}>
-                    <Icon size={24} className={textColor} />
-                </div>
-                {trend && (
-                    <div className="flex items-center gap-1 text-green-500 text-xs font-bold font-outfit">
-                        <ArrowUpRight size={14} />
-                        {trend}
-                    </div>
-                )}
-            </div>
-            <h3 className="text-sm font-bold text-text-muted uppercase tracking-widest mb-1 font-outfit">{title}</h3>
-            <p className="text-2xl font-bold text-text-main font-outfit">{value}</p>
-        </div>
-    );
+
 
     if (loading) {
         return <DashboardSkeleton />;

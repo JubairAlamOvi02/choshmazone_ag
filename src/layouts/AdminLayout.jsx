@@ -3,6 +3,25 @@ import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, LayoutDashboard, Box, ShoppingCart, Users, LogOut, Bell, Search, Settings, Glasses } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+
+
+const AdminNavLink = ({ to, icon: Icon, label, isActive, onClick }) => (
+    <Link
+        to={to}
+        onClick={onClick}
+        className={`
+            flex items-center gap-3 px-6 py-4 text-sm font-bold transition-all duration-300 group
+            ${isActive
+                ? 'bg-primary/10 text-primary border-r-4 border-primary'
+                : 'text-text-muted hover:bg-gray-50 hover:text-text-main'}
+            font-outfit uppercase tracking-widest
+        `}
+    >
+        <Icon size={20} className={`${isActive ? 'text-primary' : 'text-text-muted group-hover:text-text-main'} transition-colors`} />
+        {label}
+    </Link>
+);
+
 const AdminLayout = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { signOut, user } = useAuth();
@@ -19,22 +38,7 @@ const AdminLayout = () => {
 
     const isActive = (path) => location.pathname === path;
 
-    const NavLink = ({ to, icon: Icon, label }) => (
-        <Link
-            to={to}
-            onClick={closeMobileMenu}
-            className={`
-                flex items-center gap-3 px-6 py-4 text-sm font-bold transition-all duration-300 group
-                ${isActive(to)
-                    ? 'bg-primary/10 text-primary border-r-4 border-primary'
-                    : 'text-text-muted hover:bg-gray-50 hover:text-text-main'}
-                font-outfit uppercase tracking-widest
-            `}
-        >
-            <Icon size={20} className={`${isActive(to) ? 'text-primary' : 'text-text-muted group-hover:text-text-main'} transition-colors`} />
-            {label}
-        </Link>
-    );
+
 
     return (
         <div className="min-h-screen bg-gray-50 flex">
@@ -54,10 +58,10 @@ const AdminLayout = () => {
                     </div>
 
                     <nav className="flex-1 space-y-2">
-                        <NavLink to="/admin/dashboard" icon={LayoutDashboard} label="Dashboard" />
-                        <NavLink to="/admin/products" icon={Box} label="Inventory" />
-                        <NavLink to="/admin/orders" icon={ShoppingCart} label="Orders" />
-                        <NavLink to="/admin/customers" icon={Users} label="Members" />
+                        <AdminNavLink to="/admin/dashboard" icon={LayoutDashboard} label="Dashboard" isActive={isActive('/admin/dashboard')} onClick={closeMobileMenu} />
+                        <AdminNavLink to="/admin/products" icon={Box} label="Inventory" isActive={isActive('/admin/products')} onClick={closeMobileMenu} />
+                        <AdminNavLink to="/admin/orders" icon={ShoppingCart} label="Orders" isActive={isActive('/admin/orders')} onClick={closeMobileMenu} />
+                        <AdminNavLink to="/admin/customers" icon={Users} label="Members" isActive={isActive('/admin/customers')} onClick={closeMobileMenu} />
                     </nav>
 
                     <div className="p-8 border-t border-border">

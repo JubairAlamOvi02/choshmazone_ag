@@ -75,7 +75,6 @@ const Navbar = () => {
                                             <Link to="/admin/dashboard" className="block px-4 py-2 text-text-main no-underline text-sm hover:bg-background-alt transition-colors" onClick={() => setIsProfileOpen(false)}>Admin Dashboard</Link>
                                         )}
                                         <Link to="/profile" className="block px-4 py-2 text-text-main no-underline text-sm hover:bg-background-alt transition-colors" onClick={() => setIsProfileOpen(false)}>My Profile</Link>
-                                        <Link to="/profile" className="block px-4 py-2 text-text-main no-underline text-sm hover:bg-background-alt transition-colors" onClick={() => setIsProfileOpen(false)}>My Profile</Link>
                                         <Link to="/wishlist" className="block px-4 py-2 text-text-main no-underline text-sm hover:bg-background-alt transition-colors" onClick={() => setIsProfileOpen(false)}>My Wishlist</Link>
                                         <Link to="/orders" className="block px-4 py-2 text-text-main no-underline text-sm hover:bg-background-alt transition-colors" onClick={() => setIsProfileOpen(false)}>My Orders</Link>
                                         <button

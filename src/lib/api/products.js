@@ -1,9 +1,18 @@
-
 import { supabase } from '../supabaseClient';
+import { cacheManager } from '../cache';
 
 export const productParams = {
-    // Fetch all products
+    // Fetch all products with caching
     fetchAll: async (activeOnly = false) => {
+        const cacheKey = `products_${activeOnly ? 'active' : 'all'}`;
+        const cachedData = cacheManager.get(cacheKey);
+
+        if (cachedData) {
+            // Optional: You could trigger a background refresh here (stale-while-revalidate)
+            // For now, we return cached data immediately for speed.
+            return cachedData;
+        }
+
         let query = supabase
             .from('products')
             .select('*');
@@ -15,6 +24,9 @@ export const productParams = {
         const { data, error } = await query.order('created_at', { ascending: false });
 
         if (error) throw error;
+
+        // Cache for 5 minutes
+        cacheManager.set(cacheKey, data, 1000 * 60 * 5);
         return data;
     },
 
@@ -39,6 +51,9 @@ export const productParams = {
             .single();
 
         if (error) throw error;
+
+        // Invalidate all product listings caches
+        cacheManager.invalidatePattern('products_');
         return data;
     },
 
@@ -52,6 +67,9 @@ export const productParams = {
             .single();
 
         if (error) throw error;
+
+        // Invalidate all product listings caches
+        cacheManager.invalidatePattern('products_');
         return data;
     },
 
@@ -63,6 +81,9 @@ export const productParams = {
             .eq('id', id);
 
         if (error) throw error;
+
+        // Invalidate all product listings caches
+        cacheManager.invalidatePattern('products_');
         return true;
     },
 
@@ -70,7 +91,7 @@ export const productParams = {
     uploadImage: async (file) => {
         const randomStr = Math.random().toString(36).substring(2, 8);
         const fileName = `${Date.now()}-${randomStr}-${file.name}`;
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
             .from('products')
             .upload(fileName, file);
 

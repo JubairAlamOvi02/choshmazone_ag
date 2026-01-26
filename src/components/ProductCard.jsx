@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ShoppingBag, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import OptimizedImage from './ui/OptimizedImage';
 
 const ProductCard = ({ product }) => {
     const { id, title, price, image, images } = product;
@@ -28,12 +29,10 @@ const ProductCard = ({ product }) => {
             <Link to={`/product/${id}`} className="no-underline text-inherit">
                 <div className="relative aspect-square overflow-hidden bg-gray-100">
                     {/* Primary Image */}
-                    <img
+                    <OptimizedImage
                         src={image}
                         alt={title}
-                        loading="lazy"
-                        decoding="async"
-                        className="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:opacity-0"
+                        className="absolute inset-0 w-full h-full group-hover:scale-105 group-hover:opacity-0 transition-all duration-500"
                     />
 
                     {/* Wishlist Button */}
@@ -47,11 +46,9 @@ const ProductCard = ({ product }) => {
 
                     {/* Hover Image */}
                     {hoverImage && (
-                        <img
+                        <OptimizedImage
                             src={hoverImage}
                             alt={`${title} - alternate view`}
-                            loading="lazy"
-                            decoding="async"
                             className="absolute inset-0 w-full h-full object-cover transition-all duration-500 opacity-0 group-hover:opacity-100 group-hover:scale-105"
                         />
                     )}
