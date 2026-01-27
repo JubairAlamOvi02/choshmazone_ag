@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import Navbar from '../components/Navbar';
@@ -11,6 +11,7 @@ import OptimizedImage from '../components/ui/OptimizedImage';
 
 const ProductDetails = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const { addToCart } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
     const [product, setProduct] = useState(null);
@@ -50,6 +51,11 @@ const ProductDetails = () => {
     const handleQuantityChange = (type) => {
         if (type === 'inc') setQuantity(prev => prev + 1);
         if (type === 'dec' && quantity > 1) setQuantity(prev => prev - 1);
+    };
+
+    const handleBuyNow = () => {
+        addToCart({ ...product, quantity }, false);
+        navigate('/checkout');
     };
 
     if (loading) {
@@ -192,16 +198,25 @@ const ProductDetails = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex-1 flex flex-col gap-2 pt-6">
-                                    <div className="flex gap-4">
+                                <div className="flex-1 flex flex-col gap-4 pt-6">
+                                    <div className="flex flex-col sm:flex-row gap-4">
                                         <button
                                             className={`flex-1 h-14 bg-primary text-white font-bold text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg hover:shadow-xl ${product.is_active === false ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'hover:bg-secondary hover:scale-[1.02]'}`}
                                             onClick={() => addToCart({ ...product, quantity })}
                                             disabled={product.is_active === false}
                                         >
                                             <ShoppingBag size={20} strokeWidth={2.5} />
-                                            <span>{product.is_active === false ? 'Out of Stock' : 'Add to Shopping Bag'}</span>
+                                            <span>{product.is_active === false ? 'Out of Stock' : 'Add to Bag'}</span>
                                         </button>
+
+                                        <button
+                                            className={`flex-1 h-14 bg-secondary text-primary font-bold text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg hover:shadow-xl ${product.is_active === false ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'hover:bg-primary hover:text-white hover:scale-[1.02]'}`}
+                                            onClick={handleBuyNow}
+                                            disabled={product.is_active === false}
+                                        >
+                                            <span>Buy Now</span>
+                                        </button>
+
                                         <button
                                             onClick={() => toggleWishlist(product)}
                                             className={`h-14 w-14 border-2 rounded-lg flex items-center justify-center transition-all duration-300 group ${isWishlisted ? 'border-error bg-error/5' : 'border-border hover:bg-error/10 hover:border-error'}`}

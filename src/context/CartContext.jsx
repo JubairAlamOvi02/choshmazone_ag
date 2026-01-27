@@ -58,7 +58,7 @@ export const CartProvider = ({ children }) => {
         localStorage.setItem('cartItems', JSON.stringify(cartItems));
     }, [cartItems]);
 
-    const addToCart = useCallback((product) => {
+    const addToCart = useCallback((product, shouldOpenCart = true) => {
         const quantityToAdd = product.quantity || 1;
 
         setCartItems(prevItems => {
@@ -78,9 +78,11 @@ export const CartProvider = ({ children }) => {
         showToast(`${product.name || product.title} added to your bag!`, 'success');
 
         // Wrap UI state update in transition to improve INP/responsiveness
-        startTransition(() => {
-            setIsCartOpen(true);
-        });
+        if (shouldOpenCart) {
+            startTransition(() => {
+                setIsCartOpen(true);
+            });
+        }
     }, [showToast]);
 
     const removeFromCart = useCallback((id) => {
