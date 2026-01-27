@@ -108,10 +108,10 @@ const ProductDetails = () => {
                 </div>
             </div>
 
-            <main className="container mx-auto px-4 py-8 md:py-16">
+            <main className="container mx-auto px-4 py-8 md:py-16 pb-24 lg:pb-16">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-24">
                     {/* Left: Image Gallery */}
-                    <div className="flex flex-col gap-6 sticky top-24 h-fit">
+                    <div className="flex flex-col gap-6 sticky top-[72px] lg:top-24 h-fit z-10 bg-white">
                         <div className="relative group bg-background-alt rounded-2xl overflow-hidden aspect-square flex items-center justify-center border border-border/50 shadow-sm transition-all duration-500 hover:shadow-xl">
                             <OptimizedImage
                                 src={mainImage}
@@ -294,6 +294,25 @@ const ProductDetails = () => {
                     </div>
                 </div>
             </main>
+
+            {/* Mobile Sticky Bottom Bar */}
+            <div className="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-lg border-t border-border p-4 z-40 md:hidden flex gap-3 animate-in slide-in-from-bottom duration-500">
+                <button
+                    className={`flex-1 h-16 bg-primary text-white font-bold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 shadow-xl ${product.is_active === false ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'active:scale-95 transition-transform'}`}
+                    onClick={() => addToCart({ ...product, quantity })}
+                    disabled={product.is_active === false}
+                >
+                    <ShoppingBag size={18} />
+                    <span>{product.is_active === false ? 'Out of Stock' : 'Add to Bag'}</span>
+                </button>
+                <button
+                    className={`flex-1 h-16 bg-secondary text-primary font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-xl ${product.is_active === false ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'active:scale-95 transition-transform'}`}
+                    onClick={handleBuyNow}
+                    disabled={product.is_active === false}
+                >
+                    <span>Buy Now</span>
+                </button>
+            </div>
 
             <Footer />
         </div>

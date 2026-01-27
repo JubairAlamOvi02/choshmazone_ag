@@ -56,7 +56,7 @@ const Home = () => {
                             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
                             {newArrivals.map(product => (
                                 <ProductCard key={product.id} product={product} />
                             ))}
