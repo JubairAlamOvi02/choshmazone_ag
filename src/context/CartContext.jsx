@@ -10,8 +10,15 @@ export const useCart = () => useContext(CartContext);
 export const CartProvider = ({ children }) => {
     const { showToast } = useToast();
     const [cartItems, setCartItems] = useState(() => {
-        const localData = localStorage.getItem('cartItems');
-        return localData ? JSON.parse(localData) : [];
+        try {
+            const localData = localStorage.getItem('cartItems');
+            if (!localData) return [];
+            const parsed = JSON.parse(localData);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            console.error("Error parsing cartItems:", e);
+            return [];
+        }
     });
     const [isCartOpen, setIsCartOpen] = useState(false);
 

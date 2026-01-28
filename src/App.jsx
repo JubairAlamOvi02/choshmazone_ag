@@ -17,9 +17,9 @@ const PageLoader = () => (
 );
 
 // Pages
+import ProductDetails from './pages/ProductDetails';
 const Home = lazy(() => import('./pages/Home'));
 const Shop = lazy(() => import('./pages/Shop'));
-const ProductDetails = lazy(() => import('./pages/ProductDetails'));
 const Collections = lazy(() => import('./pages/Collections'));
 const About = lazy(() => import('./pages/About'));
 const Contact = lazy(() => import('./pages/Contact'));

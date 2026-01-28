@@ -24,7 +24,7 @@ const ProductDetails = () => {
     const [mainImage, setMainImage] = useState('');
 
     // Derived state, safe to use even if product is null initially (will just be false)
-    const isWishlisted = product ? isInWishlist(product.id) : false;
+    const [isWishlisted, setIsWishlisted] = useState(false);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState('description');
@@ -34,6 +34,8 @@ const ProductDetails = () => {
             try {
                 setLoading(true);
                 const data = await productParams.fetchById(id);
+                if (!data) throw new Error("Product not found");
+
                 const formattedProduct = {
                     ...data,
                     id: data.id,
@@ -53,6 +55,7 @@ const ProductDetails = () => {
 
                 setProduct(formattedProduct);
                 setMainImage(formattedProduct.image);
+                setIsWishlisted(isInWishlist(formattedProduct.id));
                 addToRecentlyViewed(formattedProduct);
 
                 // Fetch related products - only if category exists
@@ -75,6 +78,7 @@ const ProductDetails = () => {
                 }
             } catch (error) {
                 console.error("Error fetching product details:", error);
+                setProduct(null);
             } finally {
                 setLoading(false);
             }
@@ -83,7 +87,14 @@ const ProductDetails = () => {
         if (id) {
             getProduct();
         }
-    }, [id]);
+    }, [id, isInWishlist, addToRecentlyViewed]);
+
+    // Update wishlist icon when context changes
+    useEffect(() => {
+        if (product) {
+            setIsWishlisted(isInWishlist(product.id));
+        }
+    }, [product, isInWishlist]);
 
     const handleQuantityChange = (type) => {
         if (type === 'inc') setQuantity(prev => prev + 1);
@@ -91,6 +102,7 @@ const ProductDetails = () => {
     };
 
     const handleBuyNow = () => {
+        if (!product) return;
         addToCart({ ...product, quantity }, false);
         navigate('/checkout');
     };
@@ -134,32 +146,6 @@ const ProductDetails = () => {
 
             {/* Breadcrumbs */}
             <div className="bg-background-alt/50 border-b border-border">
-                {product && (
-                    <script
-                        type="application/ld+json"
-                        dangerouslySetInnerHTML={{
-                            __html: JSON.stringify({
-                                "@context": "https://schema.org/",
-                                "@type": "Product",
-                                "name": product?.title || 'Sunglasses',
-                                "image": product?.images || [],
-                                "description": `Premium handcrafted ${product?.style || 'sunglasses'} from Choshma Zone.`,
-                                "brand": {
-                                    "@type": "Brand",
-                                    "name": "Choshma Zone"
-                                },
-                                "offers": {
-                                    "@type": "Offer",
-                                    "url": typeof window !== 'undefined' ? window.location.href : '',
-                                    "priceCurrency": "BDT",
-                                    "price": product?.price || 0,
-                                    "itemCondition": "https://schema.org/NewCondition",
-                                    "availability": product?.is_active !== false ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
-                                }
-                            })
-                        }}
-                    />
-                )}
                 <div className="container mx-auto px-4 py-4">
                     <nav className="flex items-center gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest font-outfit text-text-muted">
                         <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -236,7 +222,7 @@ const ProductDetails = () => {
                         </div>
 
                         <div className="mb-8 text-text-muted leading-relaxed font-outfit">
-                            <p className="text-lg">Experience premium vision with our handcrafted {product.style} sunglasses. Designed for ultimate comfort and durability, these frames feature high-quality materials and 100% UV protection lenses.</p>
+                            <p className="text-lg">Experience premium vision with our handcrafted {product.style || 'sunglasses'}. Designed for ultimate comfort and durability, these frames feature high-quality materials and 100% UV protection lenses.</p>
                         </div>
 
                         {/* Add to Cart Controls */}
@@ -314,7 +300,7 @@ const ProductDetails = () => {
                                                 <ul className="space-y-3">
                                                     <li className="flex gap-3">
                                                         <div className="w-1.5 h-1.5 bg-secondary rounded-full mt-1.5"></div>
-                                                        Handcrafted {product.style} frame for a timeless look.
+                                                        Handcrafted {product.style || 'sunglasses'} frame for a timeless look.
                                                     </li>
                                                     <li className="flex gap-3">
                                                         <div className="w-1.5 h-1.5 bg-secondary rounded-full mt-1.5"></div>
@@ -399,7 +385,7 @@ const ProductDetails = () => {
                 </section>
             )}
 
-            <RecentlyViewed excludeId={product?.id} />
+            <RecentlyViewed excludeId={product.id} />
             <Footer />
         </div>
     );
