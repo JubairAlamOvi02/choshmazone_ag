@@ -156,3 +156,9 @@
     - [x] Implemented global `WishlistContext`.
     - [x] Added Heart toggle button/icon to Product Cards, Product Details, and Navbar.
     - [x] Built responsive "My Wishlist" page.
+- [x] **Customer Review System**:
+    - [x] Created `ReviewSection` for PDP with star ratings and average scores.
+    - [x] Implemented smart data merging in `reviews.js` to handle DB schema limitations without console errors.
+- [x] **Custom Product Metadata**:
+    - [x] Added admin fields for Highlights, Technical Specifications, and Shipping info.
+    - [x] Built dynamic UI in `ProductDetails.jsx` to render this data with professional defaults.

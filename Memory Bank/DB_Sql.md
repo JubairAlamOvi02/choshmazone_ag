@@ -47,6 +47,12 @@ CREATE TABLE public.products (
   bridge_width text,
   temple_length text,
   face_shape text,
+  highlights text,
+  spec_frame text,
+  spec_lens text,
+  spec_hardware text,
+  spec_weight text,
+  shipping_info text,
   CONSTRAINT products_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.profiles (

@@ -26,6 +26,7 @@
     *   `OrderTimeline`: State-driven progress tracking for fulfillment.
     *   `SearchBar`: Debounced multi-field filtering.
     *   `ErrorBoundary`: Global crash protection.
+    *   `Data Services`: Intelligent manual merging for relational data (e.g., Reviews -> Profiles) to bypass missing DB foreign key constraints and minimize console errors.
 *   **PWA** (Implemented): Service Worker (`sw.js`) with offline caching for assets/images and Manifest support.
 *   **Performance Optimization**: 
     - **Code Splitting**: Route-level granularity via `React.lazy` and `Suspense`.
@@ -63,6 +64,9 @@
 *   `category` (Text)
 *   `image_url` (Text) - Main display image
 *   `images` (Text[]) - Support for multiple gallery images
+*   `highlights` (Text) - Bulleted highlights for PDP
+*   `spec_frame`, `spec_lens`, `spec_hardware`, `spec_weight` (Text) - Technical specifications
+*   `shipping_info` (Text) - Delivery and returns details
 *   `is_active` (Boolean) - For soft deleting/hiding products (Default: true)
 *   `created_at` (Timestamp)
 
