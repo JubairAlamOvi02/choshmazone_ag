@@ -169,3 +169,7 @@
 - [x] **Product Trust Badge Refinement**:
     - [x] Updated badge text to: "Nationwide Delivery", "UV400 Protected", and "Premium Hard Case".
     - [x] Swapped "Hard Case" icon for a more appropriate Package icon.
+- [x] **Admin Image Upload UX**:
+    - [x] Implemented immediate visual previews for Main Cover and Gallery images.
+    - [x] Added "New Selection" and "New" badges for clear state feedback.
+    - [x] Integrated automated memory cleanup for local object URLs.

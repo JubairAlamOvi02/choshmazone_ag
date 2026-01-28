@@ -27,6 +27,7 @@
     *   `SearchBar`: Debounced multi-field filtering.
     *   `ErrorBoundary`: Global crash protection.
     *   `Data Services`: Intelligent manual merging for relational data (e.g., Reviews -> Profiles) to bypass missing DB foreign key constraints and minimize console errors.
+    *   `Media Manager`: Implementation of `URL.createObjectURL` for immediate, low-latency visual feedback during admin image uploads.
 *   **PWA** (Implemented): Service Worker (`sw.js`) with offline caching for assets/images and Manifest support.
 *   **Performance Optimization**: 
     - **Code Splitting**: Route-level granularity via `React.lazy` and `Suspense`.
@@ -141,3 +142,5 @@
 5.  **Product Management**: Build forms for creating/editing products and uploading images to Supabase Storage.
 6.  **User Portal**: Build "My Orders" page fetching data from `orders` table.
 7.  **Responsive Polishing**: Implemented mobile drawers, responsive grids, and narrow-device visibility fixes.
+8.  **Community & Reviews**: Built a premium, glassmorphic review system with smart-merge relational logic and dynamic user avatars.
+9.  **Admin UX Refinement**: Integrated real-time image previews and status badges to eliminate ambiguity during product management.
