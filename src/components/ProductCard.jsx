@@ -6,6 +6,7 @@ import { useWishlist } from '../context/WishlistContext';
 import OptimizedImage from './ui/OptimizedImage';
 
 const ProductCard = ({ product }) => {
+    if (!product || !product.id) return null;
     const { id, title, price, image, images } = product;
     const hoverImage = images && images.length > 1 ? images[1] : null;
     const navigate = useNavigate();
@@ -75,7 +76,7 @@ const ProductCard = ({ product }) => {
                 <div className="p-3 md:py-4">
                     <h3 className="text-sm md:text-lg font-medium mb-1 text-text-main font-outfit truncate">{title}</h3>
                     <div className="flex justify-between items-center mb-3">
-                        <span className="text-sm md:text-base font-bold text-text-muted font-outfit">৳{price}</span>
+                        <span className="text-sm md:text-base font-bold text-text-muted font-outfit">৳{Number(price || 0).toLocaleString()}</span>
                     </div>
 
                     {/* Mobile Quick Actions */}

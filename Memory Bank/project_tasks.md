@@ -200,3 +200,6 @@
   - [x] Developed RecentlyViewedContext with LocalStorage persistence
   - [x] Integrated history tracking on product views
   - [x] Added responsive "Recently Viewed" display section to Home and PDP
+- [x] **Smart Recommendations (Task Id: 529)**:
+  - [x] Implemented category-based "You May Also Like" logic on PDP
+  - [x] Created `fetchByCategory` API helper with exclusion filters

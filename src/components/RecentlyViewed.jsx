@@ -7,7 +7,7 @@ const RecentlyViewed = ({ excludeId }) => {
 
     // Filter out the current product and limit to 4 items for display
     const displayProducts = viewedProducts
-        .filter(p => p.id !== excludeId)
+        .filter(p => p && p.id && p.id !== excludeId)
         .slice(0, 4);
 
     if (displayProducts.length === 0) return null;

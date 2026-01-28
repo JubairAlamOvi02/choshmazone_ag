@@ -42,6 +42,26 @@ export const productParams = {
         return data;
     },
 
+    // Fetch products by category
+    fetchByCategory: async (category, excludeId = null) => {
+        let query = supabase
+            .from('products')
+            .select('*')
+            .eq('category', category)
+            .eq('is_active', true);
+
+        if (excludeId) {
+            query = query.neq('id', excludeId);
+        }
+
+        const { data, error } = await query
+            .order('created_at', { ascending: false })
+            .limit(4);
+
+        if (error) throw error;
+        return data;
+    },
+
     // Create new product (Admin only via RLS)
     create: async (productData) => {
         const { data, error } = await supabase

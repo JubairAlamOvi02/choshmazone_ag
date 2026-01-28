@@ -10,6 +10,7 @@ import { productParams } from '../lib/api/products';
 import { ChevronRight, ShieldCheck, Truck, RotateCcw, Plus, Minus, Star, Heart, ShoppingBag } from 'lucide-react';
 import OptimizedImage from '../components/ui/OptimizedImage';
 import RecentlyViewed from '../components/RecentlyViewed';
+import ProductCard from '../components/ProductCard';
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -18,6 +19,7 @@ const ProductDetails = () => {
     const { isInWishlist, toggleWishlist } = useWishlist();
     const { addToRecentlyViewed } = useRecentlyViewed();
     const [product, setProduct] = useState(null);
+    const [relatedProducts, setRelatedProducts] = useState([]);
     const [mainImage, setMainImage] = useState('');
 
     // Derived state, safe to use even if product is null initially (will just be false)
@@ -33,13 +35,43 @@ const ProductDetails = () => {
                 const data = await productParams.fetchById(id);
                 const formattedProduct = {
                     ...data,
-                    title: data.name,
-                    image: data.image_url,
-                    images: data.images && data.images.length > 0 ? data.images : [data.image_url]
+                    id: data.id,
+                    title: data.name || 'Untitled Product',
+                    price: Number(data.price) || 0,
+                    image: data.image_url || '',
+                    images: Array.isArray(data.images) && data.images.length > 0
+                        ? data.images
+                        : [data.image_url].filter(Boolean)
                 };
+
+                // Final safety: if no images at all, use a placeholder
+                if (formattedProduct.images.length === 0) {
+                    formattedProduct.images = ['/placeholder-product.png'];
+                    if (!formattedProduct.image) formattedProduct.image = '/placeholder-product.png';
+                }
+
                 setProduct(formattedProduct);
                 setMainImage(formattedProduct.image);
                 addToRecentlyViewed(formattedProduct);
+
+                // Fetch related products - only if category exists
+                if (data.category) {
+                    try {
+                        const related = await productParams.fetchByCategory(data.category, id);
+                        if (Array.isArray(related)) {
+                            setRelatedProducts(related.map(p => ({
+                                ...p,
+                                title: p.name || 'Untitled Product',
+                                price: Number(p.price) || 0,
+                                image: p.image_url || '',
+                                images: Array.isArray(p.images) ? p.images : [p.image_url].filter(Boolean)
+                            })));
+                        }
+                    } catch (relatedError) {
+                        console.error("Error fetching related products:", relatedError);
+                        setRelatedProducts([]);
+                    }
+                }
             } catch (error) {
                 console.error("Error fetching product details:", error);
             } finally {
@@ -101,33 +133,32 @@ const ProductDetails = () => {
 
             {/* Breadcrumbs */}
             <div className="bg-background-alt/50 border-b border-border">
-                {/* JSON-LD Structured Data for SEO */}
-                <script type="application/ld+json">
-                    {JSON.stringify({
-                        "@context": "https://schema.org/",
-                        "@type": "Product",
-                        "name": product.title,
-                        "image": product.images,
-                        "description": `Premium handcrafted ${product.style || 'sunglasses'} from Choshma Zone.`,
-                        "brand": {
-                            "@type": "Brand",
-                            "name": "Choshma Zone"
-                        },
-                        "aggregateRating": {
-                            "@type": "AggregateRating",
-                            "ratingValue": "4.8",
-                            "reviewCount": "24"
-                        },
-                        "offers": {
-                            "@type": "Offer",
-                            "url": window.location.href,
-                            "priceCurrency": "BDT",
-                            "price": product.price,
-                            "itemCondition": "https://schema.org/NewCondition",
-                            "availability": product.is_active !== false ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
-                        }
-                    })}
-                </script>
+                {product && (
+                    <script
+                        type="application/ld+json"
+                        dangerouslySetInnerHTML={{
+                            __html: JSON.stringify({
+                                "@context": "https://schema.org/",
+                                "@type": "Product",
+                                "name": product?.title || 'Sunglasses',
+                                "image": product?.images || [],
+                                "description": `Premium handcrafted ${product?.style || 'sunglasses'} from Choshma Zone.`,
+                                "brand": {
+                                    "@type": "Brand",
+                                    "name": "Choshma Zone"
+                                },
+                                "offers": {
+                                    "@type": "Offer",
+                                    "url": typeof window !== 'undefined' ? window.location.href : '',
+                                    "priceCurrency": "BDT",
+                                    "price": product?.price || 0,
+                                    "itemCondition": "https://schema.org/NewCondition",
+                                    "availability": product?.is_active !== false ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+                                }
+                            })
+                        }}
+                    />
+                )}
                 <div className="container mx-auto px-4 py-4">
                     <nav className="flex items-center gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest font-outfit text-text-muted">
                         <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -192,7 +223,7 @@ const ProductDetails = () => {
 
                             <div className="flex items-center gap-4 mb-6">
                                 <div className="text-3xl md:text-4xl font-bold text-primary font-outfit">
-                                    ৳{product.price.toLocaleString()}
+                                    ৳{Number(product.price || 0).toLocaleString()}
                                 </div>
                                 <div className="flex items-center gap-1">
                                     {[...Array(5)].map((_, i) => (
@@ -345,7 +376,27 @@ const ProductDetails = () => {
                 </button>
             </div>
 
-            <RecentlyViewed excludeId={product.id} />
+            {/* Related Products Section */}
+            {relatedProducts && relatedProducts.length > 0 && (
+                <section className="py-12 md:py-20 border-t border-border bg-background-alt/30">
+                    <div className="container mx-auto px-4">
+                        <div className="flex justify-between items-end mb-8 md:mb-12">
+                            <div>
+                                <h2 className="text-2xl md:text-3xl font-bold font-outfit uppercase tracking-tighter mb-2">You May Also Like</h2>
+                                <div className="w-12 h-1 bg-secondary"></div>
+                            </div>
+                            <Link to="/shop" className="text-[10px] font-bold uppercase tracking-widest text-text-muted hover:text-primary transition-colors">View All Products</Link>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+                            {relatedProducts.map(p => (
+                                <ProductCard key={p.id} product={p} />
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            <RecentlyViewed excludeId={product?.id} />
             <Footer />
         </div>
     );

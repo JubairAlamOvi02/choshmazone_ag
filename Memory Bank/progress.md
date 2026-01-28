@@ -120,3 +120,6 @@
 - Task 42 (Recently Viewed Products): Completed
   - Created RecentlyViewedContext for tracking browsing history.
   - Added "Recently Viewed" section to Home and Product Details pages.
+- Task 43 (Related Products Recommendation): Completed
+  - Implemented category-based product recommendations on Product Details Page.
+  - Added "You May Also Like" section with dynamic product suggestions.
