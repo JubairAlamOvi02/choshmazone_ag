@@ -218,3 +218,7 @@
 - [x] **Product Trust Badge Refinement (Task Id: 533)**:
   - [x] Updated marketing text for all trust badges
   - [x] Updated iconography for "Premium Hard Case" (Package icon)
+- [x] **Admin Image Upload UX (Task Id: 534)**:
+  - [x] Implemented immediate visual previews for Main Cover and Gallery
+  - [x] Added visual cues ("New Selection" / "New" badges) for unsaved changes
+  - [x] Added proper memory cleanup for object URLs

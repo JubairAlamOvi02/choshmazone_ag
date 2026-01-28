@@ -137,3 +137,7 @@
 - Task 47 (Product Trust Badge Refinement): Completed
   - Updated badge text: "Nationwide Delivery", "UV400 Protected", "Premium Hard Case".
   - Swapped RotateCcw icon with Package icon for the Hard Case badge.
+- Task 48 (Admin Image Upload UX): Completed
+  - Implemented immediate image previews using URL.createObjectURL.
+  - Added "New Selection" and "New" badges for better visual feedback.
+  - Optimized cleanup logic to prevent memory leaks.

@@ -25,7 +25,9 @@ const ProductForm = () => {
         shipping_info: ''
     });
     const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
     const [additionalFiles, setAdditionalFiles] = useState([]);
+    const [additionalPreviews, setAdditionalPreviews] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -60,7 +62,12 @@ const ProductForm = () => {
 
     const handleImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
-            setImageFile(e.target.files[0]);
+            const file = e.target.files[0];
+            setImageFile(file);
+
+            // Create preview
+            if (imagePreview) URL.revokeObjectURL(imagePreview);
+            setImagePreview(URL.createObjectURL(file));
         }
     };
 
@@ -68,12 +75,31 @@ const ProductForm = () => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files);
             setAdditionalFiles(prev => [...prev, ...filesArray]);
+
+            // Create previews
+            const newPreviews = filesArray.map(file => URL.createObjectURL(file));
+            setAdditionalPreviews(prev => [...prev, ...newPreviews]);
         }
     };
 
     const removeAdditionalFile = (index) => {
-        setAdditionalFiles(prev => prev.filter((_, i) => i !== index));
+        setAdditionalFiles(prev => {
+            const newFiles = prev.filter((_, i) => i !== index);
+            return newFiles;
+        });
+        setAdditionalPreviews(prev => {
+            URL.revokeObjectURL(prev[index]);
+            return prev.filter((_, i) => i !== index);
+        });
     };
+
+    // Cleanup object URLs to prevent memory leaks
+    useEffect(() => {
+        return () => {
+            if (imagePreview) URL.revokeObjectURL(imagePreview);
+            additionalPreviews.forEach(url => URL.revokeObjectURL(url));
+        };
+    }, [imagePreview, additionalPreviews]);
 
     const removeExistingImage = (url) => {
         setFormData(prev => ({
@@ -376,12 +402,21 @@ const ProductForm = () => {
 
                             <div className="space-y-4">
                                 <label className="block text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">Main Cover</label>
-                                {formData.image_url ? (
+                                {(imagePreview || formData.image_url) ? (
                                     <div className="relative group rounded-3xl overflow-hidden aspect-square bg-gray-50 border border-border/50">
-                                        <img src={formData.image_url} alt="Main" className="w-full h-full object-contain mb-multiply" />
+                                        <img
+                                            src={imagePreview || formData.image_url}
+                                            alt="Preview"
+                                            className="w-full h-full object-contain mb-multiply transition-opacity duration-300"
+                                        />
                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                                             <Upload className="text-white" size={32} />
                                         </div>
+                                        {imagePreview && (
+                                            <div className="absolute top-2 right-2 bg-secondary text-primary text-[8px] font-bold px-2 py-1 rounded-full uppercase tracking-widest animate-in zoom-in">
+                                                New Selection
+                                            </div>
+                                        )}
                                     </div>
                                 ) : (
                                     <div className="aspect-square bg-gray-50 border-2 border-dashed border-border rounded-3xl flex flex-col items-center justify-center text-text-muted">
@@ -410,16 +445,20 @@ const ProductForm = () => {
                                             </button>
                                         </div>
                                     ))}
-                                    {additionalFiles.map((file, idx) => (
-                                        <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-dashed border-primary/50 bg-primary/5 flex items-center justify-center">
-                                            <span className="text-[8px] font-bold text-primary text-center px-1 truncate">{file.name}</span>
+                                    {additionalPreviews.map((url, idx) => (
+                                        <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-primary/50 bg-primary/5 group animate-in zoom-in duration-300">
+                                            <img src={url} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                                             <button
                                                 type="button"
                                                 onClick={() => removeAdditionalFile(idx)}
-                                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full shadow-sm"
+                                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full shadow-sm hover:bg-red-600 transition-colors"
                                             >
                                                 <X size={10} />
                                             </button>
+                                            <div className="absolute bottom-0 left-0 w-full bg-primary/80 text-white text-[6px] font-bold py-0.5 text-center uppercase tracking-tighter">
+                                                New
+                                            </div>
                                         </div>
                                     ))}
                                     <label className="aspect-square rounded-xl border-2 border-dashed border-border flex items-center justify-center text-text-muted cursor-pointer hover:bg-gray-50 transition-colors">
