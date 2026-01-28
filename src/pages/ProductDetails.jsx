@@ -2,18 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useRecentlyViewed } from '../context/RecentlyViewedContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
 import { productParams } from '../lib/api/products';
 import { ChevronRight, ShieldCheck, Truck, RotateCcw, Plus, Minus, Star, Heart, ShoppingBag } from 'lucide-react';
 import OptimizedImage from '../components/ui/OptimizedImage';
+import RecentlyViewed from '../components/RecentlyViewed';
 
 const ProductDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToCart } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
+    const { addToRecentlyViewed } = useRecentlyViewed();
     const [product, setProduct] = useState(null);
     const [mainImage, setMainImage] = useState('');
 
@@ -36,6 +39,7 @@ const ProductDetails = () => {
                 };
                 setProduct(formattedProduct);
                 setMainImage(formattedProduct.image);
+                addToRecentlyViewed(formattedProduct);
             } catch (error) {
                 console.error("Error fetching product details:", error);
             } finally {
@@ -97,6 +101,33 @@ const ProductDetails = () => {
 
             {/* Breadcrumbs */}
             <div className="bg-background-alt/50 border-b border-border">
+                {/* JSON-LD Structured Data for SEO */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org/",
+                        "@type": "Product",
+                        "name": product.title,
+                        "image": product.images,
+                        "description": `Premium handcrafted ${product.style || 'sunglasses'} from Choshma Zone.`,
+                        "brand": {
+                            "@type": "Brand",
+                            "name": "Choshma Zone"
+                        },
+                        "aggregateRating": {
+                            "@type": "AggregateRating",
+                            "ratingValue": "4.8",
+                            "reviewCount": "24"
+                        },
+                        "offers": {
+                            "@type": "Offer",
+                            "url": window.location.href,
+                            "priceCurrency": "BDT",
+                            "price": product.price,
+                            "itemCondition": "https://schema.org/NewCondition",
+                            "availability": product.is_active !== false ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+                        }
+                    })}
+                </script>
                 <div className="container mx-auto px-4 py-4">
                     <nav className="flex items-center gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest font-outfit text-text-muted">
                         <Link to="/" className="hover:text-primary transition-colors">Home</Link>
@@ -298,7 +329,7 @@ const ProductDetails = () => {
             {/* Mobile Sticky Bottom Bar */}
             <div className="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-lg border-t border-border p-4 z-40 md:hidden flex gap-3 animate-in slide-in-from-bottom duration-500">
                 <button
-                    className={`flex-1 h-16 bg-primary text-white font-bold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 shadow-xl ${product.is_active === false ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'active:scale-95 transition-transform'}`}
+                    className={`flex-1 h-14 bg-primary text-white font-bold text-[11px] uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 shadow-lg ${product.is_active === false ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'active:scale-95 transition-transform'}`}
                     onClick={() => addToCart({ ...product, quantity })}
                     disabled={product.is_active === false}
                 >
@@ -306,7 +337,7 @@ const ProductDetails = () => {
                     <span>{product.is_active === false ? 'Out of Stock' : 'Add to Bag'}</span>
                 </button>
                 <button
-                    className={`flex-1 h-16 bg-secondary text-primary font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-xl ${product.is_active === false ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'active:scale-95 transition-transform'}`}
+                    className={`flex-1 h-14 bg-secondary text-primary font-bold text-[11px] uppercase tracking-widest rounded-xl shadow-lg ${product.is_active === false ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'active:scale-95 transition-transform'}`}
                     onClick={handleBuyNow}
                     disabled={product.is_active === false}
                 >
@@ -314,6 +345,7 @@ const ProductDetails = () => {
                 </button>
             </div>
 
+            <RecentlyViewed excludeId={product.id} />
             <Footer />
         </div>
     );

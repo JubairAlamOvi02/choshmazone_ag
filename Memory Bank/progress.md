@@ -111,3 +111,12 @@
   - **Build**: Verified production build with correct asset chunking.
 - Task 39 (Navbar UI Fix): Completed
   - Removed duplicate "My Profile" link in the user account dropdown.
+- Task 40 (Mobile Product Card Refinement): Completed
+  - Increased mobile button sizes and text for better tap usability.
+  - Disabled hover transitions and image shifts on mobile for a "frozen" feel.
+  - Ensured desktop overlays remain hidden on mobile devices.
+- Task 41 (Product SEO & Structured Data): Completed
+  - Implemented JSON-LD Schema markup in ProductDetails.jsx for better search visibility.
+- Task 42 (Recently Viewed Products): Completed
+  - Created RecentlyViewedContext for tracking browsing history.
+  - Added "Recently Viewed" section to Home and Product Details pages.

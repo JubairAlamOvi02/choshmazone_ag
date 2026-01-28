@@ -4,6 +4,7 @@ import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { RecentlyViewedProvider } from './context/RecentlyViewedContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import CartDrawer from './components/Cart/CartDrawer';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -54,59 +55,61 @@ function App() {
           <AuthProvider>
             <CartProvider>
               <WishlistProvider>
-                <div className="app">
-                  <CartDrawer />
-                  <Suspense fallback={<PageLoader />}>
-                    <Routes>
-                      {/* Public Routes */}
-                      <Route path="/" element={<Home />} />
-                      <Route path="/shop" element={<Shop />} />
-                      <Route path="/product/:id" element={<ProductDetails />} />
-                      <Route path="/checkout" element={<Checkout />} />
-                      <Route path="/order-success" element={<OrderSuccess />} />
-                      <Route path="/collections" element={<Collections />} />
-                      <Route path="/about" element={<About />} />
-                      <Route path="/contact" element={<Contact />} />
-                      <Route path="/wishlist" element={<Wishlist />} />
+                <RecentlyViewedProvider>
+                  <div className="app">
+                    <CartDrawer />
+                    <Suspense fallback={<PageLoader />}>
+                      <Routes>
+                        {/* Public Routes */}
+                        <Route path="/" element={<Home />} />
+                        <Route path="/shop" element={<Shop />} />
+                        <Route path="/product/:id" element={<ProductDetails />} />
+                        <Route path="/checkout" element={<Checkout />} />
+                        <Route path="/order-success" element={<OrderSuccess />} />
+                        <Route path="/collections" element={<Collections />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/wishlist" element={<Wishlist />} />
 
-                      {/* Customer Routes */}
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/register" element={<Register />} />
-                      <Route path="/profile" element={
-                        <ProtectedRoute>
-                          <UserProfile />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/orders" element={
-                        <ProtectedRoute>
-                          <UserOrders />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/account/orders/:id" element={
-                        <ProtectedRoute>
-                          <UserOrderDetails />
-                        </ProtectedRoute>
-                      } />
+                        {/* Customer Routes */}
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/profile" element={
+                          <ProtectedRoute>
+                            <UserProfile />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/orders" element={
+                          <ProtectedRoute>
+                            <UserOrders />
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/account/orders/:id" element={
+                          <ProtectedRoute>
+                            <UserOrderDetails />
+                          </ProtectedRoute>
+                        } />
 
-                      {/* Admin Routes */}
-                      <Route path="/admin/login" element={<AdminLogin />} />
+                        {/* Admin Routes */}
+                        <Route path="/admin/login" element={<AdminLogin />} />
 
-                      <Route path="/admin" element={
-                        <ProtectedRoute requireAdmin={true}>
-                          <AdminLayout />
-                        </ProtectedRoute>
-                      }>
-                        <Route index element={<Navigate to="dashboard" replace />} />
-                        <Route path="dashboard" element={<AdminDashboard />} />
-                        <Route path="products" element={<AdminProducts />} />
-                        <Route path="products/new" element={<AdminProductNew />} />
-                        <Route path="products/edit/:id" element={<ProductForm />} />
-                        <Route path="orders" element={<AdminOrders />} />
-                        <Route path="customers" element={<AdminCustomers />} />
-                      </Route>
-                    </Routes>
-                  </Suspense>
-                </div>
+                        <Route path="/admin" element={
+                          <ProtectedRoute requireAdmin={true}>
+                            <AdminLayout />
+                          </ProtectedRoute>
+                        }>
+                          <Route index element={<Navigate to="dashboard" replace />} />
+                          <Route path="dashboard" element={<AdminDashboard />} />
+                          <Route path="products" element={<AdminProducts />} />
+                          <Route path="products/new" element={<AdminProductNew />} />
+                          <Route path="products/edit/:id" element={<ProductForm />} />
+                          <Route path="orders" element={<AdminOrders />} />
+                          <Route path="customers" element={<AdminCustomers />} />
+                        </Route>
+                      </Routes>
+                    </Suspense>
+                  </div>
+                </RecentlyViewedProvider>
               </WishlistProvider>
             </CartProvider>
           </AuthProvider>

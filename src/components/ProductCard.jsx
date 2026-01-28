@@ -33,14 +33,14 @@ const ProductCard = ({ product }) => {
     };
 
     return (
-        <div className="flex flex-col transition-transform duration-300 bg-surface rounded-md overflow-hidden md:hover:-translate-y-1 group border border-border/10 md:border-transparent">
+        <div className="flex flex-col bg-surface rounded-md overflow-hidden md:hover:-translate-y-1 md:transition-transform md:duration-300 group border border-border/10 md:border-transparent">
             <Link to={`/product/${id}`} className="no-underline text-inherit">
                 <div className="relative aspect-square overflow-hidden bg-gray-100">
                     {/* Primary Image */}
                     <OptimizedImage
                         src={image}
                         alt={title}
-                        className="absolute inset-0 w-full h-full md:group-hover:scale-105 md:group-hover:opacity-0 transition-all duration-500"
+                        className="absolute inset-0 w-full h-full md:group-hover:scale-105 md:group-hover:opacity-0 md:transition-all md:duration-500"
                     />
 
                     {/* Wishlist Button */}
@@ -57,7 +57,7 @@ const ProductCard = ({ product }) => {
                         <OptimizedImage
                             src={hoverImage}
                             alt={`${title} - alternate view`}
-                            className="absolute inset-0 w-full h-full object-cover transition-all duration-500 opacity-0 md:group-hover:opacity-100 md:group-hover:scale-105"
+                            className="absolute inset-0 w-full h-full object-cover opacity-0 md:group-hover:opacity-100 md:group-hover:scale-105 md:transition-all md:duration-500"
                         />
                     )}
 
@@ -79,16 +79,16 @@ const ProductCard = ({ product }) => {
                     </div>
 
                     {/* Mobile Quick Actions */}
-                    <div className="flex flex-col gap-1.5 md:hidden">
+                    <div className="flex flex-col gap-2 md:hidden">
                         <button
-                            className="w-full h-10 bg-primary text-white font-bold text-[9px] uppercase tracking-widest rounded-md flex items-center justify-center gap-2"
+                            className="w-full h-11 bg-primary text-white font-bold text-[11px] uppercase tracking-widest rounded-md flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-transform"
                             onClick={handleAddToCart}
                         >
-                            <ShoppingBag size={12} />
+                            <ShoppingBag size={14} />
                             Add to Bag
                         </button>
                         <button
-                            className="w-full h-10 bg-secondary text-primary font-bold text-[9px] uppercase tracking-widest rounded-md"
+                            className="w-full h-11 bg-secondary text-primary font-bold text-[11px] uppercase tracking-widest rounded-md shadow-sm active:scale-[0.98] transition-transform"
                             onClick={handleBuyNow}
                         >
                             Buy Now

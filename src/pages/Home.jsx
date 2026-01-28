@@ -4,6 +4,7 @@ import Hero from '../components/Hero';
 import FeaturedCollections from '../components/FeaturedCollections';
 import ProductCard from '../components/ProductCard';
 import PromotionalBanner from '../components/PromotionalBanner';
+import RecentlyViewed from '../components/RecentlyViewed';
 import Footer from '../components/Footer';
 
 import { productParams } from '../lib/api/products';
@@ -65,6 +66,7 @@ const Home = () => {
                 </section>
 
                 <PromotionalBanner />
+                <RecentlyViewed />
             </main>
 
             <Footer />
