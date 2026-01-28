@@ -16,7 +16,13 @@ const ProductForm = () => {
         style: '',
         stock_quantity: 0,
         image_url: '',
-        images: []
+        images: [],
+        highlights: '',
+        spec_frame: '',
+        spec_lens: '',
+        spec_hardware: '',
+        spec_weight: '',
+        shipping_info: ''
     });
     const [imageFile, setImageFile] = useState(null);
     const [additionalFiles, setAdditionalFiles] = useState([]);
@@ -106,7 +112,13 @@ const ProductForm = () => {
                 category: formData.category,
                 style: formData.style,
                 image_url: imageUrl,
-                images: allImages
+                images: allImages,
+                highlights: formData.highlights,
+                spec_frame: formData.spec_frame,
+                spec_lens: formData.spec_lens,
+                spec_hardware: formData.spec_hardware,
+                spec_weight: formData.spec_weight,
+                shipping_info: formData.shipping_info
             };
 
             if (isEditMode) {
@@ -268,6 +280,89 @@ const ProductForm = () => {
                                         onChange={handleChange}
                                         required
                                         className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit font-bold"
+                                    />
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="bg-white p-8 rounded-3xl border border-border/50 shadow-sm space-y-6">
+                            <h3 className="text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit border-b border-border/50 pb-4 mb-6">Product Highlights & Shipping</h3>
+
+                            <div className="space-y-2">
+                                <label className="flex items-center gap-2 text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                    Product Highlights (One per line)
+                                </label>
+                                <textarea
+                                    name="highlights"
+                                    value={formData.highlights || ''}
+                                    onChange={handleChange}
+                                    rows={4}
+                                    placeholder="• Handcrafted frame&#10;• UV400 Protection..."
+                                    className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="flex items-center gap-2 text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                    Shipping Information
+                                </label>
+                                <textarea
+                                    name="shipping_info"
+                                    value={formData.shipping_info || ''}
+                                    onChange={handleChange}
+                                    rows={3}
+                                    placeholder="Details about delivery time and returns..."
+                                    className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                />
+                            </div>
+                        </section>
+
+                        <section className="bg-white p-8 rounded-3xl border border-border/50 shadow-sm space-y-6">
+                            <h3 className="text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit border-b border-border/50 pb-4 mb-6">Technical Specifications</h3>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">Frame Material</label>
+                                    <input
+                                        type="text"
+                                        name="spec_frame"
+                                        value={formData.spec_frame || ''}
+                                        onChange={handleChange}
+                                        placeholder="e.g. Acetate / Metal"
+                                        className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">Lens Type</label>
+                                    <input
+                                        type="text"
+                                        name="spec_lens"
+                                        value={formData.spec_lens || ''}
+                                        onChange={handleChange}
+                                        placeholder="e.g. Polarized UV400"
+                                        className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">Hardware</label>
+                                    <input
+                                        type="text"
+                                        name="spec_hardware"
+                                        value={formData.spec_hardware || ''}
+                                        onChange={handleChange}
+                                        placeholder="e.g. Italian Hinges"
+                                        className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">Weight</label>
+                                    <input
+                                        type="text"
+                                        name="spec_weight"
+                                        value={formData.spec_weight || ''}
+                                        onChange={handleChange}
+                                        placeholder="e.g. 32g"
+                                        className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
                                     />
                                 </div>
                             </div>

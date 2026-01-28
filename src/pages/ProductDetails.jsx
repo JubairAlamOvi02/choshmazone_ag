@@ -7,7 +7,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
 import { productParams } from '../lib/api/products';
-import { ChevronRight, ShieldCheck, Truck, RotateCcw, Plus, Minus, Star, Heart, ShoppingBag } from 'lucide-react';
+import { ChevronRight, ShieldCheck, Truck, Package, Plus, Minus, Star, Heart, ShoppingBag } from 'lucide-react';
 import OptimizedImage from '../components/ui/OptimizedImage';
 import RecentlyViewed from '../components/RecentlyViewed';
 import ProductCard from '../components/ProductCard';
@@ -298,26 +298,49 @@ const ProductDetails = () => {
                                         <div className="text-sm text-text-muted font-outfit leading-relaxed">
                                             {tab === 'description' && (
                                                 <ul className="space-y-3">
-                                                    <li className="flex gap-3">
-                                                        <div className="w-1.5 h-1.5 bg-secondary rounded-full mt-1.5"></div>
-                                                        Handcrafted {product.style || 'sunglasses'} frame for a timeless look.
-                                                    </li>
-                                                    <li className="flex gap-3">
-                                                        <div className="w-1.5 h-1.5 bg-secondary rounded-full mt-1.5"></div>
-                                                        Premium scratch-resistant polarized lenses.
-                                                    </li>
+                                                    {product.highlights ? (
+                                                        product.highlights.split('\n').filter(line => line.trim()).map((line, idx) => (
+                                                            <li key={idx} className="flex gap-3">
+                                                                <div className="w-1.5 h-1.5 bg-secondary rounded-full mt-1.5"></div>
+                                                                {line.trim()}
+                                                            </li>
+                                                        ))
+                                                    ) : (
+                                                        <>
+                                                            <li className="flex gap-3">
+                                                                <div className="w-1.5 h-1.5 bg-secondary rounded-full mt-1.5"></div>
+                                                                Handcrafted {product.style || 'sunglasses'} frame for a timeless look.
+                                                            </li>
+                                                            <li className="flex gap-3">
+                                                                <div className="w-1.5 h-1.5 bg-secondary rounded-full mt-1.5"></div>
+                                                                Premium scratch-resistant polarized lenses.
+                                                            </li>
+                                                        </>
+                                                    )}
                                                 </ul>
                                             )}
                                             {tab === 'specifications' && (
                                                 <div className="grid grid-cols-2 gap-y-4">
-                                                    <div><span className="text-[10px] block font-bold text-text-muted uppercase">Frame</span>Acetate</div>
-                                                    <div><span className="text-[10px] block font-bold text-text-muted uppercase">Lens</span>Polarized UV400</div>
-                                                    <div><span className="text-[10px] block font-bold text-text-muted uppercase">Hardware</span>Italian Hinges</div>
-                                                    <div><span className="text-[10px] block font-bold text-text-muted uppercase">Weight</span>32g</div>
+                                                    <div>
+                                                        <span className="text-[10px] block font-bold text-text-muted uppercase">Frame</span>
+                                                        {product.spec_frame || 'Acetate'}
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-[10px] block font-bold text-text-muted uppercase">Lens</span>
+                                                        {product.spec_lens || 'Polarized UV400'}
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-[10px] block font-bold text-text-muted uppercase">Hardware</span>
+                                                        {product.spec_hardware || 'Italian Hinges'}
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-[10px] block font-bold text-text-muted uppercase">Weight</span>
+                                                        {product.spec_weight || '32g'}
+                                                    </div>
                                                 </div>
                                             )}
                                             {tab === 'shipping' && (
-                                                <p>Complimentary shipping on all orders over ৳5000. 7-day hassle-free return policy. Ships in premium branded hard case.</p>
+                                                <p>{product.shipping_info || 'Complimentary shipping on all orders over ৳5000. 7-day hassle-free return policy. Ships in premium branded hard case.'}</p>
                                             )}
                                         </div>
                                     </div>
@@ -325,19 +348,18 @@ const ProductDetails = () => {
                             ))}
                         </div>
 
-                        {/* Trust Badges */}
                         <div className="grid grid-cols-3 gap-4 p-6 bg-background-alt rounded-2xl border border-border/50">
                             <div className="flex flex-col items-center text-center gap-2">
                                 <Truck size={20} className="text-primary" />
-                                <span className="text-[8px] font-bold uppercase tracking-widest">Free Shipping</span>
+                                <span className="text-[8px] font-bold uppercase tracking-widest">Nationwide Delivery</span>
                             </div>
                             <div className="flex flex-col items-center text-center gap-2 border-x border-border/30 px-2">
                                 <ShieldCheck size={20} className="text-primary" />
-                                <span className="text-[8px] font-bold uppercase tracking-widest">UV400 Protection</span>
+                                <span className="text-[8px] font-bold uppercase tracking-widest">UV400 Protected</span>
                             </div>
                             <div className="flex flex-col items-center text-center gap-2">
-                                <RotateCcw size={20} className="text-primary" />
-                                <span className="text-[8px] font-bold uppercase tracking-widest">7-Day Returns</span>
+                                <Package size={20} className="text-primary" />
+                                <span className="text-[8px] font-bold uppercase tracking-widest">Premium Hard Case</span>
                             </div>
                         </div>
                     </div>
