@@ -85,6 +85,15 @@
 *   `quantity` (Integer)
 *   `unit_price` (Numeric) - Snapshot of price at purchase time
 
+#### 5. `reviews`
+*Customer feedback and ratings.*
+*   `id` (UUID, Primary Key)
+*   `product_id` (UUID, References `products.id`)
+*   `user_id` (UUID, References `profiles.id`)
+*   `rating` (Integer) - 1 to 5 stars
+*   `comment` (Text)
+*   `created_at` (Timestamp)
+
 ### B. Relationships
 *   `profiles` 1:N `orders`
 *   `orders` 1:N `order_items`

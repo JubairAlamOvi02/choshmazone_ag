@@ -11,6 +11,7 @@ import { ChevronRight, ShieldCheck, Truck, RotateCcw, Plus, Minus, Star, Heart, 
 import OptimizedImage from '../components/ui/OptimizedImage';
 import RecentlyViewed from '../components/RecentlyViewed';
 import ProductCard from '../components/ProductCard';
+import ReviewSection from '../components/ReviewSection';
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -225,12 +226,12 @@ const ProductDetails = () => {
                                 <div className="text-3xl md:text-4xl font-bold text-primary font-outfit">
                                     ৳{Number(product.price || 0).toLocaleString()}
                                 </div>
-                                <div className="flex items-center gap-1">
+                                <a href="#reviews" className="flex items-center gap-1 hover:opacity-70 transition-opacity">
                                     {[...Array(5)].map((_, i) => (
                                         <Star key={i} size={14} className={i < 4 ? "fill-secondary text-secondary" : "text-border"} />
                                     ))}
                                     <span className="text-xs text-text-muted font-bold ml-1">(4.8/5.0)</span>
-                                </div>
+                                </a>
                             </div>
                         </div>
 
@@ -356,6 +357,8 @@ const ProductDetails = () => {
                     </div>
                 </div>
             </main>
+
+            <ReviewSection productId={product.id} />
 
             {/* Mobile Sticky Bottom Bar */}
             <div className="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-lg border-t border-border p-4 z-40 md:hidden flex gap-3 animate-in slide-in-from-bottom duration-500">

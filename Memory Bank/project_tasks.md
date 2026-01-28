@@ -203,3 +203,7 @@
 - [x] **Smart Recommendations (Task Id: 529)**:
   - [x] Implemented category-based "You May Also Like" logic on PDP
   - [x] Created `fetchByCategory` API helper with exclusion filters
+- [ ] **Product Reviews & Ratings (Task Id: 530)**:
+  - [x] Created `ReviewSection` component for the Product Details Page
+  - [x] Implemented Review submission and listing API logic
+  - [ ] Apply Supabase SQL for `reviews` table and RLS policies
