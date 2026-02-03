@@ -8,21 +8,31 @@ import { Package, Clock, CheckCircle2, ChevronRight } from 'lucide-react';
 
 
 const UserOrders = () => {
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (user) {
-            fetchOrders();
+        if (!authLoading) {
+            if (user) {
+                fetchOrders();
+            } else {
+                setLoading(false);
+            }
         }
-    }, [user]);
+    }, [user, authLoading]);
 
     const fetchOrders = async () => {
         try {
             const { data, error } = await supabase
                 .from('orders')
-                .select('*')
+                .select(`
+                    *,
+                    order_items (
+                        *,
+                        products (*)
+                    )
+                `)
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false });
 
@@ -96,7 +106,7 @@ const UserOrders = () => {
                                                 <div>
                                                     <span className="text-xs font-bold text-text-muted uppercase tracking-widest block mb-1">Items</span>
                                                     <span className="text-base font-bold text-text-main">
-                                                        {order.shipping_address?.items_count || order.total_items || 'N/A'} Products
+                                                        {order.order_items?.length || '0'} Products
                                                     </span>
                                                 </div>
                                                 <div>

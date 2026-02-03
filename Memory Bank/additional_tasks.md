@@ -173,3 +173,14 @@
     - [x] Implemented immediate visual previews for Main Cover and Gallery images.
     - [x] Added "New Selection" and "New" badges for clear state feedback.
     - [x] Integrated automated memory cleanup for local object URLs.
+- [x] **Admin Order Intelligence**:
+    - [x] Created comprehensive Order Details modal with glassmorphism design.
+    - [x] Added interactive image preview lightbox for detailed product inspection.
+    - [x] Integrated customer info, granular shipping addresses, and bKash details.
+- [x] **Customer Portal Stability**:
+    - [x] Fixed `TypeError: Invalid option : timeStyle` crash on Order Details page.
+    - [x] Resolved "N/A Products" product count bug in My Orders list.
+    - [x] Optimized Auth initialization to prevent hangs on slow networks (15s timeout, non-blocking role fetching).
+- [x] **Field Standardisation**:
+    - [x] Unified usage of `unit_price` across all order-related pages.
+    - [x] Fixed product relationship mapping in Supabase queries to ensure images and names load correctly.

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabaseClient';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
@@ -10,12 +11,15 @@ import {
 
 const OrderDetails = () => {
     const { id } = useParams();
+    const { user, loading: authLoading } = useAuth();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchOrderDetails();
-    }, [id]);
+        if (!authLoading) {
+            fetchOrderDetails();
+        }
+    }, [id, authLoading]);
 
     const fetchOrderDetails = async () => {
         try {
@@ -25,7 +29,7 @@ const OrderDetails = () => {
                     *,
                     order_items (
                         *,
-                        product:product_id (*)
+                        products (*)
                     )
                 `)
                 .eq('id', id)
@@ -99,7 +103,7 @@ const OrderDetails = () => {
                                         Order #{order.id.slice(0, 8)}
                                     </h1>
                                     <p className="text-sm text-text-muted font-outfit">
-                                        Placed on {new Date(order.created_at).toLocaleDateString(undefined, { dateStyle: 'long', timeStyle: 'short' })}
+                                        Placed on {new Date(order.created_at).toLocaleString(undefined, { dateStyle: 'long', timeStyle: 'short' })}
                                     </p>
                                 </div>
                                 <div className={`
@@ -150,18 +154,22 @@ const OrderDetails = () => {
                                 {order.order_items?.map((item) => (
                                     <div key={item.id} className="flex gap-4 items-start pb-6 border-b border-border/50 last:border-0 last:pb-0">
                                         <div className="w-20 h-24 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0">
-                                            {item.product?.image_url && (
+                                            {item.products?.image_url ? (
                                                 <img
-                                                    src={item.product.image_url}
-                                                    alt={item.product.name}
+                                                    src={item.products.image_url}
+                                                    alt={item.products.name}
                                                     className="w-full h-full object-cover"
                                                 />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
+                                                    <Package size={24} />
+                                                </div>
                                             )}
                                         </div>
                                         <div className="flex-1">
-                                            <h4 className="font-bold text-text-main font-outfit">{item.product?.name || 'Product'}</h4>
+                                            <h4 className="font-bold text-text-main font-outfit">{item.products?.name || 'Product'}</h4>
                                             <p className="text-sm text-text-muted mb-2">Quantity: {item.quantity}</p>
-                                            <p className="font-bold text-primary">৳{item.price.toLocaleString()}</p>
+                                            <p className="font-bold text-primary">৳{(item.unit_price || 0).toLocaleString()}</p>
                                         </div>
                                     </div>
                                 ))}

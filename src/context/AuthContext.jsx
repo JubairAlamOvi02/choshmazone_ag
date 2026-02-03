@@ -44,14 +44,14 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        // Timeout protection: if auth takes more than 10 seconds, stop loading
+        // Timeout protection: if auth takes more than 15 seconds, stop loading
         const timeoutId = setTimeout(() => {
             if (loading && !initializationComplete.current) {
-                console.warn('Auth initialization timeout - proceeding without auth');
+                console.warn('[Auth] Initialization timed out after 15s - forcing ready state');
                 setLoading(false);
                 setAuthError('Authentication timed out');
             }
-        }, 12000);
+        }, 15000);
 
         // Check active session
         const getSession = async () => {
@@ -65,9 +65,11 @@ export const AuthProvider = ({ children }) => {
                     setRole(null);
                 } else if (session?.user) {
                     setUser(session.user);
-                    const finalRole = await fetchUserRole(session.user.id, session.user.email);
-                    console.log(`[Auth] Session active: ${session.user.email}, Role: ${finalRole}`);
+                    // Fetch role in background to prevent blocking initialization if DB is slow
+                    fetchUserRole(session.user.id, session.user.email);
+                    console.log(`[Auth] Session detected for: ${session.user.email}`);
                 } else {
+                    console.log('[Auth] No active session found');
                     setUser(null);
                     setRole(null);
                 }

@@ -141,3 +141,16 @@
   - Implemented immediate image previews using URL.createObjectURL.
   - Added "New Selection" and "New" badges for better visual feedback.
   - Optimized cleanup logic to prevent memory leaks.
+- Task 49 (Admin Order Details Modal): Completed
+  - Implemented a comprehensive modal for viewing full order details in the admin panel.
+  - Includes product images, customer information, detailed shipping address, and payment details (method, trxID).
+  - Integrated `calculateDeliveryCharge` for accurate shipping fee display.
+  - Added an interactive image preview lightbox for product images.
+- Task 50 (Order Page Bug Fixes): Completed
+  - Fixed "N/A Products" count in the customer order list by updating the Supabase query.
+  - Resolved a crash in `OrderDetails.jsx` caused by invalid `timeStyle` option in `toLocaleDateString`.
+  - Corrected field references (standardized on `unit_price`) and fixed the `products` relationship mapping.
+- Task 51 (Auth Resilience & Performance): Completed
+  - Increased Auth initialization timeout to 15 seconds to prevent blank screens on slow connections.
+  - Made role fetching non-blocking to ensure the app becomes interactive immediately after session retrieval.
+  - Updated order pages to gracefully handle loading states when auth is pending or times out.

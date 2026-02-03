@@ -222,3 +222,21 @@
   - [x] Implemented immediate visual previews for Main Cover and Gallery
   - [x] Added visual cues ("New Selection" / "New" badges) for unsaved changes
   - [x] Added proper memory cleanup for object URLs
+
+## Phase 16: Admin Order Intelligence & Customer Portal Stability
+- [x] **Admin Order Details Experience (Task Id: 535)**:
+  - [x] Developed comprehensive Order Details modal with glassmorphism design.
+  - [x] Integrated product thumbnails and "Items Ordered" breakdown.
+  - [x] Added customer info (email, phone) and granular shipping data (Thana, District).
+  - [x] Implemented dynamic delivery charge display based on order data.
+- [x] **Product Image Lightbox (Task Id: 536)**:
+  - [x] Created interactive image preview system for admins.
+  - [x] Added zoom-in popup with backdrop-blur support for detailed product inspection.
+- [x] **Customer Portal Reliability (Task Id: 537)**:
+  - [x] Fixed `TypeError: Invalid option : timeStyle` in OrderDetails.jsx.
+  - [x] Resolved "N/A Products" display bug in customer order listings.
+  - [x] Standardized Supabase field mappings (`unit_price`, `products` object).
+- [x] **High-Latency Auth Strategy (Task Id: 538)**:
+  - [x] Extended Auth initialization timeout to 15s for slower networks.
+  - [x] Decoupled user role fetching from initial session detection to prevent startup hangs.
+  - [x] Implemented defensive loading states in protected order routes.
