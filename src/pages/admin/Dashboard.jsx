@@ -175,7 +175,7 @@ const Dashboard = () => {
                         <TrendingUp size={20} className="text-text-muted" />
                     </div>
 
-                    <div className="h-[300px] w-full">
+                    <div className="h-[400px] w-full mt-auto">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={chartData}>
                                 <defs>

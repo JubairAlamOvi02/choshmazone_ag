@@ -45,6 +45,7 @@ const AdminProductNew = lazy(() => import('./pages/admin/ProductNew'));
 const ProductForm = lazy(() => import('./pages/admin/ProductForm'));
 const AdminOrders = lazy(() => import('./pages/admin/Orders'));
 const AdminCustomers = lazy(() => import('./pages/admin/Customers'));
+const AdminMedia = lazy(() => import('./pages/admin/MediaManager'));
 
 
 function App() {
@@ -105,6 +106,7 @@ function App() {
                           <Route path="products/edit/:id" element={<ProductForm />} />
                           <Route path="orders" element={<AdminOrders />} />
                           <Route path="customers" element={<AdminCustomers />} />
+                          <Route path="media" element={<AdminMedia />} />
                         </Route>
                       </Routes>
                     </Suspense>

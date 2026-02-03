@@ -1,14 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Button from './Button';
-import heroBanner from '../assets/hero_banner.png';
+import heroBannerFallback from '../assets/hero_banner.png';
+import { settingsParams } from '../lib/api/settings';
 
 const Hero = () => {
+    const [heroImage, setHeroImage] = useState(heroBannerFallback);
+
+    useEffect(() => {
+        const fetchHero = async () => {
+            try {
+                const url = await settingsParams.get('hero_banner');
+                if (url) setHeroImage(url);
+            } catch (err) {
+                console.error("Failed to fetch hero banner:", err);
+            }
+        };
+        fetchHero();
+    }, []);
+
     return (
         <section className="h-[70vh] md:h-[85vh] min-h-[500px] md:min-h-[700px] relative flex items-center overflow-hidden">
             {/* Background Image with optimized loading */}
             <img
-                src={heroBanner}
+                src={heroImage}
                 alt="Premium Eyewear Collection"
                 className="absolute inset-0 w-full h-full object-cover object-center scale-105 animate-slow-zoom"
                 fetchPriority="high"

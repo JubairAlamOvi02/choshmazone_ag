@@ -3,14 +3,41 @@ import { useNavigate } from 'react-router-dom';
 import product1 from '../assets/product_1.png';
 import product3 from '../assets/product_3.png';
 import product4 from '../assets/product_4.png';
+import { settingsParams } from '../lib/api/settings';
 
 const FeaturedCollections = () => {
     const navigate = useNavigate();
+    const [collectionImages, setCollectionImages] = React.useState({
+        Men: product1,
+        Women: product3,
+        Unisex: product4
+    });
+
+    React.useEffect(() => {
+        const fetchImages = async () => {
+            try {
+                const [men, women, unisex] = await Promise.all([
+                    settingsParams.get('men_collection'),
+                    settingsParams.get('women_collection'),
+                    settingsParams.get('unisex_collection')
+                ]);
+
+                setCollectionImages({
+                    Men: men || product1,
+                    Women: women || product3,
+                    Unisex: unisex || product4
+                });
+            } catch (err) {
+                console.error("Failed to fetch collection images:", err);
+            }
+        };
+        fetchImages();
+    }, []);
 
     const collections = [
-        { id: 1, title: 'Men', category: 'Men', image: product1 },
-        { id: 2, title: 'Women', category: 'Women', image: product3 },
-        { id: 3, title: 'Unisex', category: 'Unisex', image: product4 },
+        { id: 1, title: 'Men', category: 'Men', image: collectionImages.Men },
+        { id: 2, title: 'Women', category: 'Women', image: collectionImages.Women },
+        { id: 3, title: 'Unisex', category: 'Unisex', image: collectionImages.Unisex },
     ];
 
     const handleCollectionClick = (category) => {

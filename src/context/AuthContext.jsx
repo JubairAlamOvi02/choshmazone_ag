@@ -128,7 +128,9 @@ export const AuthProvider = ({ children }) => {
                 id: userId,
                 role: 'admin',
                 full_name: 'Ovi Admin'
-            }, { onConflict: 'id' }).catch((e) => console.warn('[Auth] Background sync failed:', e));
+            }, { onConflict: 'id' }).then(({ error }) => {
+                if (error) console.warn('[Auth] Background sync failed:', error);
+            });
             return 'admin';
         }
 
