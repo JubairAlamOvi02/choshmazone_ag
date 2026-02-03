@@ -17,6 +17,8 @@ const AdminMedia = () => {
         women_collection: womenFallback,
         unisex_collection: unisexFallback,
     });
+    const [previewAssets, setPreviewAssets] = useState({});
+    const [pendingProducts, setPendingProducts] = useState({}); // productId -> newUrl
     const [tableMissing, setTableMissing] = useState(false);
     const [products, setProducts] = useState([]);
     const [library, setLibrary] = useState([]);
@@ -26,6 +28,8 @@ const AdminMedia = () => {
     const [showLibrary, setShowLibrary] = useState(false);
     const [selectingFor, setSelectingFor] = useState(null); // { type, id/key }
     const { showToast } = useToast();
+
+    const hasChanges = Object.keys(previewAssets).length > 0 || Object.keys(pendingProducts).length > 0;
 
     useEffect(() => {
         fetchData();
@@ -65,23 +69,47 @@ const AdminMedia = () => {
         if (!selectingFor) return;
 
         if (selectingFor.type === 'site') {
-            handleSiteAssetUpdate(url, selectingFor.key);
+            setPreviewAssets(prev => ({ ...prev, [selectingFor.key]: url }));
+            showToast('Preview updated', 'info');
         } else if (selectingFor.type === 'product') {
-            handleProductImageUpdate(selectingFor.id, url, true);
+            setPendingProducts(prev => ({ ...prev, [selectingFor.id]: url }));
+            showToast('Product preview updated', 'info');
         }
 
         setShowLibrary(false);
         setSelectingFor(null);
     };
 
-    const handleSiteAssetUpdate = async (value, key) => {
+    const handleSaveAll = async () => {
         try {
             setSaving(true);
-            await settingsParams.set(key, value);
-            setSiteAssets(prev => ({ ...prev, [key]: value }));
-            showToast('Asset updated from library', 'success');
+
+            // 1. Save Global Assets
+            const siteUpdates = Object.entries(previewAssets).map(([key, value]) =>
+                settingsParams.set(key, value)
+            );
+
+            // 2. Save Product Updates
+            const productUpdates = Object.entries(pendingProducts).map(([id, url]) =>
+                productParams.update(id, { image_url: url })
+            );
+
+            await Promise.all([...siteUpdates, ...productUpdates]);
+
+            // Sync states
+            setSiteAssets(prev => ({ ...prev, ...previewAssets }));
+            setProducts(prev => prev.map(p =>
+                pendingProducts[p.id] ? { ...p, image_url: pendingProducts[p.id] } : p
+            ));
+
+            // Clear pending
+            setPreviewAssets({});
+            setPendingProducts({});
+
+            showToast('All changes published to live site!', 'success');
         } catch (err) {
-            showToast('Failed to update asset', 'error');
+            console.error('Failed to save changes:', err);
+            showToast('Failed to save some changes', 'error');
         } finally {
             setSaving(false);
         }
@@ -93,35 +121,34 @@ const AdminMedia = () => {
             try {
                 setSaving(true);
                 const url = await settingsParams.uploadAsset(file);
-                await settingsParams.set(key, url);
-                setSiteAssets(prev => ({ ...prev, [key]: url }));
-                // Refresh library after upload
+                setPreviewAssets(prev => ({ ...prev, [key]: url }));
+
+                // Refresh library to show new image
                 const updatedLibrary = await settingsParams.listAssets();
                 setLibrary(updatedLibrary);
-                showToast('Asset updated successfully', 'success');
+
+                showToast('Image uploaded and ready to save', 'info');
             } catch (err) {
-                showToast('Failed to upload asset', 'error');
+                showToast('Failed to upload image', 'error');
             } finally {
                 setSaving(false);
             }
         }
     };
 
-    const handleProductImageUpdate = async (productId, source, isUrl = false) => {
+    const handleProductImageUpload = async (productId, file) => {
         try {
             setSaving(true);
-            let url = source;
-            if (!isUrl) {
-                url = await productParams.uploadImage(source);
-                // Refresh library after upload
-                const updatedLibrary = await settingsParams.listAssets();
-                setLibrary(updatedLibrary);
-            }
-            await productParams.update(productId, { image_url: url });
-            setProducts(prev => prev.map(p => p.id === productId ? { ...p, image_url: url } : p));
-            showToast('Product image updated', 'success');
+            const url = await productParams.uploadImage(file);
+            setPendingProducts(prev => ({ ...prev, [productId]: url }));
+
+            // Refresh library
+            const updatedLibrary = await settingsParams.listAssets();
+            setLibrary(updatedLibrary);
+
+            showToast('Product image uploaded and ready to save', 'info');
         } catch (err) {
-            showToast('Failed to update product image', 'error');
+            showToast('Failed to upload image', 'error');
         } finally {
             setSaving(false);
         }
@@ -209,14 +236,14 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                     </div>
                 </div>
             )}
-
             {activeTab === 'site' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-32">
                     {/* Hero Banner Card */}
                     <AssetCard
                         title="Hero Banner"
-                        description="Main landing image (Landscape recommended)"
-                        imageUrl={siteAssets.hero_banner}
+                        description="Main landing image"
+                        imageUrl={previewAssets.hero_banner || siteAssets.hero_banner}
+                        isPending={!!previewAssets.hero_banner}
                         onUpload={(e) => handleSiteAssetUpload(e, 'hero_banner')}
                         onSelect={() => {
                             setSelectingFor({ type: 'site', key: 'hero_banner' });
@@ -228,8 +255,9 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                     {/* Logo Card */}
                     <AssetCard
                         title="Main Logo"
-                        description="Displayed in Navbar (PNG/SVG recommended)"
-                        imageUrl={siteAssets.logo_main}
+                        description="Displayed in Navbar"
+                        imageUrl={previewAssets.logo_main || siteAssets.logo_main}
+                        isPending={!!previewAssets.logo_main}
                         onUpload={(e) => handleSiteAssetUpload(e, 'logo_main')}
                         onSelect={() => {
                             setSelectingFor({ type: 'site', key: 'logo_main' });
@@ -241,8 +269,9 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                     {/* Footer Logo Card */}
                     <AssetCard
                         title="Footer Logo"
-                        description="Secondary branding in footer"
-                        imageUrl={siteAssets.footer_logo}
+                        description="Secondary branding"
+                        imageUrl={previewAssets.footer_logo || siteAssets.footer_logo}
+                        isPending={!!previewAssets.footer_logo}
                         onUpload={(e) => handleSiteAssetUpload(e, 'footer_logo')}
                         onSelect={() => {
                             setSelectingFor({ type: 'site', key: 'footer_logo' });
@@ -262,8 +291,9 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
 
                     <AssetCard
                         title="Men Collection"
-                        description="Featured image for Men's category"
-                        imageUrl={siteAssets.men_collection}
+                        description="Men's category image"
+                        imageUrl={previewAssets.men_collection || siteAssets.men_collection}
+                        isPending={!!previewAssets.men_collection}
                         onUpload={(e) => handleSiteAssetUpload(e, 'men_collection')}
                         onSelect={() => {
                             setSelectingFor({ type: 'site', key: 'men_collection' });
@@ -274,8 +304,9 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
 
                     <AssetCard
                         title="Women Collection"
-                        description="Featured image for Women's category"
-                        imageUrl={siteAssets.women_collection}
+                        description="Women's category image"
+                        imageUrl={previewAssets.women_collection || siteAssets.women_collection}
+                        isPending={!!previewAssets.women_collection}
                         onUpload={(e) => handleSiteAssetUpload(e, 'women_collection')}
                         onSelect={() => {
                             setSelectingFor({ type: 'site', key: 'women_collection' });
@@ -286,8 +317,9 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
 
                     <AssetCard
                         title="Unisex Collection"
-                        description="Featured image for Unisex category"
-                        imageUrl={siteAssets.unisex_collection}
+                        description="Unisex category image"
+                        imageUrl={previewAssets.unisex_collection || siteAssets.unisex_collection}
+                        isPending={!!previewAssets.unisex_collection}
                         onUpload={(e) => handleSiteAssetUpload(e, 'unisex_collection')}
                         onSelect={() => {
                             setSelectingFor({ type: 'site', key: 'unisex_collection' });
@@ -297,15 +329,20 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                     />
                 </div>
             ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 pb-32">
                     {products.map(product => (
-                        <div key={product.id} className="group bg-white rounded-3xl border border-border/50 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500">
+                        <div key={product.id} className={`group bg-white rounded-3xl border ${pendingProducts[product.id] ? 'border-primary ring-2 ring-primary/20' : 'border-border/50'} overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500`}>
                             <div className="relative aspect-square">
                                 <img
-                                    src={product.image_url}
+                                    src={pendingProducts[product.id] || product.image_url}
                                     alt={product.name}
                                     className="w-full h-full object-contain p-4 mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
                                 />
+                                {pendingProducts[product.id] && (
+                                    <div className="absolute top-2 right-2 bg-primary text-white text-[8px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">
+                                        Modified
+                                    </div>
+                                )}
                                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
                                     <label className="p-2 bg-white/10 hover:bg-white/20 rounded-xl cursor-pointer transition-colors" title="Upload New">
                                         <Upload className="text-white" size={20} />
@@ -313,7 +350,7 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                                             type="file"
                                             className="hidden"
                                             onChange={(e) => {
-                                                if (e.target.files?.[0]) handleProductImageUpdate(product.id, e.target.files[0]);
+                                                if (e.target.files?.[0]) handleProductImageUpload(product.id, e.target.files[0]);
                                             }}
                                             accept="image/*"
                                         />
@@ -336,6 +373,52 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* Sticky Save Bar */}
+            {hasChanges && (
+                <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-xl border border-primary/20 p-4 rounded-[2rem] shadow-2xl flex items-center gap-8 z-[90] animate-in slide-in-from-bottom-10 duration-500">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary/10 text-primary rounded-full flex items-center justify-center animate-pulse">
+                            <AlertCircle size={20} />
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-text-main font-outfit uppercase tracking-tight">Unpublished Changes</p>
+                            <p className="text-[10px] text-text-muted font-outfit">You have modified {Object.keys(previewAssets).length + Object.keys(pendingProducts).length} assets</p>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <button
+                            disabled={saving}
+                            onClick={() => {
+                                setPreviewAssets({});
+                                setPendingProducts({});
+                                showToast('All changes discarded', 'info');
+                            }}
+                            className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-text-muted hover:text-red-500 transition-colors"
+                        >
+                            Discard
+                        </button>
+                        <button
+                            disabled={saving}
+                            onClick={handleSaveAll}
+                            className="px-8 py-3 bg-primary text-white text-[10px] font-bold uppercase tracking-[0.2em] rounded-2xl shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:bg-black transition-all flex items-center gap-2"
+                        >
+                            {saving ? (
+                                <>
+                                    <RefreshCw size={14} className="animate-spin" />
+                                    Publishing...
+                                </>
+                            ) : (
+                                <>
+                                    <Save size={14} />
+                                    Save & Publish
+                                </>
+                            )}
+                        </button>
+                    </div>
                 </div>
             )}
 
@@ -395,21 +478,24 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
     );
 };
 
-const AssetCard = ({ title, description, imageUrl, onUpload, onSelect, saving }) => (
-    <div className="bg-white p-8 rounded-[2.5rem] border border-border/50 shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col h-full group">
+const AssetCard = ({ title, description, imageUrl, onUpload, onSelect, saving, isPending }) => (
+    <div className={`bg-white p-8 rounded-[2.5rem] border ${isPending ? 'border-primary ring-4 ring-primary/5' : 'border-border/50'} shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col h-full group`}>
         <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+            <div className={`w-10 h-10 ${isPending ? 'bg-primary text-white' : 'bg-primary/10 text-primary'} rounded-xl flex items-center justify-center transition-colors`}>
                 <ImageIcon size={20} />
             </div>
             <div>
-                <h3 className="text-sm font-bold text-text-main uppercase tracking-widest font-outfit">{title}</h3>
+                <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-text-main uppercase tracking-widest font-outfit">{title}</h3>
+                    {isPending && <span className="text-[10px] font-bold text-primary uppercase animate-pulse">Draft</span>}
+                </div>
                 <p className="text-[10px] text-text-muted font-outfit mt-0.5">{description}</p>
             </div>
         </div>
 
         <div className="relative flex-1 min-h-[200px] rounded-3xl overflow-hidden bg-gray-50 border border-border/50 mb-6 flex items-center justify-center p-6 group/img">
             {imageUrl ? (
-                <img src={imageUrl} alt={title} className="w-full h-full object-contain mix-blend-multiply" />
+                <img src={imageUrl} alt={title} className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700" />
             ) : (
                 <div className="text-center space-y-2 opacity-30">
                     <ImageIcon size={48} className="mx-auto" />
@@ -417,7 +503,7 @@ const AssetCard = ({ title, description, imageUrl, onUpload, onSelect, saving })
                 </div>
             )}
 
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+            <div className={`absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center pointer-events-none`}>
                 <Upload className="text-white" size={32} />
             </div>
         </div>
