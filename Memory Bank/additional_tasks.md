@@ -184,3 +184,15 @@
 - [x] **Field Standardisation**:
     - [x] Unified usage of `unit_price` across all order-related pages.
     - [x] Fixed product relationship mapping in Supabase queries to ensure images and names load correctly.
+- [x] **Admin Login & Dashboard Polish**:
+    - [x] Implemented a "Session Active" choice screen for logged-in users.
+    - [x] Added "Back to Site" navigation to Admin Login page.
+    - [x] Resolved Recharts hydration warnings in the Admin Dashboard via `isMounted` checks.
+- [x] **Review Section Premium Redesign**:
+    - [x] Redesigned the review summary with a dark-mode card and glassmorphism.
+    - [x] Added user avatars with initials and "Verified Purchase" badges.
+    - [x] Repositioned and optimized the "Join the Conversation" prompt for better balance.
+- [x] **Mobile Product Card Stability**:
+    - [x] Disabled hover transforms and image transitions on mobile.
+    - [x] Fixed the CTA buttons ("Add to Bag", "Buy Now") to be permanently visible on mobile devices.
+    - [x] Optimized tap targets and text contrast for better accessibility on narrow screens.

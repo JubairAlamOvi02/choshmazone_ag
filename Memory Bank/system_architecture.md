@@ -28,6 +28,8 @@
     *   `ErrorBoundary`: Global crash protection.
     *   `Data Services`: Intelligent manual merging for relational data (e.g., Reviews -> Profiles) to bypass missing DB foreign key constraints and minimize console errors.
     *   `Media Manager`: Implementation of `URL.createObjectURL` for immediate, low-latency visual feedback during admin image uploads.
+    *   **Session Intelligence**: Client-side logic for managing active sessions (`SESSION_VERSION`) and providing "Session Active" choice screens to prevent login loops.
+    *   **Chart Optimization**: Component-level hydration tracking (`isMounted`) and debounced `ResponsiveContainer` to ensure Recharts stability in the Admin Dashboard.
 *   **PWA** (Implemented): Service Worker (`sw.js`) with offline caching for assets/images and Manifest support.
 *   **Performance Optimization**: 
     - **Code Splitting**: Route-level granularity via `React.lazy` and `Suspense`.

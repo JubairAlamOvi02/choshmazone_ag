@@ -24,19 +24,21 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 - **User Portal**:
     - Registration and Login system.
     - View Order History and Profile.
+    - **Session Intelligence**: "Session Active" choice screen for already logged-in users to navigate between Shop, Profile, and Admin areas.
 - **Admin Panel (WordPress-like)**:
     - Secure Login for Admins.
-    - **Dashboard**: Overview of orders, customers, and system status with live stats.
+    - **Dashboard**: Overview of orders, customers, and system status with **Live Sales Analytics (Recharts)**.
     - **Product Management**: Full CRUD operations + Advanced Multi-Image Upload and Gallery management.
-    - **Order Management**: Monitor sales, update statuses, and administrative deletion.
+    - **Order Management**: Monitor sales, update statuses, administrative deletion, and Comprehensive Order Details Modal.
     - **Customer Management**: View registered user list and roles.
     - **Inventory Control**: Manage stock levels and dynamic "Active/Inactive" visibility toggle.
     - **Database Visibility**: Access to schemas and tables for debugging.
 
 ## 5. Non-Functional Requirements
-- **Responsive Design**: Mobile-first approach to ensure usability on phones and tablets.
-- **Performance**: Fast loading times for image-heavy pages.
-- **Accessibility**: adherence to basic web accessibility standards (WCAG).
+- **Responsive Design**: Mobile-first approach with optimized tap targets and fixed mobile product card layouts.
+- **Performance**: Fast loading times via route splitting, image optimization (lazy loading), and API response caching.
+- **Resilience**: Global Error Boundary protection and high-latency Auth strategies (15s timeouts).
+- **Accessibility**: Adherence to basic web accessibility standards (WCAG).
 
 ## 6. Chosen Tech Stack
 - **Frontend**: React (Vite), Lucide Icons, Tailwind CSS v4.

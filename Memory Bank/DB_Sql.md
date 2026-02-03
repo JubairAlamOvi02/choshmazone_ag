@@ -35,7 +35,7 @@ CREATE TABLE public.products (
   is_active boolean DEFAULT true,
   created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
   style text,
-  images ARRAY,
+  images text[],
   brand text,
   frame_material text,
   lens_material text,

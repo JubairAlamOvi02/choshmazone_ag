@@ -56,6 +56,10 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **Fulfillment Tracking**: Dynamic visual timeline for customer order status (Placed → Processing → Shipped → Delivered).
     - **Media Manager**: High-performance local preview system using browser Blob URLs to provide zero-latency visual feedback for admin uploads.
     - **Resilience**: Comprehensive Error Boundaries and Auth timeout protection to prevent blank screens.
+- **Session Intelligence**: Dedicated "Session Active" choice screen for authenticated users to navigate efficiently between Shop, Profile, and Admin zones.
+- **Dynamic Graphics**: Recharts-based sales analytics with specialized mount-tracking to eliminate hydration warnings and ensure stable, fluid rendering across different screen sizes.
+- **Advanced Social Proof**: Premium dark-mode review system with glassmorphic aesthetics, user-initial avatars, and verified purchase indicators.
+- **Fixed Mobile Experience**: Enhanced product cards on small screens with frozen images and permanently visible, high-accessibility "Add to Bag" and "Buy Now" buttons.
 - **Elite Performance**: 
     - **Route-Based Splitting**: Uses `React.lazy` and `Suspense` for on-demand chunk loading, reducing initial payload.
     - **Build Optimization**: Custom `manualChunks` in Vite for vendor library caching.
