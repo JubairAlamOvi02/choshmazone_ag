@@ -10,8 +10,9 @@ const Hero = () => {
     useEffect(() => {
         const fetchHero = async () => {
             try {
-                const url = await settingsParams.get('hero_banner');
-                if (url) setHeroImage(url);
+                const settings = await settingsParams.fetchAll();
+                const banner = settings.find(s => s.key === 'hero_banner')?.value;
+                if (banner) setHeroImage(banner);
             } catch (err) {
                 console.error("Failed to fetch hero banner:", err);
             }

@@ -96,9 +96,12 @@ export const AuthProvider = ({ children }) => {
                     setUser(null);
                     setRole(null);
                     localStorage.clear();
-                } else if (session?.user) {
+                } else if (session?.user && event !== 'INITIAL_SESSION') {
+                    // INITIAL_SESSION is already handled by getSession() above
                     setUser(session.user);
                     await fetchUserRole(session.user.id, session.user.email);
+                } else if (session?.user) {
+                    setUser(session.user);
                 } else {
                     setUser(null);
                     setRole(null);

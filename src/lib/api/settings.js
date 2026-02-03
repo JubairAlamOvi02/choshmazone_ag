@@ -1,21 +1,44 @@
 import { supabase } from '../supabaseClient';
 
+let settingsCache = null;
+
 export const settingsParams = {
-    fetchAll: async () => {
+    fetchAll: async (forceRefresh = false) => {
+        if (settingsCache && !forceRefresh) return settingsCache;
+
         const { data, error } = await supabase
             .from('site_settings')
             .select('*');
-        if (error) throw error;
+        if (error) {
+            if (error.code === '42P01') { // Table missing
+                console.warn('[Settings] site_settings table missing. Using fallbacks.');
+                return [];
+            }
+            throw error;
+        }
+
+        settingsCache = data;
         return data;
     },
 
     get: async (key) => {
+        // Try cache first
+        if (settingsCache) {
+            const cached = settingsCache.find(s => s.key === key);
+            if (cached) return cached.value;
+        }
+
         const { data, error } = await supabase
             .from('site_settings')
             .select('value')
             .eq('key', key)
-            .single();
-        if (error && error.code !== 'PGRST116') throw error; // PGRST116 is code for 'no rows returned'
+            .maybeSingle(); // Switch to maybeSingle to avoid 406 error
+
+        if (error) {
+            if (error.code === '42P01') return null; // Table missing
+            throw error;
+        }
+
         return data?.value;
     },
 
@@ -24,6 +47,17 @@ export const settingsParams = {
             .from('site_settings')
             .upsert({ key, value, updated_at: new Date() })
             .select();
+
+        // Update cache
+        if (!error && settingsCache) {
+            const index = settingsCache.findIndex(s => s.key === key);
+            if (index > -1) {
+                settingsCache[index] = { ...settingsCache[index], value };
+            } else {
+                settingsCache.push({ key, value });
+            }
+        }
+
         if (error) throw error;
         return data;
     },

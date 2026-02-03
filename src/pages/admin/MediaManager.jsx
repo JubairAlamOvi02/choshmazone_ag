@@ -426,11 +426,17 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
             {showLibrary && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
                     <div className="absolute inset-0 bg-text-main/60 backdrop-blur-md" onClick={() => setShowLibrary(false)}></div>
-                    <div className="relative bg-white w-full max-w-5xl max-h-[85vh] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="library-modal-title"
+                        aria-describedby="library-modal-desc"
+                        className="relative bg-white w-full max-w-5xl max-h-[85vh] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300"
+                    >
                         <div className="px-8 py-6 border-b border-border/50 flex items-center justify-between">
                             <div>
-                                <h2 className="text-2xl font-bold text-text-main font-outfit uppercase tracking-tight">Image Library</h2>
-                                <p className="text-xs text-text-muted font-outfit">Select an existing image from your storage history.</p>
+                                <h2 id="library-modal-title" className="text-2xl font-bold text-text-main font-outfit uppercase tracking-tight">Image Library</h2>
+                                <p id="library-modal-desc" className="text-xs text-text-muted font-outfit">Select an existing image from your storage history.</p>
                             </div>
                             <button onClick={() => setShowLibrary(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                                 <X size={24} />

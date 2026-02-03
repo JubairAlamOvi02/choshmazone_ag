@@ -28,18 +28,24 @@ const AdminLogin = () => {
                     <div className="space-y-4">
                         <button
                             onClick={() => navigate('/admin/dashboard')}
-                            className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all font-outfit uppercase tracking-[0.2em]"
+                            className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all font-outfit uppercase tracking-[0.2em] shadow-lg shadow-primary/20"
                         >
                             Open Dashboard
+                        </button>
+                        <button
+                            onClick={() => navigate('/')}
+                            className="w-full py-4 border border-slate-800 text-slate-400 font-bold rounded-xl hover:bg-slate-800 hover:text-white transition-all font-outfit uppercase tracking-[0.2em]"
+                        >
+                            Back to Site
                         </button>
                         <button
                             onClick={async () => {
                                 await signOut();
                                 navigate('/admin/login');
                             }}
-                            className="w-full py-4 border border-slate-800 text-slate-400 font-bold rounded-xl hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 transition-all font-outfit uppercase tracking-[0.2em]"
+                            className="w-full py-3 text-red-500/50 hover:text-red-500 text-xs font-bold uppercase tracking-[0.2em] transition-all"
                         >
-                            Log Out & Switch
+                            Log Out
                         </button>
                     </div>
                 </div>

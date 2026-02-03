@@ -16,16 +16,13 @@ const FeaturedCollections = () => {
     React.useEffect(() => {
         const fetchImages = async () => {
             try {
-                const [men, women, unisex] = await Promise.all([
-                    settingsParams.get('men_collection'),
-                    settingsParams.get('women_collection'),
-                    settingsParams.get('unisex_collection')
-                ]);
+                const settings = await settingsParams.fetchAll();
+                const getImage = (key) => settings.find(s => s.key === key)?.value;
 
                 setCollectionImages({
-                    Men: men || product1,
-                    Women: women || product3,
-                    Unisex: unisex || product4
+                    Men: getImage('men_collection') || product1,
+                    Women: getImage('women_collection') || product3,
+                    Unisex: getImage('unisex_collection') || product4
                 });
             } catch (err) {
                 console.error("Failed to fetch collection images:", err);
