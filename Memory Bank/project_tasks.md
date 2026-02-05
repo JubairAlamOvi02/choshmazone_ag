@@ -260,3 +260,12 @@
   - [x] Fixed mobile product images to prevent unwanted scale/hover effects.
   - [x] Ensured "Add to Bag" and "Buy Now" buttons are always visible on small screens.
   - [x] Optimized button sizing for 44px tap targets.
++
++## Phase 19: Navigation Smoothness & Portal Access
++- [x] **Sign-out UX Optimization (Task Id: 543)**:
++  - [x] Removed disruptive `window.location.href` refresh during logout.
++  - [x] Integrated `useNavigate` for seamless home page redirection.
++- [x] **Admin Portal Choice Restoration (Task Id: 544)**:
++  - [x] Disabled automatic login redirection in `AdminLogin.jsx`.
++  - [x] Re-enabled the post-login choice screen (Dashboard vs Site).
++  - [x] Applied similar logic to the standard `Login.jsx` for consistent experience.

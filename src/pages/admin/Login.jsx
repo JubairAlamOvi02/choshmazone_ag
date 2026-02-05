@@ -67,8 +67,8 @@ const AdminLogin = () => {
                 return;
             }
 
-            const from = location.state?.from?.pathname || "/admin/dashboard";
-            navigate(from, { replace: true });
+            // Instead of navigating away, stay on this page to show the choice portal
+            // navigate(from, { replace: true });
         } catch (err) {
             setError(err.message);
         } finally {

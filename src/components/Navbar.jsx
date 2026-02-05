@@ -17,6 +17,7 @@ const Navbar = () => {
     const handleLogout = async () => {
         setIsProfileOpen(false);
         await signOut();
+        navigate('/');
     };
 
     return (

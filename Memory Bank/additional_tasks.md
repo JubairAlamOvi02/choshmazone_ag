@@ -196,3 +196,8 @@
     - [x] Disabled hover transforms and image transitions on mobile.
     - [x] Fixed the CTA buttons ("Add to Bag", "Buy Now") to be permanently visible on mobile devices.
     - [x] Optimized tap targets and text contrast for better accessibility on narrow screens.
+- [x] **Sign-out Smoothness Fix**:
+    - [x] Removed hard-refresh glitch in `AuthContext` by replacing `window.location.href` with React Router's `navigate`.
+    - [x] Added explicit `navigate('/')` to `Navbar` logout handler for immediate feedback.
+- [x] **Admin Portal Choice Restoration**:
+    - [x] Restored the post-login choice screen (Dashboard vs Site) by disabling auto-redirection in `AdminLogin.jsx` and `Login.jsx`.

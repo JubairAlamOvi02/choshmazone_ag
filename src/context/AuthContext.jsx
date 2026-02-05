@@ -218,11 +218,6 @@ export const AuthProvider = ({ children }) => {
             });
 
             showToast('Successfully logged out.', 'info');
-
-            // Short delay to allow toast to appear and state to settle before hard refresh
-            setTimeout(() => {
-                window.location.href = '/';
-            }, 500);
         }
     };
 

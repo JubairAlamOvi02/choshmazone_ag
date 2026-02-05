@@ -81,7 +81,8 @@ const Login = () => {
             const { error, userRole } = await signIn(email, password);
             if (error) throw error;
 
-            // Role-based redirection - Master Override for Ovi
+            // Instead of navigating away, stay on this page to show the choice screen
+            /*
             if (userRole === 'admin' || email.toLowerCase().trim() === 'ovi.extra@gmail.com') {
                 navigate('/admin/dashboard', { replace: true });
             } else {
@@ -92,6 +93,7 @@ const Login = () => {
                 const target = from === "/login" ? "/" : from;
                 navigate(target, { replace: true });
             }
+            */
         } catch (err) {
             setError(err.message || 'Failed to login');
         } finally {

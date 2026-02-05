@@ -165,3 +165,9 @@
   - Re-engineered the review summary with a premium dark-mode aesthetic.
   - Added modern user avatars with initials and verified purchase indicators.
   - Optimized the "Join the Conversation" layout for better visual balance.
+- Task 55 (Sign-out Glitch Fix): Completed
+  - Removed browser-level hard refresh on sign-out to prevent UI flickering.
+  - Implemented smooth programmatic navigation using React Router.
+- Task 56 (Admin Portal Restoration): Completed
+  - Disabled automatic redirection after admin login to restore the "Choice Portal" screen.
+  - Admins can now choose between "Open Dashboard" and "Back to Site" after logging in.
