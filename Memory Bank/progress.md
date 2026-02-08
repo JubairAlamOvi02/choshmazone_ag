@@ -184,3 +184,11 @@
 - [x] **Legacy Data Handling (Task Id: 547)**:
   - [x] Updated `AdminOrders.jsx` to gracefully handle "Deleted Products" in historical orders.
   - [x] Added fallback UI (Package icon, "Deleted Product" text) for null product references.
+
+## Phase 21: Deployment Documentation
+- [x] **Deployment Guides (Task Id: 548)**:
+  - [x] Created `deployment_guide.md` covering Vercel/Netlify options.
+  - [x] Created `cpanel_deployment.md` specifically for local BD shared hosting (Best Web Host BD).
+  - [x] Documented the "Hybrid Hosting" strategy (Frontend on cPanel + Supabase Cloud Database/Auth).
+  - [x] Included `.htaccess` configuration for Client-Side Routing on Apache servers.
+  - [x] Consolidated all deployment documentation into `Memory Bank` folder.

@@ -201,3 +201,11 @@
     - [x] Added explicit `navigate('/')` to `Navbar` logout handler for immediate feedback.
 - [x] **Admin Portal Choice Restoration**:
     - [x] Restored the post-login choice screen (Dashboard vs Site) by disabling auto-redirection in `AdminLogin.jsx` and `Login.jsx`.
+
+## Phase 21: Deployment Documentation
+- [x] **Deployment Guides (Task Id: 548)**:
+    - [x] Created comprehensive `deployment_guide.md` covering Vercel/Netlify for modern hosting solutions.
+    - [x] Created specific `cpanel_deployment.md` for shared cPanel hosting environments.
+    - [x] Documented the `.htaccess` configuration required for React Client-Side Routing on Apache servers.
+    - [x] Formalized the "Hybrid Hosting" architecture (Frontend on cPanel + Backend on Supabase) in system documentation.
+    - [x] Centralized all deployment resources in the `Memory Bank` directory.

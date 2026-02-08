@@ -281,3 +281,12 @@
 +- [x] **Legacy Data Handling (Task Id: 547)**:
 +  - [x] Updated `AdminOrders.jsx` to gracefully handle "Deleted Products" in historical orders.
 +  - [x] Added fallback UI (Package icon, "Deleted Product" text) for null product references.
++
++## Phase 21: Deployment Documentation
++- [x] **Deployment Guide Creation (Task Id: 548)**:
++  - [x] Comprehensive `deployment_guide.md` for modern hosting (Vercel/Netlify).
++  - [x] Specialized `cpanel_deployment.md` for shared cPanel/Apache hosting.
++  - [x] Documented the `.htaccess` fix for React Client-Side Routing.
++  - [x] Migrated deployment files to `Memory Bank` directory for centralized access.
++- [x] **Hybrid Architecture Documentation**:
++  - [x] Explicitly documented the "Supabase Cloud + cPanel Host" strategy as the recommended approach for maintaining backend functionality.

@@ -147,3 +147,18 @@
 7.  **Responsive Polishing**: Implemented mobile drawers, responsive grids, and narrow-device visibility fixes.
 8.  **Community & Reviews**: Built a premium, glassmorphic review system with smart-merge relational logic and dynamic user avatars.
 9.  **Admin UX Refinement**: Integrated real-time image previews and status badges to eliminate ambiguity during product management.
+
+## 6. Deployment Strategy
+
+### Hybrid Architecture (cPanel + Supabase)
+Given the constraints of traditional cPanel hosting (MySQL-centric) versus our modern stack (PostgreSQL), we have adopted a **Hybrid Hosting Model**:
+
+*   **Frontend (The "Head")**: Hosted on cPanel/Apache (Best Web Host BD).
+    *   Served as static files (`dist` folder).
+    *   Uses `.htaccess` rewrite rules to handle Client-Side Routing (SPA navigation).
+*   **Backend (The "Body")**: Remains on Supabase Cloud.
+    *   **Database**: PostgreSQL hosted on Supabase.
+    *   **Auth**: Managed by Supabase Auth Service.
+    *   **Storage**: Supabase Storage buckets.
+
+**Why this works**: The Frontend is just a set of files that runs in the user's browser. Once loaded, the browser makes direct, secure API calls to Supabase over the internet. The cPanel server is only responsible for delivering the initial HTML/JS/CSS files. This avoids the massive complexity of migrating a cloud-native PostgreSQL backend to a legacy cPanel environment.
