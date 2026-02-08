@@ -308,17 +308,21 @@ const AdminOrders = () => {
                                                         <td className="px-6 py-4">
                                                             <div className="flex items-center gap-4">
                                                                 <button
-                                                                    onClick={() => setPreviewImage(item.products?.image_url)}
+                                                                    onClick={() => item.products?.image_url && setPreviewImage(item.products.image_url)}
                                                                     className="w-14 h-14 bg-white rounded-xl border border-border/50 flex items-center justify-center p-1.5 shadow-sm hover:scale-110 hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden group/img"
                                                                 >
-                                                                    <img
-                                                                        src={item.products?.image_url}
-                                                                        alt={item.products?.name}
-                                                                        className="w-full h-full object-contain mix-blend-multiply group-hover/img:scale-110 transition-transform duration-500"
-                                                                    />
+                                                                    {item.products?.image_url ? (
+                                                                        <img
+                                                                            src={item.products.image_url}
+                                                                            alt={item.products.name}
+                                                                            className="w-full h-full object-contain mix-blend-multiply group-hover/img:scale-110 transition-transform duration-500"
+                                                                        />
+                                                                    ) : (
+                                                                        <Package size={20} className="text-gray-300" />
+                                                                    )}
                                                                 </button>
                                                                 <span className="text-sm font-bold text-text-main font-outfit max-w-[150px] line-clamp-2">
-                                                                    {item.products?.name}
+                                                                    {item.products?.name || <span className="text-text-muted italic">Deleted Product</span>}
                                                                 </span>
                                                             </div>
                                                         </td>

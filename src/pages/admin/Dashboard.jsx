@@ -177,53 +177,52 @@ const Dashboard = () => {
                         <TrendingUp size={20} className="text-text-muted" />
                     </div>
 
-                    <div className="h-[400px] w-full relative overflow-hidden" style={{ minHeight: '400px' }}>
-                        {isMounted && (
-                            <ResponsiveContainer width="99%" height="100%" debounce={100}>
-                                {chartData.length > 0 ? (
-                                    <AreaChart data={chartData}>
-                                        <defs>
-                                            <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#d4af37" stopOpacity={0.3} />
-                                                <stop offset="95%" stopColor="#d4af37" stopOpacity={0} />
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f1f1" />
-                                        <XAxis
-                                            dataKey="name"
-                                            axisLine={false}
-                                            tickLine={false}
-                                            tick={{ fontSize: 10, fill: '#666', fontWeight: 600 }}
-                                            dy={10}
-                                        />
-                                        <YAxis
-                                            axisLine={false}
-                                            tickLine={false}
-                                            tick={{ fontSize: 10, fill: '#666', fontWeight: 600 }}
-                                            tickFormatter={(val) => `৳${val}`}
-                                        />
-                                        <Tooltip
-                                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', fontSize: '12px' }}
-                                            formatter={(value) => [`৳${value}`, 'Revenue']}
-                                        />
-                                        <Area
-                                            type="monotone"
-                                            dataKey="sales"
-                                            stroke="#d4af37"
-                                            strokeWidth={3}
-                                            fillOpacity={1}
-                                            fill="url(#colorSales)"
-                                        />
-                                    </AreaChart>
-                                ) : (
-                                    <div className="h-full w-full flex items-center justify-center">
-                                        <div className="animate-pulse flex flex-col items-center gap-2">
-                                            <div className="w-12 h-12 bg-gray-100 rounded-full"></div>
-                                            <div className="w-24 h-4 bg-gray-100 rounded-lg"></div>
-                                        </div>
-                                    </div>
-                                )}
+                    <div className="h-[400px] w-full" style={{ minHeight: '400px' }}>
+                        {isMounted && chartData.length > 0 && (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={chartData}>
+                                    <defs>
+                                        <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#d4af37" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="#d4af37" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f1f1" />
+                                    <XAxis
+                                        dataKey="name"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fontSize: 10, fill: '#666', fontWeight: 600 }}
+                                        dy={10}
+                                    />
+                                    <YAxis
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fontSize: 10, fill: '#666', fontWeight: 600 }}
+                                        tickFormatter={(val) => `৳${val}`}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', fontSize: '12px' }}
+                                        formatter={(value) => [`৳${value}`, 'Revenue']}
+                                    />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="sales"
+                                        stroke="#d4af37"
+                                        strokeWidth={3}
+                                        fillOpacity={1}
+                                        fill="url(#colorSales)"
+                                    />
+                                </AreaChart>
                             </ResponsiveContainer>
+                        )}
+                        {isMounted && chartData.length === 0 && (
+                            <div className="h-full w-full flex items-center justify-center">
+                                <div className="flex flex-col items-center gap-2 text-text-muted opacity-50">
+                                    <ShoppingBag size={24} />
+                                    <p className="font-outfit text-xs uppercase tracking-widest">No Sales Data</p>
+                                </div>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -264,7 +263,7 @@ const Dashboard = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

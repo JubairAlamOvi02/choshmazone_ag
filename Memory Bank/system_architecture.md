@@ -116,6 +116,7 @@
 2.  **Order Placement**:
     *   `orders`: INSERT for everyone (Guests and Authenticated). SELECT for admins or matching `user_id`.
     *   `order_items`: INSERT for everyone. SELECT matching parent order.
+    *   **Data Integrity update**: The foreign key `product_id` is set to `ON DELETE SET NULL`. This ensures that when an Admin permanently deletes a product, the historical order record remains intact (with `product_id` becoming null), preventing foreign key violation errors (409 Conflict).
 3.  **Authenticated Data**:
     *   `profiles`: SELECT/UPDATE own profile.
 4.  **Admin Access**:

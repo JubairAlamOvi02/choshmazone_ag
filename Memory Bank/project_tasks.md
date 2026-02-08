@@ -268,4 +268,16 @@
 +- [x] **Admin Portal Choice Restoration (Task Id: 544)**:
 +  - [x] Disabled automatic login redirection in `AdminLogin.jsx`.
 +  - [x] Re-enabled the post-login choice screen (Dashboard vs Site).
-+  - [x] Applied similar logic to the standard `Login.jsx` for consistent experience.
++  - [x] Admins can now choose between "Open Dashboard" and "Back to Site" after logging in.
+ 
++## Phase 20: Data Integrity & Admin Stability
++- [x] **Product Deletion Logic Fix (Task Id: 545)**:
++  - [x] Resolved `409 Conflict` errors by updating database foreign key constraints.
++  - [x] Changed `order_items` constraint to `ON DELETE SET NULL` to preserve order history after product deletion.
++  - [x] Enhanced `Products.jsx` with robust error parsing and user-friendly alerts.
++- [x] **Dashboard Chart Reliability (Task Id: 546)**:
++  - [x] Fixed `Recharts` console warnings (`width(-1)`) by simplifying container logic.
++  - [x] Implemented fixed-height container and conditional rendering for stability.
++- [x] **Legacy Data Handling (Task Id: 547)**:
++  - [x] Updated `AdminOrders.jsx` to gracefully handle "Deleted Products" in historical orders.
++  - [x] Added fallback UI (Package icon, "Deleted Product" text) for null product references.

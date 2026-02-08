@@ -95,12 +95,22 @@ export const productParams = {
 
     // Delete product (Admin only via RLS)
     delete: async (id) => {
-        const { error } = await supabase
+        console.log(`Attempting to delete product with ID: ${id}`);
+        const { error, count } = await supabase
             .from('products')
-            .delete()
+            .delete({ count: 'exact' })
             .eq('id', id);
 
-        if (error) throw error;
+        if (error) {
+            console.error('Supabase Delete Error:', error);
+            throw error;
+        }
+
+        if (count === 0) {
+            console.warn(`Delete operation returned count 0 for ID: ${id}. Ensure the product exists and you have permission.`);
+            // You might want to throw an error here if strict validation is needed
+            // throw new Error('Product not found or permission denied.'); 
+        }
 
         // Invalidate all product listings caches
         cacheManager.invalidatePattern('products_');

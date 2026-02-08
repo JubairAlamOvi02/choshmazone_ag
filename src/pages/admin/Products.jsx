@@ -27,17 +27,32 @@ const AdminProducts = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this product?')) return;
 
+        console.log('Initiating delete for product ID:', id);
         try {
             await productParams.delete(id);
             setProducts(products.filter(p => p.id !== id));
         } catch (err) {
-            console.error('Delete error:', err);
+            console.error('Delete error details:', err); // Log the object directly
+            console.error('Delete error JSON:', JSON.stringify(err, null, 2)); // improved logging
+
             let message = 'Failed to delete product.';
-            if (err.code === '23503') {
-                message = 'Cannot delete product because it has associated orders. Try deactivating it instead.';
+            let isFKViolation = false;
+
+            // Check for Foreign Key Violation (Postgres code 23503 or HTTP 409 Conflict)
+            if (err.code === '23503' || err.status === 409) {
+                isFKViolation = true;
+            } else if (err.message && err.message.toLowerCase().includes('violates foreign key constraint')) {
+                isFKViolation = true;
+            }
+
+            if (isFKViolation) {
+                message = '⚠️ Cannot Delete Product\n\nThis product is part of existing customer orders. Deleting it would corrupt your order history.\n\nSolution: Click the "Active/Inactive" status button to hide it from the shop instead.';
+            } else if (err.status === 404) {
+                message = 'Product not found. It may have already been deleted.';
             } else if (err.message) {
                 message = `Failed to delete product: ${err.message}`;
             }
+
             alert(message);
         }
     };
