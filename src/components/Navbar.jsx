@@ -49,6 +49,7 @@ const Navbar = () => {
                         ${isMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
                     `}>
                     <Link to="/shop" className="font-outfit font-medium text-xl md:text-sm uppercase tracking-widest text-text-main hover:text-secondary border-b md:border-b-0 border-background-alt py-2 md:py-0 transition-colors" onClick={() => setIsMenuOpen(false)}>Shop</Link>
+                    <Link to="/track-order" className="font-outfit font-medium text-xl md:text-sm uppercase tracking-widest text-text-main hover:text-secondary border-b md:border-b-0 border-background-alt py-2 md:py-0 transition-colors" onClick={() => setIsMenuOpen(false)}>Track Order</Link>
                     <Link to="/collections" className="font-outfit font-medium text-xl md:text-sm uppercase tracking-widest text-text-main hover:text-secondary border-b md:border-b-0 border-background-alt py-2 md:py-0 transition-colors" onClick={() => setIsMenuOpen(false)}>Collections</Link>
                     <Link to="/about" className="font-outfit font-medium text-xl md:text-sm uppercase tracking-widest text-text-main hover:text-secondary border-b md:border-b-0 border-background-alt py-2 md:py-0 transition-colors" onClick={() => setIsMenuOpen(false)}>About</Link>
                     <Link to="/contact" className="font-outfit font-medium text-xl md:text-sm uppercase tracking-widest text-text-main hover:text-secondary border-b md:border-b-0 border-background-alt py-2 md:py-0 transition-colors" onClick={() => setIsMenuOpen(false)}>Contact</Link>

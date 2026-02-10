@@ -31,7 +31,7 @@ const OrderSuccess = () => {
                         <Link to="/" className="w-full sm:w-auto">
                             <Button variant="primary" size="large" className="w-full">Continue Shopping</Button>
                         </Link>
-                        <Link to="/orders" className="w-full sm:w-auto">
+                        <Link to="/track-order" className="w-full sm:w-auto">
                             <Button variant="outline" size="large" className="w-full">View My Orders</Button>
                         </Link>
                     </div>

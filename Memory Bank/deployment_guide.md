@@ -34,6 +34,9 @@ You have two main choices for hosting the frontend (the visible website).
 ### Option B: cPanel / Shared Hosting (Traditional)
 **Best for:** If you have already purchased a standard hosting plan (e.g., Namecheap, Hostinger, local BD hosting).
 
+> **Note for Hostinger Users:** Hostinger uses **hPanel** instead of cPanel. The process is very similar, but we have a dedicated guide for you: `Memory Bank/hostinger_deployment.md`.
+
+
 #### Step 1: Build the Project
 Run this command in your VS Code terminal:
 ```bash

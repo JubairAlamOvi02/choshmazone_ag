@@ -1,5 +1,5 @@
-import React from 'react';
 import { Facebook, Instagram, Music2 as Tiktok } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
     return (
@@ -44,7 +44,7 @@ const Footer = () => {
                         <div className="flex flex-col gap-2 font-outfit">
                             <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Contact Us</a>
                             <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Shipping & Returns</a>
-                            <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Order Tracking</a>
+                            <Link to="/track-order" className="text-gray-400 hover:text-white text-sm transition-colors">Order Tracking</Link>
                             <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">FAQ</a>
                         </div>
                     </div>
