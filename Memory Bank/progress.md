@@ -166,9 +166,25 @@
   - Added modern user avatars with initials and verified purchase indicators.
   - Optimized the "Join the Conversation" layout for better visual balance.
 - Task 55 (Sign-out Glitch Fix): Completed
-  - Removed browser-level hard refresh on sign-out to prevent UI flickering.
-  - Implemented smooth programmatic navigation using React Router.
-- Task- [x] **Admin Portal Choice Restoration (Task Id: 544)**:
+    - Removed browser-level hard refresh on sign-out to prevent UI flickering.
+    - Implemented smooth programmatic navigation using React Router.
+- Task 56 (Secure Order Tracking & OTP): Completed
+    - Created `TrackOrder.jsx` for phone-based order lookup.
+    - Implemented real-time email verification flow (OTP).
+    - Integrated with Google Apps Script to serve as an email gateway.
+    - Added masked email previews and secure order access state.
+    - Integrated with Order Success page and global navigation.
+- Task 57 (Navigation UX - Scroll to Top): Completed
+    - Created a global `ScrollToTop` trigger component.
+    - Integrated with React Router to reset scroll position on every page transition.
+- Task 58 (Centralized Configuration): Completed
+    - Moved Google Apps Script URL to `.env` for easier maintenance.
+    - Updated `Checkout.jsx` and `TrackOrder.jsx` to use centralized environment variables.
+- Task 59 (Automated Order Email Confirmations): Completed
+    - Updated Google Apps Script to automatically send "Order Received" emails upon checkout.
+
+## Phase 20: Data Integrity & Admin Stability
+- [x] **Admin Portal Choice Restoration (Task Id: 544)**:
   - [x] Disabled automatic login redirection in `AdminLogin.jsx`.
   - [x] Re-enabled the post-login choice screen (Dashboard vs Site).
   - [x] Admins can now choose between "Open Dashboard" and "Back to Site" after logging in.

@@ -24,6 +24,8 @@
     *   `Skeleton`: Global shimmering placeholder system for smooth loading transitions.
     *   `DashboardCharts`: Real-time data visualization using Recharts.
     *   `OrderTimeline`: State-driven progress tracking for fulfillment.
+    *   `TrackOrder`: Phone-based lookup and secure OTP verification flow.
+    *   `ScrollToTop`: Global scroll reset on route changes.
     *   `SearchBar`: Debounced multi-field filtering.
     *   `ErrorBoundary`: Global crash protection.
     *   `Data Services`: Intelligent manual merging for relational data (e.g., Reviews -> Profiles) to bypass missing DB foreign key constraints and minimize console errors.

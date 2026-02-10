@@ -18,6 +18,13 @@
     - Removed Twitter logo and links.
     - Integrated TikTok branding with the profile link: `https://www.tiktok.com/@choshma.zone?_t=ZS-93COQHamGZd`.
     - Updated Instagram and Facebook links to official profile URLs.
+- [x] Secure Order Tracking & Identity Verification:
+    - Implemented `TrackOrder.jsx` with phone lookup.
+    - Added OTP verification sent to associated order email.
+    - Integrated with Google Apps Script for automated transactional emails (OTP & Confirmation).
+- [x] UX & Navigation Improvements:
+    - Implemented `ScrollToTop` component to fix mid-page route loading.
+    - Centralized external service URLs (Google Script) in `.env` variables.
 
 **Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, and Social Media branding have been implemented and verified.
 

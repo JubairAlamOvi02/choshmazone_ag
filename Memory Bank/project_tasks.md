@@ -284,9 +284,38 @@
 +
 +## Phase 21: Deployment Documentation
 +- [x] **Deployment Guide Creation (Task Id: 548)**:
-+  - [x] Comprehensive `deployment_guide.md` for modern hosting (Vercel/Netlify).
-+  - [x] Specialized `cpanel_deployment.md` for shared cPanel/Apache hosting.
-+  - [x] Documented the `.htaccess` fix for React Client-Side Routing.
-+  - [x] Migrated deployment files to `Memory Bank` directory for centralized access.
-+- [x] **Hybrid Architecture Documentation**:
-+  - [x] Explicitly documented the "Supabase Cloud + cPanel Host" strategy as the recommended approach for maintaining backend functionality.
+## Phase 20: Data Integrity & Admin Stability
+- [x] **Product Deletion Logic Fix (Task Id: 545)**:
+  - [x] Resolved `409 Conflict` errors by updating database foreign key constraints.
+  - [x] Changed `order_items` constraint to `ON DELETE SET NULL` to preserve order history after product deletion.
+  - [x] Enhanced `Products.jsx` with robust error parsing and user-friendly alerts.
+- [x] **Dashboard Chart Reliability (Task Id: 546)**:
+  - [x] Fixed `Recharts` console warnings (`width(-1)`) by simplifying container logic.
+  - [x] Implemented fixed-height container and conditional rendering for stability.
+- [x] **Legacy Data Handling (Task Id: 547)**:
+  - [x] Updated `AdminOrders.jsx` to gracefully handle "Deleted Products" in historical orders.
+  - [x] Added fallback UI (Package icon, "Deleted Product" text) for null product references.
+
+## Phase 21: Deployment Documentation
+- [x] **Deployment Guide Creation (Task Id: 548)**:
+  - [x] Comprehensive `deployment_guide.md` for modern hosting (Vercel/Netlify).
+  - [x] Specialized `cpanel_deployment.md` for shared cPanel/Apache hosting.
+  - [x] Documented the `.htaccess` fix for React Client-Side Routing.
+  - [x] Migrated deployment files to `Memory Bank` directory for centralized access.
+- [x] **Hybrid Architecture Documentation**:
+  - [x] Explicitly documented the "Supabase Cloud + cPanel Host" strategy as the recommended approach for maintaining backend functionality.
+
+## Phase 22: Order Visibility & OTP Security
+- [x] **Secure Order Tracking (Task Id: 549)**:
+  - [x] Implemented phone-number based order discovery.
+  - [x] Created secure OTP verification flow via Email.
+  - [x] Integrated Google Apps Script as a transactional email provider.
+  - [x] Added persistent verification state for viewing order history.
+- [x] **Customer Confirmation Emails (Task Id: 550)**:
+  - [x] Automated confirmation emails for new orders via Google Script.
+
+## Phase 23: Global UX Refinements
+- [x] **Global Route Scrolling (Task Id: 551)**:
+  - [x] Implemented `ScrollToTop` component to reset viewport on navigation.
+- [x] **Environment Abstraction (Task Id: 552)**:
+  - [x] Centralized Google Script and Supabase keys in `.env` for production readiness.

@@ -58,6 +58,9 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **Resilience**: Comprehensive Error Boundaries and Auth timeout protection to prevent blank screens.
 - **Session Intelligence**: Dedicated "Session Active" choice screen for authenticated users to navigate efficiently between Shop, Profile, and Admin zones.
 - **Dynamic Graphics**: Recharts-based sales analytics with specialized mount-tracking to eliminate hydration warnings and ensure stable, fluid rendering across different screen sizes.
+- **Secure Order Tracking**: Multi-step verification flow using phone lookup and OTP authentication.
+- **Email Gateway**: Leverages **Google Apps Script** as a cost-free transactional email service for OTP codes and order confirmations.
+- **Navigation UX**: Integrated `ScrollToTop` logic to maintain consistent viewport positioning on route changes.
 - **Advanced Social Proof**: Premium dark-mode review system with glassmorphic aesthetics, user-initial avatars, and verified purchase indicators.
 - **Fixed Mobile Experience**: Enhanced product cards on small screens with frozen images and permanently visible, high-accessibility "Add to Bag" and "Buy Now" buttons.
 - **Elite Performance**: 

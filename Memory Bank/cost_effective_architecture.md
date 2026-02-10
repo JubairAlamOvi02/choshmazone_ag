@@ -11,7 +11,7 @@ Instead of paying for expensive "Pro" tiers, we will use **generous free tiers**
 | **CDN & DNS** | Cloudflare (Free Tier) | **$0/mo** | **CRITICAL**. Caches your site globally. Makes Hostinger feel as fast as Vercel. |
 | **Database & Auth** | Supabase (Free Tier) | **$0/mo** | 500MB DB & 50k monthly users is HUGE. Sufficient for starting. |
 | **Image Storage** | Cloudflare R2 / Backblaze | ~$0/mo (First 10GB free) | Cheaper than Supabase Storage if you have thousands of HD images. |
-| **Transactional Email** | Resend / Brevo | **$0/mo** | 3,000 emails/mo free. Perfect for order confirmations. |
+| **Transactional Email** | Resend / Brevo / **Google Apps Script** | **$0/mo** | 3,000 emails/mo free. Google Apps Script is $0/mo (uses Gmail). |
 
 ---
 

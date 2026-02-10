@@ -24,6 +24,7 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 - **User Portal**:
     - Registration and Login system.
     - View Order History and Profile.
+    - **Secure Order Tracking**: Phone-number based order lookup with mandatory Email OTP (One-Time Password) verification for guests and users.
     - **Session Intelligence**: "Session Active" choice screen for already logged-in users to navigate between Shop, Profile, and Admin areas.
 - **Admin Panel (WordPress-like)**:
     - Secure Login for Admins.
