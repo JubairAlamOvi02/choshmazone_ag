@@ -8,6 +8,8 @@ import { RecentlyViewedProvider } from './context/RecentlyViewedContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import CartDrawer from './components/Cart/CartDrawer';
 import ProtectedRoute from './components/ProtectedRoute';
+import ScrollToTop from './components/ScrollToTop';
+
 
 // Loading Component
 const PageLoader = () => (
@@ -54,7 +56,9 @@ function App() {
   return (
     <ErrorBoundary>
       <Router>
+        <ScrollToTop />
         <ToastProvider>
+
           <AuthProvider>
             <CartProvider>
               <WishlistProvider>
