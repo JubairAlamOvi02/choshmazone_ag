@@ -164,3 +164,7 @@ Given the constraints of traditional cPanel hosting (MySQL-centric) versus our m
     *   **Storage**: Supabase Storage buckets.
 
 **Why this works**: The Frontend is just a set of files that runs in the user's browser. Once loaded, the browser makes direct, secure API calls to Supabase over the internet. The cPanel server is only responsible for delivering the initial HTML/JS/CSS files. This avoids the massive complexity of migrating a cloud-native PostgreSQL backend to a legacy cPanel environment.
+
+### External API Strategy: Google Apps Script
+*   **Protocol**: `POST` requests with `mode: 'no-cors'`.
+*   **Rationale**: Browser CORS policies strictly block cross-origin requests to Google Scripts unless the script is deployed as a Web App with access set to "Anyone" and the client uses opaque (`no-cors`) requests. This allows data submission (fire-and-forget) without requiring complex backend proxies.

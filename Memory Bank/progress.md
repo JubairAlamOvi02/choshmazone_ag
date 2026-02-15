@@ -208,3 +208,9 @@
   - [x] Documented the "Hybrid Hosting" strategy (Frontend on cPanel + Supabase Cloud Database/Auth).
   - [x] Included `.htaccess` configuration for Client-Side Routing on Apache servers.
   - [x] Consolidated all deployment documentation into `Memory Bank` folder.
+
+## Phase 24: Maintenance & Updates
+- [x] **Google Sheet Integration Update (Task Id: 553)**:
+  - [x] Updated `GoogleAppsScript_Reference.js` to target the new spreadsheet ID.
+  - [x] Updated `.env` with the new Google Apps Script web app URL.
+  - [x] **Fix**: Resolved CORS 403 error by implementing `mode: 'no-cors'` in client-side fetch and creating `GOOGLE_FIX.md` with strict deployment instructions (Access: "Anyone").

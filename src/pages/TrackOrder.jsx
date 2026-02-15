@@ -70,7 +70,7 @@ const TrackOrder = () => {
 
             // SIMULATION: Calling the Google Apps Script to send a real email
             try {
-                fetch('https://script.google.com/macros/s/AKfycbwzBtCvO6vpGxuQK3vA8fXGwW8---EZB0Hk5UO44t8Yt239L0p1ktq6kCxiIsD7cWGnIA/exec', {
+                fetch(import.meta.env.VITE_GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors', // Apps Script requires no-cors for simple POST
                     body: JSON.stringify({

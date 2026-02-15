@@ -319,3 +319,9 @@
   - [x] Implemented `ScrollToTop` component to reset viewport on navigation.
 - [x] **Environment Abstraction (Task Id: 552)**:
   - [x] Centralized Google Script and Supabase keys in `.env` for production readiness.
+
+## Phase 24: Maintenance & Updates
+- [x] **Google Sheet Integration Update (Task Id: 553)**:
+  - [x] Updated `GoogleAppsScript_Reference.js` to target the new spreadsheet ID.
+  - [x] Updated `.env` with the new Google Apps Script web app URL.
+  - [x] **Fix**: Resolved CORS 403 error by implementing `mode: 'no-cors'` in client-side fetch and creating `GOOGLE_FIX.md` with strict deployment instructions (Access: "Anyone").
