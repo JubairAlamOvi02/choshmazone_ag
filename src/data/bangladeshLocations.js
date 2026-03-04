@@ -11,6 +11,10 @@ export const bangladeshLocations = {
         "Sutrapur", "Tejgaon", "Tejgaon I/A", "Turag", "Uttara",
         "Uttara West", "Uttarkhan", "Vatara", "Wari"
     ],
+    "Dhaka Sub-Urban": [
+        "Ashulia", "Dhamrai", "Dohar", "Hemayetpur", "Keraniganj Model",
+        "Nawabganj", "Savar", "South Keraniganj"
+    ],
     "Chittagong": [
         "Akbar Shah", "Anwara", "Bakalia", "Bandar", "Bayazid Bostami",
         "Boalkhali", "Chandanaish", "Chandgaon", "Chawk Bazar", "Double Mooring",

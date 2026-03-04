@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Minus, Plus } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
@@ -10,22 +11,27 @@ import { orderParams } from '../lib/api/orders';
 import { getDistricts, getThanas, calculateDeliveryCharge } from '../data/bangladeshLocations';
 
 const Checkout = () => {
-    const { cartItems, cartTotal, clearCart } = useCart();
+    const { cartItems, cartTotal, clearCart, updateQuantity, resetQuantities } = useCart();
     const { user } = useAuth();
     const navigate = useNavigate();
+
+    // Reset quantities to 1 when entering the checkout page
+    useEffect(() => {
+        resetQuantities();
+    }, [resetQuantities]);
+
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         email: user?.email || '',
         phone: '',
-        firstName: '',
-        lastName: '',
+        name: '',
         address: '',
         district: '',
         thana: '',
         city: '',
         zip: '',
         country: 'Bangladesh',
-        paymentMethod: 'bkash', // 'bkash' or 'cod'
+        paymentMethod: 'cod', // 'bkash' or 'cod'
         bkashNumber: '',
         bkashTrxId: ''
     });
@@ -69,14 +75,18 @@ const Checkout = () => {
         try {
             const totalWithDelivery = cartTotal + deliveryCharge;
 
+            const nameParts = formData.name.trim().split(' ');
+            const fName = nameParts[0] || '';
+            const lName = nameParts.slice(1).join(' ') || '';
+
             const supabaseOrderData = {
                 user_id: user?.id || null,
                 total_amount: totalWithDelivery,
                 status: 'pending',
                 payment_method: formData.paymentMethod,
                 shipping_address: {
-                    first_name: formData.firstName,
-                    last_name: formData.lastName,
+                    first_name: fName,
+                    last_name: lName,
                     email: formData.email,
                     phone: formData.phone,
                     address: formData.address,
@@ -100,6 +110,8 @@ const Checkout = () => {
                 orderDate: now.toLocaleDateString(),
                 orderTime: now.toLocaleTimeString(),
                 ...formData,
+                firstName: fName,
+                lastName: lName,
                 items: cartItems.map(item => ({
                     title: item.title,
                     quantity: item.quantity,
@@ -182,19 +194,13 @@ const Checkout = () => {
                             <h2 className="text-xl font-bold mb-6 pb-2 border-b border-border font-outfit uppercase tracking-wider text-text-main">
                                 Shipping Address
                             </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div className="mb-6">
                                 <Input
-                                    label="First Name"
-                                    name="firstName"
-                                    value={formData.firstName}
+                                    label="Full Name"
+                                    name="name"
+                                    value={formData.name}
                                     onChange={handleChange}
-                                    required
-                                />
-                                <Input
-                                    label="Last Name"
-                                    name="lastName"
-                                    value={formData.lastName}
-                                    onChange={handleChange}
+                                    placeholder="Enter your full name"
                                     required
                                 />
                             </div>
@@ -251,14 +257,12 @@ const Checkout = () => {
                                     name="city"
                                     value={formData.city}
                                     onChange={handleChange}
-                                    required
                                 />
                                 <Input
                                     label="Zip / Postal Code"
                                     name="zip"
                                     value={formData.zip}
                                     onChange={handleChange}
-                                    required
                                 />
                             </div>
                         </div>
@@ -359,13 +363,28 @@ const Checkout = () => {
                                     <div key={item.id} className="flex gap-4 items-center">
                                         <div className="w-16 h-16 bg-white rounded-lg border border-border flex items-center justify-center shrink-0 relative p-1">
                                             <img src={item.image} alt={item.title} className="w-full h-full object-contain mix-blend-multiply" />
-                                            <span className="absolute -top-2 -right-2 w-6 h-6 bg-primary text-white text-[10px] flex items-center justify-center rounded-full font-bold shadow-sm">
-                                                {item.quantity}
-                                            </span>
                                         </div>
                                         <div className="flex-1">
                                             <p className="text-sm font-bold text-text-main font-outfit leading-tight mb-1">{item.title}</p>
-                                            <p className="text-xs text-text-muted font-outfit opacity-80">{item.style}</p>
+                                            <p className="text-xs text-text-muted font-outfit opacity-80 mb-2">{item.style}</p>
+                                            <div className="flex items-center gap-2 border border-border rounded-lg px-2 py-1 w-fit bg-white">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateQuantity(item.id, -1)}
+                                                    className="text-text-muted hover:text-primary transition-colors disabled:opacity-50"
+                                                    disabled={item.quantity <= 1}
+                                                >
+                                                    <Minus size={14} />
+                                                </button>
+                                                <span className="text-sm font-bold w-6 text-center font-outfit">{item.quantity}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateQuantity(item.id, 1)}
+                                                    className="text-text-muted hover:text-primary transition-colors"
+                                                >
+                                                    <Plus size={14} />
+                                                </button>
+                                            </div>
                                         </div>
                                         <div className="text-sm font-bold text-text-main font-outfit ml-auto">
                                             ৳{(item.price * item.quantity).toFixed(2)}

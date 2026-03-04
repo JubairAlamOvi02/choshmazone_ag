@@ -123,6 +123,10 @@ export const CartProvider = ({ children }) => {
         });
     }, []);
 
+    const resetQuantities = useCallback(() => {
+        setCartItems(prevItems => prevItems.map(item => ({ ...item, quantity: 1 })));
+    }, []);
+
     const cartCount = useMemo(() => cartItems.reduce((acc, item) => acc + item.quantity, 0), [cartItems]);
     const cartTotal = useMemo(() => cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0), [cartItems]);
 
@@ -135,8 +139,9 @@ export const CartProvider = ({ children }) => {
         toggleCart,
         cartCount,
         cartTotal,
-        clearCart
-    }), [cartItems, isCartOpen, addToCart, removeFromCart, updateQuantity, toggleCart, cartCount, cartTotal, clearCart]);
+        clearCart,
+        resetQuantities
+    }), [cartItems, isCartOpen, addToCart, removeFromCart, updateQuantity, toggleCart, cartCount, cartTotal, clearCart, resetQuantities]);
 
     return (
         <CartContext.Provider value={contextValue}>
