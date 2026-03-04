@@ -25,6 +25,11 @@
 - [x] UX & Navigation Improvements:
     - Implemented `ScrollToTop` component to fix mid-page route loading.
     - Centralized external service URLs (Google Script) in `.env` variables.
+- [x] Shopping Cart Flexibility:
+    - Added quantity adjustment controls directly within the `Checkout.jsx` summary view.
+    - Synchronized cart context with checkout-level quantity changes.
+- [x] Admin Productivity Features:
+    - Enabled bulk order management via checkboxes and an action-oriented toolbar in the Admin panel.
 
 **Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, and Social Media branding have been implemented and verified.
 

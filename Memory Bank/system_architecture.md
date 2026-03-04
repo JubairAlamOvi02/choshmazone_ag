@@ -27,6 +27,8 @@
     *   `TrackOrder`: Phone-based lookup and secure OTP verification flow.
     *   `ScrollToTop`: Global scroll reset on route changes.
     *   `SearchBar`: Debounced multi-field filtering.
+    *   **Checkout Logic**: Integrated quantity counters with real-time total and delivery charge recalculation.
+    *   **Admin Intelligence**: Multi-select bulk operation toolbar for status management and deletion.
     *   `ErrorBoundary`: Global crash protection.
     *   `Data Services`: Intelligent manual merging for relational data (e.g., Reviews -> Profiles) to bypass missing DB foreign key constraints and minimize console errors.
     *   `Media Manager`: Implementation of `URL.createObjectURL` for immediate, low-latency visual feedback during admin image uploads.

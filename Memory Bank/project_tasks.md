@@ -260,30 +260,16 @@
   - [x] Fixed mobile product images to prevent unwanted scale/hover effects.
   - [x] Ensured "Add to Bag" and "Buy Now" buttons are always visible on small screens.
   - [x] Optimized button sizing for 44px tap targets.
-+
-+## Phase 19: Navigation Smoothness & Portal Access
-+- [x] **Sign-out UX Optimization (Task Id: 543)**:
-+  - [x] Removed disruptive `window.location.href` refresh during logout.
-+  - [x] Integrated `useNavigate` for seamless home page redirection.
-+- [x] **Admin Portal Choice Restoration (Task Id: 544)**:
-+  - [x] Disabled automatic login redirection in `AdminLogin.jsx`.
-+  - [x] Re-enabled the post-login choice screen (Dashboard vs Site).
-+  - [x] Admins can now choose between "Open Dashboard" and "Back to Site" after logging in.
+
+## Phase 19: Navigation Smoothness & Portal Access
+- [x] **Sign-out UX Optimization (Task Id: 543)**:
+  - [x] Removed disruptive `window.location.href` refresh during logout.
+  - [x] Integrated `useNavigate` for seamless home page redirection.
+- [x] **Admin Portal Choice Restoration (Task Id: 544)**:
+  - [x] Disabled automatic login redirection in `AdminLogin.jsx`.
+  - [x] Re-enabled the post-login choice screen (Dashboard vs Site).
+  - [x] Admins can now choose between "Open Dashboard" and "Back to Site" after logging in.
  
-+## Phase 20: Data Integrity & Admin Stability
-+- [x] **Product Deletion Logic Fix (Task Id: 545)**:
-+  - [x] Resolved `409 Conflict` errors by updating database foreign key constraints.
-+  - [x] Changed `order_items` constraint to `ON DELETE SET NULL` to preserve order history after product deletion.
-+  - [x] Enhanced `Products.jsx` with robust error parsing and user-friendly alerts.
-+- [x] **Dashboard Chart Reliability (Task Id: 546)**:
-+  - [x] Fixed `Recharts` console warnings (`width(-1)`) by simplifying container logic.
-+  - [x] Implemented fixed-height container and conditional rendering for stability.
-+- [x] **Legacy Data Handling (Task Id: 547)**:
-+  - [x] Updated `AdminOrders.jsx` to gracefully handle "Deleted Products" in historical orders.
-+  - [x] Added fallback UI (Package icon, "Deleted Product" text) for null product references.
-+
-+## Phase 21: Deployment Documentation
-+- [x] **Deployment Guide Creation (Task Id: 548)**:
 ## Phase 20: Data Integrity & Admin Stability
 - [x] **Product Deletion Logic Fix (Task Id: 545)**:
   - [x] Resolved `409 Conflict` errors by updating database foreign key constraints.
@@ -325,3 +311,17 @@
   - [x] Updated `GoogleAppsScript_Reference.js` to target the new spreadsheet ID.
   - [x] Updated `.env` with the new Google Apps Script web app URL.
   - [x] **Fix**: Resolved CORS 403 error by implementing `mode: 'no-cors'` in client-side fetch and creating `GOOGLE_FIX.md` with strict deployment instructions (Access: "Anyone").
+
+## Phase 25: Checkout UX & Order Flexibility
+- [x] **Checkout Quantity Selection (Task Id: 554)**:
+  - [x] Integrated quantity counter (Plus/Minus) in the Checkout summary.
+  - [x] Implemented real-time subtotal and total updates during checkout.
+- [x] **State Persistence (Task Id: 555)**:
+  - [x] Added `resetQuantities` logic to maintain predictable cart state during transitions.
+ 
+## Phase 26: Admin Order Intelligence Upgrade
+- [x] **Bulk Operations (Task Id: 556)**:
+  - [x] Developed multi-select checkbox system for the Admin Orders table.
+  - [x] Implemented bulk status updates (Multi-status transitions).
+  - [x] Implemented bulk permanent deletion with processing states.
+  - [x] Added visual selection toolbar and active counter.

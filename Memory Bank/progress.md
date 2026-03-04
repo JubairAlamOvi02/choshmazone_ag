@@ -182,23 +182,28 @@
     - Updated `Checkout.jsx` and `TrackOrder.jsx` to use centralized environment variables.
 - Task 59 (Automated Order Email Confirmations): Completed
     - Updated Google Apps Script to automatically send "Order Received" emails upon checkout.
+- Task 60 (Checkout Quantity Selection): Completed
+    - Implemented quantity increment/decrement controls in the Checkout page order summary.
+    - Enabled dynamic total and delivery charge updates based on adjusted item quantities.
+    - Added a safety reset to ensure base quantities start at 1 when entering the checkout flow.
+- Task 61 (Admin Bulk Order Management): Completed
+    - Implemented multi-select functionality for the Admin Orders dashboard.
+    - Added bulk status modification (Pending, Processing, Shipped, etc.) for selected orders.
+    - Integrated bulk deletion capability with confirmation safeguards.
+    - Enhanced Order Management UI with selection counters and an action toolbar.
 
 ## Phase 20: Data Integrity & Admin Stability
 - [x] **Admin Portal Choice Restoration (Task Id: 544)**:
   - [x] Disabled automatic login redirection in `AdminLogin.jsx`.
   - [x] Re-enabled the post-login choice screen (Dashboard vs Site).
   - [x] Admins can now choose between "Open Dashboard" and "Back to Site" after logging in.
-
-## Phase 20: Data Integrity & Admin Stability
 - [x] **Product Deletion Logic Fix (Task Id: 545)**:
-  - [x] Resolved `409 Conflict` errors by updating database foreign key constraints.
-  - [x] Changed `order_items` constraint to `ON DELETE SET NULL` to preserve order history after product deletion.
+  - [x] Resolved `409 Conflict` errors by updating database foreign key constraints (SET NULL).
   - [x] Enhanced `Products.jsx` with robust error parsing and user-friendly alerts.
 - [x] **Dashboard Chart Reliability (Task Id: 546)**:
-  - [x] Fixed `Recharts` console warnings (`width(-1)`) by simplifying container logic.
-  - [x] Implemented fixed-height container and conditional rendering for stability.
+  - [x] Fixed Recharts console warnings by simplifying container logic and adding mount-state tracking.
 - [x] **Legacy Data Handling (Task Id: 547)**:
-  - [x] Updated `AdminOrders.jsx` to gracefully handle "Deleted Products" in historical orders.
+  - [x] Updated `AdminOrders.jsx` to gracefully handle "Deleted Products" in orders.
   - [x] Added fallback UI (Package icon, "Deleted Product" text) for null product references.
 
 ## Phase 21: Deployment Documentation
