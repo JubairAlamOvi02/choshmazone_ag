@@ -129,5 +129,5 @@ export const getThanas = (district) => {
 
 // Calculate delivery charge based on district
 export const calculateDeliveryCharge = (district) => {
-    return district === "Dhaka" ? 60 : 120;
+    return district === "Dhaka" ? 70 : 120;
 };
