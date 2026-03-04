@@ -7,6 +7,8 @@ const AdminProducts = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedProducts, setSelectedProducts] = useState([]);
+    const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
     useEffect(() => {
         fetchProducts();
@@ -68,6 +70,69 @@ const AdminProducts = () => {
         }
     };
 
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            setSelectedProducts(products.map(p => p.id));
+        } else {
+            setSelectedProducts([]);
+        }
+    };
+
+    const handleSelectProduct = (productId) => {
+        setSelectedProducts(prev =>
+            prev.includes(productId)
+                ? prev.filter(id => id !== productId)
+                : [...prev, productId]
+        );
+    };
+
+    const handleBulkStatusChange = async (newStatus) => {
+        const isActivating = newStatus === 'active';
+        if (!window.confirm(`Are you sure you want to change the status of ${selectedProducts.length} products to '${isActivating ? 'Active' : 'Inactive'}'?`)) return;
+
+        setIsProcessingBulk(true);
+        try {
+            await Promise.all(selectedProducts.map(id => productParams.update(id, { is_active: isActivating })));
+            setProducts(products.map(p => selectedProducts.includes(p.id) ? { ...p, is_active: isActivating } : p));
+            setSelectedProducts([]);
+        } catch (err) {
+            alert('Failed to update statuses of some products.');
+            fetchProducts();
+        } finally {
+            setIsProcessingBulk(false);
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (!window.confirm(`Are you sure you want to delete ${selectedProducts.length} products?`)) return;
+
+        setIsProcessingBulk(true);
+        try {
+            const errors = [];
+            for (const id of selectedProducts) {
+                try {
+                    await productParams.delete(id);
+                } catch (err) {
+                    errors.push(err);
+                }
+            }
+
+            if (errors.length > 0) {
+                alert(`Failed to delete ${errors.length} products (likely because they are part of existing orders). Other products were deleted successfully.`);
+                fetchProducts();
+            } else {
+                setProducts(products.filter(p => !selectedProducts.includes(p.id)));
+            }
+            setSelectedProducts([]);
+        } catch (err) {
+            console.error('Bulk delete error:', err);
+            alert('Failed to delete some products.');
+            fetchProducts();
+        } finally {
+            setIsProcessingBulk(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
@@ -105,11 +170,55 @@ const AdminProducts = () => {
                 </div>
             </div>
 
+            {selectedProducts.length > 0 && (
+                <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 mb-6 flex flex-wrap items-center justify-between gap-4 animate-in slide-in-from-top-4">
+                    <span className="text-sm font-bold text-primary font-outfit">
+                        {isProcessingBulk ? 'Processing...' : `${selectedProducts.length} product(s) selected`}
+                    </span>
+                    <div className="flex items-center gap-3">
+                        <select
+                            onChange={(e) => {
+                                if (e.target.value) {
+                                    handleBulkStatusChange(e.target.value);
+                                    e.target.value = '';
+                                }
+                            }}
+                            disabled={isProcessingBulk}
+                            className="bg-white border border-border rounded-lg px-3 py-2 text-sm font-outfit outline-none focus:border-primary disabled:opacity-50"
+                        >
+                            <option value="">Change Status...</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <button
+                            onClick={handleBulkDelete}
+                            disabled={isProcessingBulk}
+                            className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm font-bold font-outfit disabled:opacity-50"
+                        >
+                            {isProcessingBulk ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-red-600"></div>
+                            ) : (
+                                <Trash2 size={16} />
+                            )}
+                            Delete Selected
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="bg-white rounded-3xl border border-border/50 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-gray-50/50 border-b border-border/50">
+                                <th className="pl-6 py-5 w-10">
+                                    <input
+                                        type="checkbox"
+                                        className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                                        onChange={handleSelectAll}
+                                        checked={products.length > 0 && selectedProducts.length === products.length}
+                                    />
+                                </th>
                                 <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Product</th>
                                 <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Price</th>
                                 <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Stock</th>
@@ -121,7 +230,7 @@ const AdminProducts = () => {
                         <tbody className="divide-y divide-border/30">
                             {products.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="px-6 py-20 text-center">
+                                    <td colSpan="7" className="px-6 py-20 text-center">
                                         <div className="flex flex-col items-center justify-center text-text-muted">
                                             <Glasses size={48} className="mb-4 opacity-20" />
                                             <p className="font-outfit">No products found. Start adding your collection!</p>
@@ -130,7 +239,15 @@ const AdminProducts = () => {
                                 </tr>
                             ) : (
                                 products.map(product => (
-                                    <tr key={product.id} className="hover:bg-gray-50/30 transition-colors group">
+                                    <tr key={product.id} className={`transition-colors group ${selectedProducts.includes(product.id) ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-gray-50/30'}`}>
+                                        <td className="pl-6 py-5">
+                                            <input
+                                                type="checkbox"
+                                                className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                                                checked={selectedProducts.includes(product.id)}
+                                                onChange={() => handleSelectProduct(product.id)}
+                                            />
+                                        </td>
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 rounded-lg bg-gray-50 border border-border/50 overflow-hidden flex items-center justify-center">

@@ -10,6 +10,8 @@ const AdminOrders = () => {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
+    const [selectedOrders, setSelectedOrders] = useState([]);
+    const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
     useEffect(() => {
         fetchOrders();
@@ -60,6 +62,55 @@ const AdminOrders = () => {
         setSelectedOrder(null);
     };
 
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            setSelectedOrders(orders.map(o => o.id));
+        } else {
+            setSelectedOrders([]);
+        }
+    };
+
+    const handleSelectOrder = (orderId) => {
+        setSelectedOrders(prev => 
+            prev.includes(orderId) 
+                ? prev.filter(id => id !== orderId)
+                : [...prev, orderId]
+        );
+    };
+
+    const handleBulkStatusChange = async (newStatus) => {
+        if (!window.confirm(`Are you sure you want to change the status of ${selectedOrders.length} orders to '${newStatus}'?`)) return;
+        
+        setIsProcessingBulk(true);
+        try {
+            await Promise.all(selectedOrders.map(id => orderParams.updateStatus(id, newStatus)));
+            setOrders(orders.map(o => selectedOrders.includes(o.id) ? { ...o, status: newStatus } : o));
+            setSelectedOrders([]);
+        } catch (err) {
+            alert('Failed to update statuses of some orders.');
+            fetchOrders();
+        } finally {
+            setIsProcessingBulk(false);
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (!window.confirm(`Are you sure you want to PERMANENTLY delete ${selectedOrders.length} orders? This cannot be undone.`)) return;
+
+        setIsProcessingBulk(true);
+        try {
+            await Promise.all(selectedOrders.map(id => orderParams.delete(id)));
+            setOrders(orders.filter(o => !selectedOrders.includes(o.id)));
+            setSelectedOrders([]);
+        } catch (err) {
+            console.error('Bulk delete error:', err);
+            alert('Failed to delete some orders.');
+            fetchOrders();
+        } finally {
+            setIsProcessingBulk(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
@@ -92,11 +143,58 @@ const AdminOrders = () => {
                 </div>
             </div>
 
+            {selectedOrders.length > 0 && (
+                <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 mb-6 flex flex-wrap items-center justify-between gap-4 animate-in slide-in-from-top-4">
+                    <span className="text-sm font-bold text-primary font-outfit">
+                        {isProcessingBulk ? 'Processing...' : `${selectedOrders.length} order(s) selected`}
+                    </span>
+                    <div className="flex items-center gap-3">
+                        <select
+                            onChange={(e) => {
+                                if(e.target.value) {
+                                    handleBulkStatusChange(e.target.value);
+                                    e.target.value = '';
+                                }
+                            }}
+                            disabled={isProcessingBulk}
+                            className="bg-white border border-border rounded-lg px-3 py-2 text-sm font-outfit outline-none focus:border-primary disabled:opacity-50"
+                        >
+                            <option value="">Change Status...</option>
+                            <option value="pending">Pending</option>
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <button
+                            onClick={handleBulkDelete}
+                            disabled={isProcessingBulk}
+                            className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm font-bold font-outfit disabled:opacity-50"
+                        >
+                            {isProcessingBulk ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-red-600"></div>
+                            ) : (
+                                <Trash2 size={16} />
+                            )}
+                            Delete Selected
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="bg-white rounded-3xl border border-border/50 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-gray-50/50 border-b border-border/50">
+                                <th className="pl-6 py-5 w-10">
+                                    <input 
+                                        type="checkbox" 
+                                        className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                                        onChange={handleSelectAll}
+                                        checked={orders.length > 0 && selectedOrders.length === orders.length}
+                                    />
+                                </th>
                                 <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Order ID</th>
                                 <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Customer</th>
                                 <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Amount</th>
@@ -107,7 +205,15 @@ const AdminOrders = () => {
                         </thead>
                         <tbody className="divide-y divide-border/30">
                             {orders.map(order => (
-                                <tr key={order.id} className="hover:bg-gray-50/30 transition-colors group">
+                                <tr key={order.id} className={`transition-colors group ${selectedOrders.includes(order.id) ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-gray-50/30'}`}>
+                                    <td className="pl-6 py-5">
+                                        <input 
+                                            type="checkbox"
+                                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                                            checked={selectedOrders.includes(order.id)}
+                                            onChange={() => handleSelectOrder(order.id)}
+                                        />
+                                    </td>
                                     <td className="px-6 py-5">
                                         <div className="flex items-center gap-2">
                                             <span className="text-sm font-mono font-bold text-text-main uppercase">#{order.id.slice(0, 8)}</span>
