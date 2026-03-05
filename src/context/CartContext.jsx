@@ -84,6 +84,16 @@ export const CartProvider = ({ children }) => {
         // Show toast
         showToast(`${product.name || product.title} added to your bag!`, 'success');
 
+        // Facebook Pixel AddToCart event
+        if (typeof window !== 'undefined' && window.fbq) {
+            window.fbq('track', 'AddToCart', {
+                content_name: product.name || product.title,
+                content_ids: [product.id],
+                value: product.price * quantityToAdd,
+                currency: 'BDT'
+            });
+        }
+
         // Wrap UI state update in transition to improve INP/responsiveness
         if (shouldOpenCart) {
             startTransition(() => {

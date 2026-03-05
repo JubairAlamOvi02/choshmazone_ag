@@ -58,6 +58,17 @@ const ProductDetails = () => {
                 setIsWishlisted(isInWishlist(formattedProduct.id));
                 addToRecentlyViewed(formattedProduct);
 
+                // Facebook Pixel ViewContent event
+                if (typeof window !== 'undefined' && window.fbq) {
+                    window.fbq('track', 'ViewContent', {
+                        content_name: formattedProduct.title,
+                        content_ids: [formattedProduct.id],
+                        content_type: 'product',
+                        value: formattedProduct.price,
+                        currency: 'BDT'
+                    });
+                }
+
                 // Fetch related products - only if category exists
                 if (data.category) {
                     try {

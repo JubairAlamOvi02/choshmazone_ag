@@ -18,6 +18,15 @@ const Checkout = () => {
     // Reset quantities to 1 when entering the checkout page
     useEffect(() => {
         resetQuantities();
+
+        // Track Initiate Checkout
+        if (typeof window !== 'undefined' && window.fbq && cartItems.length > 0) {
+            window.fbq('track', 'InitiateCheckout', {
+                value: cartTotal,
+                currency: 'BDT',
+                num_items: cartItems.length
+            });
+        }
     }, [resetQuantities]);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -130,6 +139,17 @@ const Checkout = () => {
                 },
                 body: JSON.stringify(legacyOrderData)
             }).catch(err => console.error("Google Sheets Sync Failed:", err));
+
+            // Track Purchase event with Facebook Pixel
+            if (typeof window !== 'undefined' && window.fbq) {
+                window.fbq('track', 'Purchase', {
+                    value: totalWithDelivery,
+                    currency: 'BDT',
+                    content_ids: cartItems.map(item => item.id),
+                    content_type: 'product',
+                    num_items: cartItems.reduce((acc, item) => acc + item.quantity, 0)
+                });
+            }
 
             clearCart();
             navigate('/order-success');

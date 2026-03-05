@@ -191,6 +191,10 @@
     - Added bulk status modification (Pending, Processing, Shipped, etc.) for selected orders.
     - Integrated bulk deletion capability with confirmation safeguards.
     - Enhanced Order Management UI with selection counters and an action toolbar.
+- Task 62 (Facebook Pixel Integration): Completed
+    - Added Base Pixel code to `index.html`.
+    - Created `PixelTracker.jsx` to correctly track `PageView` on SPA route changes.
+    - Integrated standard events: `ViewContent` (ProductDetails), `AddToCart` (CartContext), `InitiateCheckout`, and `Purchase` (Checkout).
 
 ## Phase 20: Data Integrity & Admin Stability
 - [x] **Admin Portal Choice Restoration (Task Id: 544)**:

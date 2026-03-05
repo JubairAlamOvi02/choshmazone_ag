@@ -9,6 +9,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import CartDrawer from './components/Cart/CartDrawer';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
+import PixelTracker from './components/PixelTracker';
 
 
 // Loading Component
@@ -57,6 +58,7 @@ function App() {
     <ErrorBoundary>
       <Router>
         <ScrollToTop />
+        <PixelTracker />
         <ToastProvider>
 
           <AuthProvider>
