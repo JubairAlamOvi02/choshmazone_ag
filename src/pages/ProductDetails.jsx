@@ -178,7 +178,7 @@ const ProductDetails = () => {
             <main className="container mx-auto px-4 py-8 md:py-16 pb-24 lg:pb-16">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-24">
                     {/* Left: Image Gallery */}
-                    <div className="flex flex-col gap-6 sticky top-[72px] lg:top-24 h-fit z-10 bg-white">
+                    <div className="flex flex-col gap-6 relative lg:sticky top-[72px] lg:top-24 h-fit z-10 bg-white lg:bg-transparent pb-4 lg:pb-0">
                         <div className="relative group bg-background-alt rounded-2xl overflow-hidden aspect-square flex items-center justify-center border border-border/50 shadow-sm transition-all duration-500 hover:shadow-xl">
                             <OptimizedImage
                                 src={mainImage}
@@ -251,53 +251,64 @@ const ProductDetails = () => {
 
                         {/* Add to Cart Controls */}
                         <div className="space-y-6 pb-8 border-b border-border mb-8">
-                            <div className="flex flex-wrap items-center gap-6">
-                                <div className="flex flex-col gap-2">
-                                    <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted">Quantity</span>
-                                    <div className="flex items-center border border-border rounded-full p-1 bg-background-alt h-12">
-                                        <button
-                                            onClick={() => handleQuantityChange('dec')}
-                                            className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-full transition-colors"
-                                        >
-                                            <Minus size={16} />
-                                        </button>
-                                        <span className="w-10 text-center font-bold font-outfit">{quantity}</span>
-                                        <button
-                                            onClick={() => handleQuantityChange('inc')}
-                                            className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-full transition-colors"
-                                        >
-                                            <Plus size={16} />
-                                        </button>
+                            <div className="flex flex-col gap-6">
+                                {/* Quantity and Wishlist for Mobile */}
+                                <div className="flex items-end justify-between md:justify-start gap-6">
+                                    <div className="flex flex-col gap-2">
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted">Quantity</span>
+                                        <div className="flex items-center border border-border rounded-full p-1 bg-background-alt h-12 w-36">
+                                            <button
+                                                onClick={() => handleQuantityChange('dec')}
+                                                className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-full transition-colors"
+                                            >
+                                                <Minus size={16} />
+                                            </button>
+                                            <span className="flex-1 text-center font-bold font-outfit">{quantity}</span>
+                                            <button
+                                                onClick={() => handleQuantityChange('inc')}
+                                                className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-full transition-colors"
+                                            >
+                                                <Plus size={16} />
+                                            </button>
+                                        </div>
                                     </div>
+
+                                    {/* Wishlist Button - Mobile Only (moves here) */}
+                                    <button
+                                        onClick={() => toggleWishlist(product)}
+                                        className={`md:hidden h-12 w-12 border-2 rounded-full flex items-center justify-center transition-all duration-300 group shadow-sm ${isWishlisted ? 'border-error bg-error/5' : 'border-border hover:bg-error/10 hover:border-error'}`}
+                                        title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+                                    >
+                                        <Heart size={20} className={`${isWishlisted ? 'text-error fill-error' : 'text-text-muted'} transition-all`} />
+                                    </button>
                                 </div>
 
-                                <div className="flex-1 flex flex-col gap-4 pt-6">
-                                    <div className="flex flex-col sm:flex-row gap-4">
-                                        <button
-                                            className={`flex-1 h-14 font-bold text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg  ${product.is_active === false || product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed bg-gray-400 text-white' : 'bg-primary text-white hover:bg-secondary hover:scale-[1.02] hover:shadow-xl'}`}
-                                            onClick={() => addToCart({ ...product, quantity })}
-                                            disabled={product.is_active === false || product.stock_quantity <= 0}
-                                        >
-                                            <ShoppingBag size={20} strokeWidth={2.5} />
-                                            <span>{product.is_active === false || product.stock_quantity <= 0 ? 'Out of Stock' : 'Add to Bag'}</span>
-                                        </button>
+                                {/* Desktop Buttons */}
+                                <div className="hidden md:flex flex-row gap-4 w-full">
+                                    <button
+                                        className={`flex-1 h-14 font-bold text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg cursor-pointer ${product.is_active === false || product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed bg-gray-400 text-white' : 'bg-primary text-white hover:bg-secondary hover:scale-[1.02] hover:shadow-xl'}`}
+                                        onClick={() => addToCart({ ...product, quantity })}
+                                        disabled={product.is_active === false || product.stock_quantity <= 0}
+                                    >
+                                        <ShoppingBag size={20} strokeWidth={2.5} />
+                                        <span>{product.is_active === false || product.stock_quantity <= 0 ? 'Out of Stock' : 'Add to Bag'}</span>
+                                    </button>
 
-                                        <button
-                                            className={`flex-1 h-14 font-bold text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg  ${product.is_active === false || product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed bg-gray-300 text-gray-500 hidden' : 'bg-secondary text-primary hover:bg-primary hover:text-white hover:scale-[1.02] hover:shadow-xl'}`}
-                                            onClick={handleBuyNow}
-                                            disabled={product.is_active === false || product.stock_quantity <= 0}
-                                        >
-                                            <span>Buy Now</span>
-                                        </button>
+                                    <button
+                                        className={`flex-1 h-14 font-bold text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg cursor-pointer ${product.is_active === false || product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed bg-gray-300 text-gray-500 hidden' : 'bg-secondary text-primary hover:bg-primary hover:text-white hover:scale-[1.02] hover:shadow-xl'}`}
+                                        onClick={handleBuyNow}
+                                        disabled={product.is_active === false || product.stock_quantity <= 0}
+                                    >
+                                        <span>Buy Now</span>
+                                    </button>
 
-                                        <button
-                                            onClick={() => toggleWishlist(product)}
-                                            className={`h-14 w-14 border-2 rounded-lg flex items-center justify-center transition-all duration-300 group ${isWishlisted ? 'border-error bg-error/5' : 'border-border hover:bg-error/10 hover:border-error'}`}
-                                            title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
-                                        >
-                                            <Heart size={20} className={`${isWishlisted ? 'text-error fill-error' : 'text-text-muted group-hover:text-error group-hover:fill-error'} transition-all`} />
-                                        </button>
-                                    </div>
+                                    <button
+                                        onClick={() => toggleWishlist(product)}
+                                        className={`h-14 w-14 border-2 rounded-lg flex items-center justify-center transition-all duration-300 group cursor-pointer ${isWishlisted ? 'border-error bg-error/5' : 'border-border hover:bg-error/10 hover:border-error'}`}
+                                        title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+                                    >
+                                        <Heart size={20} className={`${isWishlisted ? 'text-error fill-error' : 'text-text-muted group-hover:text-error group-hover:fill-error'} transition-all`} />
+                                    </button>
                                 </div>
                             </div>
                         </div>
