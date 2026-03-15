@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Minus, Plus } from 'lucide-react';
+import { Minus, Plus, X, AlertCircle } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
@@ -8,12 +8,16 @@ import Input from '../components/Input';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { orderParams } from '../lib/api/orders';
+import { supabase } from '../lib/supabaseClient';
 import { getDistricts, getThanas, calculateDeliveryCharge } from '../data/bangladeshLocations';
 
 const Checkout = () => {
-    const { cartItems, cartTotal, clearCart, updateQuantity, resetQuantities } = useCart();
+    const { cartItems, cartTotal, clearCart, updateQuantity, resetQuantities, removeFromCart } = useCart();
     const { user } = useAuth();
     const navigate = useNavigate();
+
+    const [showStockModal, setShowStockModal] = useState(false);
+    const [outOfStockItems, setOutOfStockItems] = useState([]);
 
     // Reset quantities to 1 when entering the checkout page
     useEffect(() => {
@@ -82,6 +86,30 @@ const Checkout = () => {
         setIsSubmitting(true);
 
         try {
+            const itemIds = cartItems.map(item => item.id);
+            if (itemIds.length > 0) {
+                const { data: latestProducts, error: productsError } = await supabase
+                    .from('products')
+                    .select('id, name, stock_quantity')
+                    .in('id', itemIds);
+
+                if (productsError) throw productsError;
+
+                const outOfStock = cartItems.filter(item => {
+                    const dbProduct = latestProducts.find(p => p.id === item.id);
+                    if (!dbProduct) return true;
+                    if (dbProduct.stock_quantity <= 0) return true;
+                    return false;
+                });
+
+                if (outOfStock.length > 0) {
+                    setOutOfStockItems(outOfStock);
+                    setShowStockModal(true);
+                    setIsSubmitting(false);
+                    return;
+                }
+            }
+
             const totalWithDelivery = cartTotal + deliveryCharge;
 
             const nameParts = formData.name.trim().split(' ');
@@ -180,6 +208,58 @@ const Checkout = () => {
     return (
         <div className="min-h-screen bg-white">
             <Navbar />
+
+            {/* Out of Stock Modal */}
+            {showStockModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in zoom-in slide-in-from-bottom-4 duration-300">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="flex items-center gap-3 text-red-500">
+                                <AlertCircle size={24} />
+                                <h3 className="text-xl font-bold font-outfit uppercase tracking-wider text-text-main">Stock Issue</h3>
+                            </div>
+                            <button onClick={() => setShowStockModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <p className="text-sm text-text-muted font-outfit mb-6">
+                            We're sorry, but the following items in your cart are currently out of stock. Please remove them to proceed with your order.
+                        </p>
+                        <div className="space-y-3 mb-6 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin">
+                            {outOfStockItems.map(item => (
+                                <div key={item.id} className="flex items-center justify-between gap-3 p-3 bg-red-50/50 rounded-xl border border-red-100">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 bg-white rounded-lg p-1 shrink-0">
+                                            <img src={item.image} alt={item.title} className="w-full h-full object-contain mix-blend-multiply" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold text-text-main truncate font-outfit max-w-[120px]">{item.title}</p>
+                                            <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1">Out of Stock</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        className="text-xs font-bold text-red-500 hover:text-white bg-white hover:bg-red-500 px-3 py-1.5 rounded-lg border border-red-200 hover:border-red-500 transition-all shadow-sm"
+                                        type="button"
+                                        onClick={() => {
+                                            removeFromCart(item.id);
+                                            setOutOfStockItems(prev => prev.filter(i => i.id !== item.id));
+                                            if (outOfStockItems.length === 1) setShowStockModal(false);
+                                        }}
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="flex justify-end pt-4 border-t border-border">
+                            <Button variant="outline" type="button" onClick={() => setShowStockModal(false)} className="w-full">
+                                Close
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <main className="container mx-auto px-4 py-12 md:py-16">
                 <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-12 lg:gap-20">
                     {/* Left Column: Forms */}

@@ -108,12 +108,19 @@ const ProductDetails = () => {
     }, [product, isInWishlist]);
 
     const handleQuantityChange = (type) => {
-        if (type === 'inc') setQuantity(prev => prev + 1);
+        if (product && product.stock_quantity <= 0) return;
+        if (type === 'inc') {
+            if (product && quantity < product.stock_quantity) {
+                setQuantity(prev => prev + 1);
+            } else {
+                alert(`Only ${product?.stock_quantity || 0} items available in stock.`);
+            }
+        }
         if (type === 'dec' && quantity > 1) setQuantity(prev => prev - 1);
     };
 
     const handleBuyNow = () => {
-        if (!product) return;
+        if (!product || product.stock_quantity <= 0) return;
         addToCart({ ...product, quantity }, false);
         navigate('/checkout');
     };
@@ -207,10 +214,16 @@ const ProductDetails = () => {
                                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-2.5 py-1 bg-secondary text-white rounded-full">
                                     {product.category}
                                 </span>
-                                {product.is_active !== false && (
+                                {product.is_active !== false && product.stock_quantity > 0 && (
                                     <div className="flex items-center gap-1 text-green-600">
                                         <div className="w-1.5 h-1.5 bg-green-600 rounded-full animate-pulse"></div>
                                         <span className="text-[10px] font-bold uppercase tracking-widest">In Stock</span>
+                                    </div>
+                                )}
+                                {product.stock_quantity <= 0 && (
+                                    <div className="flex items-center gap-1 text-red-600">
+                                        <div className="w-1.5 h-1.5 bg-red-600 rounded-full"></div>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest">Out of Stock</span>
                                     </div>
                                 )}
                             </div>
@@ -261,18 +274,18 @@ const ProductDetails = () => {
                                 <div className="flex-1 flex flex-col gap-4 pt-6">
                                     <div className="flex flex-col sm:flex-row gap-4">
                                         <button
-                                            className={`flex-1 h-14 bg-primary text-white font-bold text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg hover:shadow-xl ${product.is_active === false ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'hover:bg-secondary hover:scale-[1.02]'}`}
+                                            className={`flex-1 h-14 font-bold text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg  ${product.is_active === false || product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed bg-gray-400 text-white' : 'bg-primary text-white hover:bg-secondary hover:scale-[1.02] hover:shadow-xl'}`}
                                             onClick={() => addToCart({ ...product, quantity })}
-                                            disabled={product.is_active === false}
+                                            disabled={product.is_active === false || product.stock_quantity <= 0}
                                         >
                                             <ShoppingBag size={20} strokeWidth={2.5} />
-                                            <span>{product.is_active === false ? 'Out of Stock' : 'Add to Bag'}</span>
+                                            <span>{product.is_active === false || product.stock_quantity <= 0 ? 'Out of Stock' : 'Add to Bag'}</span>
                                         </button>
 
                                         <button
-                                            className={`flex-1 h-14 bg-secondary text-primary font-bold text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg hover:shadow-xl ${product.is_active === false ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'hover:bg-primary hover:text-white hover:scale-[1.02]'}`}
+                                            className={`flex-1 h-14 font-bold text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg  ${product.is_active === false || product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed bg-gray-300 text-gray-500 hidden' : 'bg-secondary text-primary hover:bg-primary hover:text-white hover:scale-[1.02] hover:shadow-xl'}`}
                                             onClick={handleBuyNow}
-                                            disabled={product.is_active === false}
+                                            disabled={product.is_active === false || product.stock_quantity <= 0}
                                         >
                                             <span>Buy Now</span>
                                         </button>
@@ -382,17 +395,17 @@ const ProductDetails = () => {
             {/* Mobile Sticky Bottom Bar */}
             <div className="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-lg border-t border-border p-4 z-40 md:hidden flex gap-3 animate-in slide-in-from-bottom duration-500">
                 <button
-                    className={`flex-1 h-14 bg-primary text-white font-bold text-[11px] uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 shadow-lg ${product.is_active === false ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'active:scale-95 transition-transform'}`}
+                    className={`flex-1 h-14 font-bold text-[11px] uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 shadow-lg ${product.is_active === false || product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed bg-gray-400 text-white' : 'bg-primary text-white active:scale-95 transition-transform'}`}
                     onClick={() => addToCart({ ...product, quantity })}
-                    disabled={product.is_active === false}
+                    disabled={product.is_active === false || product.stock_quantity <= 0}
                 >
                     <ShoppingBag size={18} />
-                    <span>{product.is_active === false ? 'Out of Stock' : 'Add to Bag'}</span>
+                    <span>{product.is_active === false || product.stock_quantity <= 0 ? 'Out of Stock' : 'Add to Bag'}</span>
                 </button>
                 <button
-                    className={`flex-1 h-14 bg-secondary text-primary font-bold text-[11px] uppercase tracking-widest rounded-xl shadow-lg ${product.is_active === false ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'active:scale-95 transition-transform'}`}
+                    className={`flex-1 h-14 font-bold text-[11px] uppercase tracking-widest rounded-xl shadow-lg ${product.is_active === false || product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed bg-gray-300 text-gray-500 hidden' : 'bg-secondary text-primary active:scale-95 transition-transform'}`}
                     onClick={handleBuyNow}
-                    disabled={product.is_active === false}
+                    disabled={product.is_active === false || product.stock_quantity <= 0}
                 >
                     <span>Buy Now</span>
                 </button>
