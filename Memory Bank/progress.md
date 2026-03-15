@@ -223,3 +223,21 @@
   - [x] Updated `GoogleAppsScript_Reference.js` to target the new spreadsheet ID.
   - [x] Updated `.env` with the new Google Apps Script web app URL.
   - [x] **Fix**: Resolved CORS 403 error by implementing `mode: 'no-cors'` in client-side fetch and creating `GOOGLE_FIX.md` with strict deployment instructions (Access: "Anyone").
+
+## Phase 25: Checkout UX & Order Flexibility
+  - [x] Completed Quantity counters and total updates in Checkout.
+
+## Phase 26: Admin Order Intelligence Upgrade
+  - [x] Implemented bulk order state transitions and grouped selection features.
+
+## Phase 27: Advanced Inventory Management & UI Polish
+- [x] **Real-Time Stock Validation**: Completed
+  - Added real-time stock verification against Supabase during Checkout.
+  - Interactive "Out of Stock" modal deployed.
+- [x] **Storefront Out-of-Stock Status Display**: Completed
+  - Visual 'Out of Stock' product card banners, disabled buttons, blocked multi-clicks for unavailable inventory.
+- [x] **Mobile Ratio & UI Layout Fixes**: Completed
+  - Premium mobile layout tuning for PDP (fixed sticky image scrolling, removed duplicated primary CTAs, cleanly repositioned secondary actions like Wishlist).
+- [x] **Product Variants and Chart Integrity**: Completed
+  - Fixed 400 errors during product operations and stabilized Admin Dashboard charts width handling.
+

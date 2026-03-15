@@ -325,3 +325,19 @@
   - [x] Implemented bulk status updates (Multi-status transitions).
   - [x] Implemented bulk permanent deletion with processing states.
   - [x] Added visual selection toolbar and active counter.
+
+## Phase 27: Advanced Inventory Management & UI Polish
+- [x] **Real-Time Stock Validation (Task Id: 557)**:
+  - [x] Check latest product availability on Supabase before committing checkout.
+  - [x] Trigger an intuitive "Out of Stock" modal with quick removing actions.
+- [x] **Responsive Mobile Experience (Task Id: 558)**:
+  - [x] Fixed "squished" button ratios on Mobile Product Details page.
+  - [x] Hide inline duplicated action buttons on mobile, emphasizing the sticky bottom bar.
+  - [x] Switched mobile image gallery to relative scrolling.
+- [x] **Out of Stock Display UI (Task Id: 559)**:
+  - [x] Display striking watermark banners for empty-stock entities on main grids.
+  - [x] Auto-disable standard order flows for empty inventory assets.
+- [x] **Variants Saving Fix & Chart Polish (Task Id: 560)**:
+  - [x] Resolved 400 Bad Request error from admin updates on product traits.
+  - [x] Finalized Recharts dimensional responsiveness on Dashboard entries.
+

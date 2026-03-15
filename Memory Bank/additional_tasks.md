@@ -221,3 +221,22 @@
     - [x] Documented the `.htaccess` configuration required for React Client-Side Routing on Apache servers.
     - [x] Formalized the "Hybrid Hosting" architecture (Frontend on cPanel + Backend on Supabase) in system documentation.
     - [x] Centralized all deployment resources in the `Memory Bank` directory.
+
+## Phase 22: Advanced Inventory Management & UI Polish
+- [x] **Real-Time Stock Validation (Task Id: 557)**:
+    - [x] Implemented real-time Supabase stock checks at checkout form submission.
+    - [x] Designed and integrated interactive "Out of Stock" modal with instant item removal options.
+- [x] **Storefront Out-of-Stock UX (Task Id: 558)**:
+    - [x] Added visual "Out of Stock" banners on product cards.
+    - [x] Disabled "Add to Bag" and "Buy Now" buttons when stock reaches zero.
+    - [x] Implemented robust quantity limits preventing users from adding more items than available in stock.
+    - [x] Designed pulsing "Out of Stock" indicators on the PDP.
+- [x] **Mobile Responsiveness Fixes (Task Id: 559)**:
+    - [x] Refactored Product Details page for a premium mobile layout.
+    - [x] Removed duplicated/squished action buttons on mobile, deferring to the sticky bottom bar correctly.
+    - [x] Disabled sticky behavior for product image gallery on mobile screens for natural scrolling.
+    - [x] Repositioned the mobile wishlist button cleanly beside the quantity selector.
+- [x] **Admin Variants & Chart Stability (Task Id: 560)**:
+    - [x] Addressed Recharts hydration and width/height issues in the Admin Dashboard.
+    - [x] Resolved 400 Bad Request errors during Product saving/variant updates.
+
