@@ -28,6 +28,11 @@ const ProductDetails = () => {
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState('description');
+    
+    // Variant state
+    const [selectedColor, setSelectedColor] = useState('');
+    const [selectedSize, setSelectedSize] = useState('');
+    const [currentVariant, setCurrentVariant] = useState(null);
 
     useEffect(() => {
         const getProduct = async () => {
@@ -107,21 +112,78 @@ const ProductDetails = () => {
         }
     }, [product, isInWishlist]);
 
+    // Handle variant selection updates
+    useEffect(() => {
+        if (product && product.variants && product.variants.length > 0) {
+            if (!selectedColor && !selectedSize) {
+                // Default to first available variant
+                setSelectedColor(product.variants[0].color || '');
+                setSelectedSize(product.variants[0].size || '');
+            }
+            
+            const variant = product.variants.find(v => 
+                (v.color === selectedColor || (!v.color && !selectedColor)) && 
+                (v.size === selectedSize || (!v.size && !selectedSize))
+            );
+            setCurrentVariant(variant || null);
+            
+            // Update image based on variant
+            if (variant && variant.image_url) {
+                setMainImage(variant.image_url);
+            } else if (product && product.image) {
+                setMainImage(product.image);
+            }
+
+            // Reset quantity if the new variant has less stock
+            if (variant && quantity > variant.stock_quantity) {
+                setQuantity(Math.max(1, variant.stock_quantity));
+            }
+        } else {
+            setCurrentVariant(null);
+        }
+    }, [selectedColor, selectedSize, product]);
+
+    const displayStock = product?.variants?.length > 0 && currentVariant 
+        ? currentVariant.stock_quantity 
+        : product?.stock_quantity;
+        
+    const displayPrice = product?.variants?.length > 0 && currentVariant && currentVariant.price
+        ? currentVariant.price 
+        : product?.price;
+
+    const isOutOfStock = product?.is_active === false || displayStock <= 0;
+
     const handleQuantityChange = (type) => {
-        if (product && product.stock_quantity <= 0) return;
+        if (isOutOfStock) return;
         if (type === 'inc') {
-            if (product && quantity < product.stock_quantity) {
+            if (quantity < displayStock) {
                 setQuantity(prev => prev + 1);
             } else {
-                alert(`Only ${product?.stock_quantity || 0} items available in stock.`);
+                alert(`Only ${displayStock || 0} items available in stock.`);
             }
         }
         if (type === 'dec' && quantity > 1) setQuantity(prev => prev - 1);
     };
 
+    const getCartItem = () => {
+        const item = { ...product, quantity };
+        if (currentVariant) {
+            item.variant = currentVariant;
+            item.price = displayPrice; // Use variant price if available
+            item.title = `${product.title} ${selectedColor ? ` - ${selectedColor}` : ''}${selectedSize ? ` - ${selectedSize}` : ''}`;
+            item.cartItemId = `${product.id}-${currentVariant.id}`;
+            if (currentVariant.image_url) {
+                item.image = currentVariant.image_url;
+            }
+        } else {
+            item.cartItemId = product.id;
+        }
+        return item;
+    };
+
     const handleBuyNow = () => {
-        if (!product || product.stock_quantity <= 0) return;
-        addToCart({ ...product, quantity }, false);
+        if (!product || isOutOfStock) return;
+        addToCart(getCartItem(), false);
         navigate('/checkout');
     };
 
@@ -214,13 +276,13 @@ const ProductDetails = () => {
                                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-2.5 py-1 bg-secondary text-white rounded-full">
                                     {product.category}
                                 </span>
-                                {product.is_active !== false && product.stock_quantity > 0 && (
+                                {!isOutOfStock && (
                                     <div className="flex items-center gap-1 text-green-600">
                                         <div className="w-1.5 h-1.5 bg-green-600 rounded-full animate-pulse"></div>
                                         <span className="text-[10px] font-bold uppercase tracking-widest">In Stock</span>
                                     </div>
                                 )}
-                                {product.stock_quantity <= 0 && (
+                                {isOutOfStock && (
                                     <div className="flex items-center gap-1 text-red-600">
                                         <div className="w-1.5 h-1.5 bg-red-600 rounded-full"></div>
                                         <span className="text-[10px] font-bold uppercase tracking-widest">Out of Stock</span>
@@ -234,7 +296,7 @@ const ProductDetails = () => {
 
                             <div className="flex items-center gap-4 mb-6">
                                 <div className="text-3xl md:text-4xl font-bold text-primary font-outfit">
-                                    ৳{Number(product.price || 0).toLocaleString()}
+                                    ৳{Number(displayPrice || 0).toLocaleString()}
                                 </div>
                                 <a href="#reviews" className="flex items-center gap-1 hover:opacity-70 transition-opacity">
                                     {[...Array(5)].map((_, i) => (
@@ -246,8 +308,61 @@ const ProductDetails = () => {
                         </div>
 
                         <div className="mb-8 text-text-muted leading-relaxed font-outfit">
-                            <p className="text-lg">Experience premium vision with our handcrafted {product.style || 'sunglasses'}. Designed for ultimate comfort and durability, these frames feature high-quality materials and 100% UV protection lenses.</p>
+                            {product.description ? (
+                                <div className="text-lg quill-content" dangerouslySetInnerHTML={{ __html: product.description }} />
+                            ) : (
+                                <p className="text-lg">Experience premium vision with our handcrafted {product.style || 'sunglasses'}. Designed for ultimate comfort and durability, these frames feature high-quality materials and 100% UV protection lenses.</p>
+                            )}
                         </div>
+
+                        {/* Variants Selection */}
+                        {product.variants && product.variants.length > 0 && (
+                            <div className="mb-8 space-y-6">
+                                {/* Colors */}
+                                {product.variants.some(v => v.color) && (
+                                    <div>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-3 block">Color</span>
+                                        <div className="flex flex-wrap gap-3">
+                                            {[...new Set(product.variants.map(v => v.color).filter(Boolean))].map(color => (
+                                                <button
+                                                    key={color}
+                                                    onClick={() => setSelectedColor(color)}
+                                                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border-2 ${
+                                                        selectedColor === color 
+                                                            ? 'border-primary bg-primary/5 text-primary' 
+                                                            : 'border-border/50 bg-white text-text-muted hover:border-border'
+                                                    }`}
+                                                >
+                                                    {color}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {/* Sizes */}
+                                {product.variants.some(v => v.size) && (
+                                    <div>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-3 block">Size</span>
+                                        <div className="flex flex-wrap gap-3">
+                                            {[...new Set(product.variants.map(v => v.size).filter(Boolean))].map(size => (
+                                                <button
+                                                    key={size}
+                                                    onClick={() => setSelectedSize(size)}
+                                                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border-2 ${
+                                                        selectedSize === size 
+                                                            ? 'border-primary bg-primary/5 text-primary' 
+                                                            : 'border-border/50 bg-white text-text-muted hover:border-border'
+                                                    }`}
+                                                >
+                                                    {size}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {/* Add to Cart Controls */}
                         <div className="space-y-6 pb-8 border-b border-border mb-8">
@@ -286,18 +401,18 @@ const ProductDetails = () => {
                                 {/* Desktop Buttons */}
                                 <div className="hidden md:flex flex-row gap-4 w-full">
                                     <button
-                                        className={`flex-1 h-14 font-bold text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg cursor-pointer ${product.is_active === false || product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed bg-gray-400 text-white' : 'bg-primary text-white hover:bg-secondary hover:scale-[1.02] hover:shadow-xl'}`}
-                                        onClick={() => addToCart({ ...product, quantity })}
-                                        disabled={product.is_active === false || product.stock_quantity <= 0}
+                                        className={`flex-1 h-14 font-bold text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg cursor-pointer ${isOutOfStock ? 'opacity-50 cursor-not-allowed bg-gray-400 text-white' : 'bg-primary text-white hover:bg-secondary hover:scale-[1.02] hover:shadow-xl'}`}
+                                        onClick={() => addToCart(getCartItem())}
+                                        disabled={isOutOfStock}
                                     >
                                         <ShoppingBag size={20} strokeWidth={2.5} />
-                                        <span>{product.is_active === false || product.stock_quantity <= 0 ? 'Out of Stock' : 'Add to Bag'}</span>
+                                        <span>{isOutOfStock ? 'Out of Stock' : 'Add to Bag'}</span>
                                     </button>
 
                                     <button
-                                        className={`flex-1 h-14 font-bold text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg cursor-pointer ${product.is_active === false || product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed bg-gray-300 text-gray-500 hidden' : 'bg-secondary text-primary hover:bg-primary hover:text-white hover:scale-[1.02] hover:shadow-xl'}`}
+                                        className={`flex-1 h-14 font-bold text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg cursor-pointer ${isOutOfStock ? 'opacity-50 cursor-not-allowed bg-gray-300 text-gray-500 hidden' : 'bg-secondary text-primary hover:bg-primary hover:text-white hover:scale-[1.02] hover:shadow-xl'}`}
                                         onClick={handleBuyNow}
-                                        disabled={product.is_active === false || product.stock_quantity <= 0}
+                                        disabled={isOutOfStock}
                                     >
                                         <span>Buy Now</span>
                                     </button>
@@ -315,14 +430,14 @@ const ProductDetails = () => {
 
                         {/* Collapsible Info Section */}
                         <div className="space-y-4 mb-10">
-                            {['description', 'specifications', 'shipping'].map((tab) => (
+                            {['shipping'].map((tab) => (
                                 <div key={tab} className="border-b border-border pb-4 last:border-0">
                                     <button
                                         className="w-full flex justify-between items-center py-2 group"
                                         onClick={() => setActiveTab(activeTab === tab ? '' : tab)}
                                     >
                                         <span className="text-xs font-bold uppercase tracking-widest group-hover:text-primary transition-colors">
-                                            {tab === 'description' ? 'Product Highlight' : tab}
+                                            {tab}
                                         </span>
                                         <div className={`transition-transform duration-300 ${activeTab === tab ? 'rotate-180' : ''}`}>
                                             <Plus size={16} className={activeTab === tab ? 'hidden' : 'block'} />
@@ -331,49 +446,6 @@ const ProductDetails = () => {
                                     </button>
                                     <div className={`overflow-hidden transition-all duration-500 ease-in-out ${activeTab === tab ? 'max-h-96 opacity-100 pt-4' : 'max-h-0 opacity-0'}`}>
                                         <div className="text-sm text-text-muted font-outfit leading-relaxed">
-                                            {tab === 'description' && (
-                                                <ul className="space-y-3">
-                                                    {product.highlights ? (
-                                                        product.highlights.split('\n').filter(line => line.trim()).map((line, idx) => (
-                                                            <li key={idx} className="flex gap-3">
-                                                                <div className="w-1.5 h-1.5 bg-secondary rounded-full mt-1.5"></div>
-                                                                {line.trim()}
-                                                            </li>
-                                                        ))
-                                                    ) : (
-                                                        <>
-                                                            <li className="flex gap-3">
-                                                                <div className="w-1.5 h-1.5 bg-secondary rounded-full mt-1.5"></div>
-                                                                Handcrafted {product.style || 'sunglasses'} frame for a timeless look.
-                                                            </li>
-                                                            <li className="flex gap-3">
-                                                                <div className="w-1.5 h-1.5 bg-secondary rounded-full mt-1.5"></div>
-                                                                Premium scratch-resistant polarized lenses.
-                                                            </li>
-                                                        </>
-                                                    )}
-                                                </ul>
-                                            )}
-                                            {tab === 'specifications' && (
-                                                <div className="grid grid-cols-2 gap-y-4">
-                                                    <div>
-                                                        <span className="text-[10px] block font-bold text-text-muted uppercase">Frame</span>
-                                                        {product.spec_frame || 'Acetate'}
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-[10px] block font-bold text-text-muted uppercase">Lens</span>
-                                                        {product.spec_lens || 'Polarized UV400'}
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-[10px] block font-bold text-text-muted uppercase">Hardware</span>
-                                                        {product.spec_hardware || 'Italian Hinges'}
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-[10px] block font-bold text-text-muted uppercase">Weight</span>
-                                                        {product.spec_weight || '32g'}
-                                                    </div>
-                                                </div>
-                                            )}
                                             {tab === 'shipping' && (
                                                 <p>{product.shipping_info || 'Complimentary shipping on all orders over ৳5000. 7-day hassle-free return policy. Ships in premium branded hard case.'}</p>
                                             )}
@@ -383,20 +455,7 @@ const ProductDetails = () => {
                             ))}
                         </div>
 
-                        <div className="grid grid-cols-3 gap-4 p-6 bg-background-alt rounded-2xl border border-border/50">
-                            <div className="flex flex-col items-center text-center gap-2">
-                                <Truck size={20} className="text-primary" />
-                                <span className="text-[8px] font-bold uppercase tracking-widest">Nationwide Delivery</span>
-                            </div>
-                            <div className="flex flex-col items-center text-center gap-2 border-x border-border/30 px-2">
-                                <ShieldCheck size={20} className="text-primary" />
-                                <span className="text-[8px] font-bold uppercase tracking-widest">UV400 Protected</span>
-                            </div>
-                            <div className="flex flex-col items-center text-center gap-2">
-                                <Package size={20} className="text-primary" />
-                                <span className="text-[8px] font-bold uppercase tracking-widest">Premium Hard Case</span>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             </main>
@@ -406,17 +465,17 @@ const ProductDetails = () => {
             {/* Mobile Sticky Bottom Bar */}
             <div className="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-lg border-t border-border p-4 z-40 md:hidden flex gap-3 animate-in slide-in-from-bottom duration-500">
                 <button
-                    className={`flex-1 h-14 font-bold text-[11px] uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 shadow-lg ${product.is_active === false || product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed bg-gray-400 text-white' : 'bg-primary text-white active:scale-95 transition-transform'}`}
-                    onClick={() => addToCart({ ...product, quantity })}
-                    disabled={product.is_active === false || product.stock_quantity <= 0}
+                    className={`flex-1 h-14 font-bold text-[11px] uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 shadow-lg ${isOutOfStock ? 'opacity-50 cursor-not-allowed bg-gray-400 text-white' : 'bg-primary text-white active:scale-95 transition-transform'}`}
+                    onClick={() => addToCart(getCartItem())}
+                    disabled={isOutOfStock}
                 >
                     <ShoppingBag size={18} />
-                    <span>{product.is_active === false || product.stock_quantity <= 0 ? 'Out of Stock' : 'Add to Bag'}</span>
+                    <span>{isOutOfStock ? 'Out of Stock' : 'Add to Bag'}</span>
                 </button>
                 <button
-                    className={`flex-1 h-14 font-bold text-[11px] uppercase tracking-widest rounded-xl shadow-lg ${product.is_active === false || product.stock_quantity <= 0 ? 'opacity-50 cursor-not-allowed bg-gray-300 text-gray-500 hidden' : 'bg-secondary text-primary active:scale-95 transition-transform'}`}
+                    className={`flex-1 h-14 font-bold text-[11px] uppercase tracking-widest rounded-xl shadow-lg ${isOutOfStock ? 'opacity-50 cursor-not-allowed bg-gray-300 text-gray-500 hidden' : 'bg-secondary text-primary active:scale-95 transition-transform'}`}
                     onClick={handleBuyNow}
-                    disabled={product.is_active === false || product.stock_quantity <= 0}
+                    disabled={isOutOfStock}
                 >
                     <span>Buy Now</span>
                 </button>

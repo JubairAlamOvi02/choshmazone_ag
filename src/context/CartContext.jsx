@@ -67,18 +67,20 @@ export const CartProvider = ({ children }) => {
 
     const addToCart = useCallback((product, shouldOpenCart = true) => {
         const quantityToAdd = product.quantity || 1;
+        const cartId = product.cartItemId || product.id; // use cartItemId if available
 
         setCartItems(prevItems => {
-            const existingItem = prevItems.find(item => item.id === product.id);
+            const existingItemIndex = prevItems.findIndex(item => (item.cartItemId || item.id) === cartId);
 
-            if (existingItem) {
-                return prevItems.map(item =>
-                    item.id === product.id
-                        ? { ...item, quantity: item.quantity + quantityToAdd }
-                        : item
-                );
+            if (existingItemIndex >= 0) {
+                const newItems = [...prevItems];
+                newItems[existingItemIndex] = {
+                    ...newItems[existingItemIndex],
+                    quantity: newItems[existingItemIndex].quantity + quantityToAdd
+                };
+                return newItems;
             }
-            return [...prevItems, { ...product, quantity: quantityToAdd }];
+            return [...prevItems, { ...product, cartItemId: cartId, quantity: quantityToAdd }];
         });
 
         // Show toast
@@ -104,17 +106,17 @@ export const CartProvider = ({ children }) => {
 
     const removeFromCart = useCallback((id) => {
         setCartItems(prevItems => {
-            const itemToRemove = prevItems.find(item => item.id === id);
+            const itemToRemove = prevItems.find(item => (item.cartItemId || item.id) === id);
             if (itemToRemove) {
                 showToast(`${itemToRemove.name || itemToRemove.title} removed from bag.`, 'info');
             }
-            return prevItems.filter(item => item.id !== id);
+            return prevItems.filter(item => (item.cartItemId || item.id) !== id);
         });
     }, [showToast]);
 
     const updateQuantity = useCallback((id, amount) => {
         setCartItems(prevItems => prevItems.map(item => {
-            if (item.id === id) {
+            if ((item.cartItemId || item.id) === id) {
                 const newQuantity = item.quantity + amount;
                 return newQuantity > 0 ? { ...item, quantity: newQuantity } : item;
             }

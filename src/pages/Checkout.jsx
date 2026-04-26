@@ -90,7 +90,7 @@ const Checkout = () => {
             if (itemIds.length > 0) {
                 const { data: latestProducts, error: productsError } = await supabase
                     .from('products')
-                    .select('id, name, stock_quantity')
+                    .select('id, name, stock_quantity, variants')
                     .in('id', itemIds);
 
                 if (productsError) throw productsError;
@@ -98,7 +98,13 @@ const Checkout = () => {
                 const outOfStock = cartItems.filter(item => {
                     const dbProduct = latestProducts.find(p => p.id === item.id);
                     if (!dbProduct) return true;
-                    if (dbProduct.stock_quantity <= 0) return true;
+                    
+                    if (item.variant) {
+                        const dbVariant = dbProduct.variants?.find(v => v.id === item.variant.id);
+                        if (!dbVariant || dbVariant.stock_quantity <= 0) return true;
+                    } else {
+                        if (dbProduct.stock_quantity <= 0) return true;
+                    }
                     return false;
                 });
 
@@ -227,7 +233,7 @@ const Checkout = () => {
                         </p>
                         <div className="space-y-3 mb-6 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin">
                             {outOfStockItems.map(item => (
-                                <div key={item.id} className="flex items-center justify-between gap-3 p-3 bg-red-50/50 rounded-xl border border-red-100">
+                                <div key={item.cartItemId || item.id} className="flex items-center justify-between gap-3 p-3 bg-red-50/50 rounded-xl border border-red-100">
                                     <div className="flex items-center gap-3">
                                         <div className="w-12 h-12 bg-white rounded-lg p-1 shrink-0">
                                             <img src={item.image} alt={item.title} className="w-full h-full object-contain mix-blend-multiply" />
@@ -241,8 +247,8 @@ const Checkout = () => {
                                         className="text-xs font-bold text-red-500 hover:text-white bg-white hover:bg-red-500 px-3 py-1.5 rounded-lg border border-red-200 hover:border-red-500 transition-all shadow-sm"
                                         type="button"
                                         onClick={() => {
-                                            removeFromCart(item.id);
-                                            setOutOfStockItems(prev => prev.filter(i => i.id !== item.id));
+                                            removeFromCart(item.cartItemId || item.id);
+                                            setOutOfStockItems(prev => prev.filter(i => (i.cartItemId || i.id) !== (item.cartItemId || item.id)));
                                             if (outOfStockItems.length === 1) setShowStockModal(false);
                                         }}
                                     >
@@ -460,7 +466,7 @@ const Checkout = () => {
                             </h3>
                             <div className="space-y-4 mb-6 pb-6 border-b border-border max-h-[400px] overflow-y-auto pr-2 scrollbar-thin">
                                 {cartItems.map(item => (
-                                    <div key={item.id} className="flex gap-4 items-center">
+                                    <div key={item.cartItemId || item.id} className="flex gap-4 items-center">
                                         <div className="w-16 h-16 bg-white rounded-lg border border-border flex items-center justify-center shrink-0 relative p-1">
                                             <img src={item.image} alt={item.title} className="w-full h-full object-contain mix-blend-multiply" />
                                         </div>
@@ -470,7 +476,7 @@ const Checkout = () => {
                                             <div className="flex items-center gap-2 border border-border rounded-lg px-2 py-1 w-fit bg-white">
                                                 <button
                                                     type="button"
-                                                    onClick={() => updateQuantity(item.id, -1)}
+                                                    onClick={() => updateQuantity(item.cartItemId || item.id, -1)}
                                                     className="text-text-muted hover:text-primary transition-colors disabled:opacity-50"
                                                     disabled={item.quantity <= 1}
                                                 >
@@ -479,7 +485,7 @@ const Checkout = () => {
                                                 <span className="text-sm font-bold w-6 text-center font-outfit">{item.quantity}</span>
                                                 <button
                                                     type="button"
-                                                    onClick={() => updateQuantity(item.id, 1)}
+                                                    onClick={() => updateQuantity(item.cartItemId || item.id, 1)}
                                                     className="text-text-muted hover:text-primary transition-colors"
                                                 >
                                                     <Plus size={14} />

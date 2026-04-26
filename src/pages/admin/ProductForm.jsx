@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { productParams } from '../../lib/api/products';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import { ChevronLeft, Upload, X, Plus, Package, DollarSign, Layers, Tag, Eye } from 'lucide-react';
 
 const ProductForm = () => {
@@ -17,17 +19,12 @@ const ProductForm = () => {
         stock_quantity: 0,
         image_url: '',
         images: [],
-        highlights: '',
-        spec_frame: '',
-        spec_lens: '',
-        spec_hardware: '',
-        spec_weight: '',
-        shipping_info: ''
+        shipping_info: '',
+        variants: []
     });
-    const [imageFile, setImageFile] = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
-    const [additionalFiles, setAdditionalFiles] = useState([]);
-    const [additionalPreviews, setAdditionalPreviews] = useState([]);
+    const [mediaItems, setMediaItems] = useState([]);
+    const [draggedIdx, setDraggedIdx] = useState(null);
+    const [variantFiles, setVariantFiles] = useState({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -43,8 +40,22 @@ const ProductForm = () => {
             const data = await productParams.fetchById(productId);
             setFormData({
                 ...data,
-                images: data.images || []
+                images: data.images || [],
+                variants: data.variants || []
             });
+            
+            const loadedMedia = [];
+            if (data.image_url) {
+                loadedMedia.push({ type: 'url', data: data.image_url, id: Math.random().toString() });
+            }
+            if (data.images) {
+                data.images.forEach(url => {
+                    if (url !== data.image_url) {
+                        loadedMedia.push({ type: 'url', data: url, id: Math.random().toString() });
+                    }
+                });
+            }
+            setMediaItems(loadedMedia);
         } catch (err) {
             setError('Failed to load product details');
         } finally {
@@ -60,52 +71,84 @@ const ProductForm = () => {
         }));
     };
 
-    const handleImageChange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setImageFile(file);
-
-            // Create preview
-            if (imagePreview) URL.revokeObjectURL(imagePreview);
-            setImagePreview(URL.createObjectURL(file));
-        }
+    const handleMediaAdd = (e) => {
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
+        
+        const newItems = files.map(file => ({
+            type: 'file',
+            data: file,
+            preview: URL.createObjectURL(file),
+            id: Math.random().toString()
+        }));
+        setMediaItems(prev => [...prev, ...newItems]);
     };
 
-    const handleAdditionalImagesChange = (e) => {
-        if (e.target.files) {
-            const filesArray = Array.from(e.target.files);
-            setAdditionalFiles(prev => [...prev, ...filesArray]);
-
-            // Create previews
-            const newPreviews = filesArray.map(file => URL.createObjectURL(file));
-            setAdditionalPreviews(prev => [...prev, ...newPreviews]);
-        }
+    const handleDragStart = (e, index) => {
+        setDraggedIdx(index);
+        e.dataTransfer.effectAllowed = 'move';
     };
 
-    const removeAdditionalFile = (index) => {
-        setAdditionalFiles(prev => {
-            const newFiles = prev.filter((_, i) => i !== index);
-            return newFiles;
-        });
-        setAdditionalPreviews(prev => {
-            URL.revokeObjectURL(prev[index]);
-            return prev.filter((_, i) => i !== index);
-        });
+    const handleDragOver = (e, index) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    };
+
+    const handleDrop = (e, dropIndex) => {
+        e.preventDefault();
+        if (draggedIdx === null || draggedIdx === dropIndex) return;
+        
+        const items = [...mediaItems];
+        const draggedItem = items[draggedIdx];
+        items.splice(draggedIdx, 1);
+        items.splice(dropIndex, 0, draggedItem);
+        setMediaItems(items);
+        setDraggedIdx(null);
+    };
+
+    const removeMediaItem = (index) => {
+        setMediaItems(prev => prev.filter((_, i) => i !== index));
     };
 
     // Cleanup object URLs to prevent memory leaks
     useEffect(() => {
         return () => {
-            if (imagePreview) URL.revokeObjectURL(imagePreview);
-            additionalPreviews.forEach(url => URL.revokeObjectURL(url));
+            mediaItems.forEach(item => {
+                if (item.type === 'file' && item.preview) URL.revokeObjectURL(item.preview);
+            });
         };
-    }, [imagePreview, additionalPreviews]);
+    }, [mediaItems]);
 
-    const removeExistingImage = (url) => {
+    const addVariant = () => {
         setFormData(prev => ({
             ...prev,
-            images: prev.images.filter(img => img !== url)
+            variants: [...prev.variants, { id: Date.now().toString(), color: '', size: '', stock_quantity: 0, price: '', image_url: '' }]
         }));
+    };
+
+    const removeVariant = (index) => {
+        setFormData(prev => ({
+            ...prev,
+            variants: prev.variants.filter((_, i) => i !== index)
+        }));
+    };
+
+    const handleVariantChange = (index, field, value) => {
+        setFormData(prev => {
+            const newVariants = [...prev.variants];
+            newVariants[index] = { ...newVariants[index], [field]: value };
+            return { ...prev, variants: newVariants };
+        });
+    };
+
+    const handleVariantImageUpload = (index, variantId, e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        setVariantFiles(prev => ({ ...prev, [variantId]: file }));
+        
+        const previewUrl = URL.createObjectURL(file);
+        handleVariantChange(index, 'image_url', previewUrl);
     };
 
     const handleSubmit = async (e) => {
@@ -114,21 +157,32 @@ const ProductForm = () => {
         setError(null);
 
         try {
-            let imageUrl = formData.image_url;
-            let allImages = [...formData.images];
+            let allImages = [];
+            let imageUrl = '';
 
-            if (imageFile) {
-                imageUrl = await productParams.uploadImage(imageFile);
+            for (let i = 0; i < mediaItems.length; i++) {
+                const item = mediaItems[i];
+                let finalUrl = '';
+                if (item.type === 'file') {
+                    finalUrl = await productParams.uploadImage(item.data);
+                } else {
+                    finalUrl = item.data;
+                }
+                allImages.push(finalUrl);
+                if (i === 0) {
+                    imageUrl = finalUrl;
+                }
             }
 
-            if (additionalFiles.length > 0) {
-                const newImageUrls = await productParams.uploadImages(additionalFiles);
-                allImages = [...allImages, ...newImageUrls];
-            }
-
-            if (imageUrl && !allImages.includes(imageUrl)) {
-                allImages = [imageUrl, ...allImages];
-            }
+            // Upload variant images
+            const finalVariants = await Promise.all(formData.variants.map(async (variant) => {
+                const file = variantFiles[variant.id];
+                let varImageUrl = variant.image_url;
+                if (file) {
+                    varImageUrl = await productParams.uploadImage(file);
+                }
+                return { ...variant, image_url: varImageUrl };
+            }));
 
             const payload = {
                 name: formData.name,
@@ -139,12 +193,8 @@ const ProductForm = () => {
                 style: formData.style,
                 image_url: imageUrl,
                 images: allImages,
-                highlights: formData.highlights,
-                spec_frame: formData.spec_frame,
-                spec_lens: formData.spec_lens,
-                spec_hardware: formData.spec_hardware,
-                spec_weight: formData.spec_weight,
-                shipping_info: formData.shipping_info
+                shipping_info: formData.shipping_info,
+                variants: finalVariants
             };
 
             if (isEditMode) {
@@ -199,39 +249,75 @@ const ProductForm = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left: Product Info */}
                     <div className="lg:col-span-2 space-y-8">
-                        <section className="bg-white p-8 rounded-3xl border border-border/50 shadow-sm space-y-6">
-                            <h3 className="text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit border-b border-border/50 pb-4 mb-6">General Information</h3>
-
+                        <section className="bg-white p-6 rounded-xl border border-border shadow-sm space-y-6">
                             <div className="space-y-2">
-                                <label className="flex items-center gap-2 text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
-                                    <Tag size={12} />
-                                    Display Name
-                                </label>
+                                <label className="text-sm font-medium text-text-main">Title</label>
                                 <input
                                     type="text"
                                     name="name"
                                     value={formData.name}
                                     onChange={handleChange}
                                     required
-                                    placeholder="e.g. Classic Wayfarer Onyx"
-                                    className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit font-bold"
+                                    className="w-full bg-white border border-border text-text-main px-3 py-2 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <label className="flex items-center gap-2 text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
-                                    Description
-                                </label>
-                                <textarea
-                                    name="description"
-                                    value={formData.description}
-                                    onChange={handleChange}
-                                    rows={5}
-                                    placeholder="Tell the story behind this product..."
-                                    className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
-                                />
+                                <label className="text-sm font-medium text-text-main">Description</label>
+                                <div className="bg-white rounded-lg overflow-hidden border border-border focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all react-quill-wrapper">
+                                    <ReactQuill 
+                                        theme="snow"
+                                        value={formData.description}
+                                        onChange={(content) => setFormData(prev => ({ ...prev, description: content }))}
+                                        placeholder="Tell the story behind this product..."
+                                        className="min-h-[200px]"
+                                    />
+                                </div>
                             </div>
+                        </section>
+                        
+                        {/* Media Section */}
+                        <section className="bg-white p-6 rounded-xl border border-border shadow-sm space-y-4">
+                            <h3 className="text-sm font-medium text-text-main">Media</h3>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                {mediaItems.map((item, index) => (
+                                    <div 
+                                        key={item.id} 
+                                        draggable 
+                                        onDragStart={(e) => handleDragStart(e, index)}
+                                        onDragOver={(e) => handleDragOver(e, index)}
+                                        onDrop={(e) => handleDrop(e, index)}
+                                        className={`relative rounded-xl overflow-hidden border border-border group cursor-grab active:cursor-grabbing bg-gray-50 flex items-center justify-center
+                                            ${index === 0 ? 'col-span-2 row-span-2 aspect-[4/5]' : 'col-span-1 row-span-1 aspect-square'}
+                                            ${draggedIdx === index ? 'opacity-50' : 'opacity-100'}
+                                        `}
+                                    >
+                                        <img 
+                                            src={item.type === 'file' ? item.preview : item.data} 
+                                            alt={`Media ${index}`} 
+                                            className="w-full h-full object-contain pointer-events-none" 
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeMediaItem(index)}
+                                            className="absolute top-2 right-2 p-1.5 bg-white/90 text-red-500 rounded-md shadow hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </div>
+                                ))}
+                                
+                                <label className={`rounded-xl border-2 border-dashed border-border flex items-center justify-center text-text-muted cursor-pointer hover:bg-gray-50 transition-colors ${mediaItems.length === 0 ? 'col-span-2 row-span-2 aspect-[4/5]' : 'col-span-1 row-span-1 aspect-square'}`}>
+                                    <div className="flex flex-col items-center gap-2">
+                                        <Plus size={24} />
+                                        {mediaItems.length === 0 && <span className="text-sm font-medium">Add images</span>}
+                                    </div>
+                                    <input type="file" onChange={handleMediaAdd} accept="image/*" multiple className="hidden" />
+                                </label>
+                            </div>
+                        </section>
 
+                        <section className="bg-white p-8 rounded-3xl border border-border/50 shadow-sm space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="flex items-center gap-2 text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
@@ -311,22 +397,119 @@ const ProductForm = () => {
                             </div>
                         </section>
 
-                        <section className="bg-white p-8 rounded-3xl border border-border/50 shadow-sm space-y-6">
-                            <h3 className="text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit border-b border-border/50 pb-4 mb-6">Product Highlights & Shipping</h3>
-
-                            <div className="space-y-2">
-                                <label className="flex items-center gap-2 text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
-                                    Product Highlights (One per line)
-                                </label>
-                                <textarea
-                                    name="highlights"
-                                    value={formData.highlights || ''}
-                                    onChange={handleChange}
-                                    rows={4}
-                                    placeholder="• Handcrafted frame&#10;• UV400 Protection..."
-                                    className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
-                                />
+                        <section className="bg-white rounded-xl border border-border/50 shadow-sm overflow-hidden space-y-0">
+                            <div className="p-6 border-b border-border/50 flex justify-between items-center bg-white">
+                                <h3 className="text-lg font-semibold text-text-main">Variants</h3>
+                                <button
+                                    type="button"
+                                    onClick={addVariant}
+                                    className="flex items-center gap-1 text-sm font-medium text-text-main border border-border/50 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
+                                    <Plus size={16} /> Add variant
+                                </button>
                             </div>
+
+                            {formData.variants && formData.variants.length > 0 ? (
+                                <div>
+                                    {/* Table Header */}
+                                    <div className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-4 items-center px-6 py-3 border-b border-border/50 bg-gray-50/50 text-sm font-medium text-text-muted">
+                                        <div className="w-5"></div>
+                                        <div>Variant</div>
+                                        <div>Price</div>
+                                        <div>Available</div>
+                                        <div></div>
+                                    </div>
+                                    
+                                    {/* Table Body */}
+                                    <div className="divide-y divide-border/50">
+                                        {formData.variants.map((variant, index) => (
+                                            <div key={variant.id || index} className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-4 items-center px-6 py-4 bg-white hover:bg-gray-50/50 transition-colors">
+                                                
+                                                <div className="w-5 flex items-center">
+                                                    <input type="checkbox" className="rounded border-gray-300 text-primary focus:ring-primary w-4 h-4 cursor-pointer" />
+                                                </div>
+                                                
+                                                <div className="flex items-center gap-4">
+                                                    <div className="relative w-12 h-12 rounded-md border border-border/50 bg-white overflow-hidden group flex items-center justify-center cursor-pointer shrink-0">
+                                                        {variant.image_url ? (
+                                                            <img src={variant.image_url} alt="Variant" className="w-full h-full object-cover group-hover:opacity-50 transition-opacity" />
+                                                        ) : (
+                                                            <Upload size={16} className="text-text-muted" />
+                                                        )}
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => handleVariantImageUpload(index, variant.id, e)}
+                                                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col gap-2 w-full max-w-[150px]">
+                                                        <input
+                                                            type="text"
+                                                            value={variant.color}
+                                                            onChange={(e) => handleVariantChange(index, 'color', e.target.value)}
+                                                            placeholder="Color"
+                                                            className="w-full bg-white border border-border/50 text-text-main px-3 py-1.5 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm"
+                                                        />
+                                                        <input
+                                                            type="text"
+                                                            value={variant.size}
+                                                            onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
+                                                            placeholder="Size"
+                                                            className="w-full bg-white border border-border/50 text-text-main px-3 py-1.5 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <div className="relative">
+                                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm">৳</span>
+                                                        <input
+                                                            type="number"
+                                                            value={variant.price}
+                                                            onChange={(e) => handleVariantChange(index, 'price', e.target.value)}
+                                                            placeholder="1050.00"
+                                                            className="w-full bg-white border border-border/50 text-text-main pl-7 pr-3 py-2 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <input
+                                                        type="number"
+                                                        value={variant.stock_quantity}
+                                                        onChange={(e) => handleVariantChange(index, 'stock_quantity', parseInt(e.target.value) || 0)}
+                                                        className="w-full bg-white border border-border/50 text-text-main px-3 py-2 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeVariant(index)}
+                                                        className="text-text-muted hover:text-red-500 transition-colors p-2 rounded-md hover:bg-red-50"
+                                                    >
+                                                        <X size={16} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="p-4 border-t border-border/50 bg-gray-50/50 text-center text-sm text-text-main">
+                                        Total inventory at Shop location: {formData.variants.reduce((acc, v) => acc + (parseInt(v.stock_quantity) || 0), 0)} available
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="p-8 text-center text-text-muted">
+                                    <p className="text-sm mb-2">This product has no variants.</p>
+                                    <p className="text-xs opacity-70">Add variants to manage pricing and inventory for different colors or sizes.</p>
+                                </div>
+                            )}
+                        </section>
+
+                        <section className="bg-white p-8 rounded-3xl border border-border/50 shadow-sm space-y-6">
+                            <h3 className="text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit border-b border-border/50 pb-4 mb-6">Shipping Information</h3>
 
                             <div className="space-y-2">
                                 <label className="flex items-center gap-2 text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
@@ -342,138 +525,18 @@ const ProductForm = () => {
                                 />
                             </div>
                         </section>
-
-                        <section className="bg-white p-8 rounded-3xl border border-border/50 shadow-sm space-y-6">
-                            <h3 className="text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit border-b border-border/50 pb-4 mb-6">Technical Specifications</h3>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">Frame Material</label>
-                                    <input
-                                        type="text"
-                                        name="spec_frame"
-                                        value={formData.spec_frame || ''}
-                                        onChange={handleChange}
-                                        placeholder="e.g. Acetate / Metal"
-                                        className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">Lens Type</label>
-                                    <input
-                                        type="text"
-                                        name="spec_lens"
-                                        value={formData.spec_lens || ''}
-                                        onChange={handleChange}
-                                        placeholder="e.g. Polarized UV400"
-                                        className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">Hardware</label>
-                                    <input
-                                        type="text"
-                                        name="spec_hardware"
-                                        value={formData.spec_hardware || ''}
-                                        onChange={handleChange}
-                                        placeholder="e.g. Italian Hinges"
-                                        className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">Weight</label>
-                                    <input
-                                        type="text"
-                                        name="spec_weight"
-                                        value={formData.spec_weight || ''}
-                                        onChange={handleChange}
-                                        placeholder="e.g. 32g"
-                                        className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
-                                    />
-                                </div>
-                            </div>
-                        </section>
                     </div>
 
                     {/* Right: Media */}
                     <div className="space-y-8">
                         <section className="bg-white p-6 rounded-3xl border border-border/50 shadow-sm space-y-6 sticky top-8">
-                            <h3 className="text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit border-b border-border/50 pb-4 mb-6">Product Media</h3>
-
-                            <div className="space-y-4">
-                                <label className="block text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">Main Cover</label>
-                                {(imagePreview || formData.image_url) ? (
-                                    <div className="relative group rounded-3xl overflow-hidden aspect-square bg-gray-50 border border-border/50">
-                                        <img
-                                            src={imagePreview || formData.image_url}
-                                            alt="Preview"
-                                            className="w-full h-full object-contain mb-multiply transition-opacity duration-300"
-                                        />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                                            <Upload className="text-white" size={32} />
-                                        </div>
-                                        {imagePreview && (
-                                            <div className="absolute top-2 right-2 bg-secondary text-primary text-[8px] font-bold px-2 py-1 rounded-full uppercase tracking-widest animate-in zoom-in">
-                                                New Selection
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="aspect-square bg-gray-50 border-2 border-dashed border-border rounded-3xl flex flex-col items-center justify-center text-text-muted">
-                                        <Upload size={32} className="mb-2 opacity-20" />
-                                        <span className="text-[10px] font-bold uppercase tracking-widest">Upload Cover</span>
-                                    </div>
-                                )}
-                                <input type="file" onChange={handleImageChange} accept="image/*" className="hidden" id="main-upload" />
-                                <label htmlFor="main-upload" className="block w-full text-center py-3 border border-border rounded-xl text-xs font-bold uppercase tracking-widest font-outfit cursor-pointer hover:bg-gray-50 transition-colors">
-                                    Change Image
-                                </label>
-                            </div>
-
-                            <div className="space-y-4 pt-6 border-t border-border/50">
-                                <label className="block text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">Gallery</label>
-                                <div className="grid grid-cols-3 gap-3">
-                                    {formData.images.filter(url => url !== formData.image_url).map((url, idx) => (
-                                        <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-border/50 bg-gray-50">
-                                            <img src={url} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
-                                            <button
-                                                type="button"
-                                                onClick={() => removeExistingImage(url)}
-                                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                                            >
-                                                <X size={10} />
-                                            </button>
-                                        </div>
-                                    ))}
-                                    {additionalPreviews.map((url, idx) => (
-                                        <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-primary/50 bg-primary/5 group animate-in zoom-in duration-300">
-                                            <img src={url} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
-                                            <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-                                            <button
-                                                type="button"
-                                                onClick={() => removeAdditionalFile(idx)}
-                                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full shadow-sm hover:bg-red-600 transition-colors"
-                                            >
-                                                <X size={10} />
-                                            </button>
-                                            <div className="absolute bottom-0 left-0 w-full bg-primary/80 text-white text-[6px] font-bold py-0.5 text-center uppercase tracking-tighter">
-                                                New
-                                            </div>
-                                        </div>
-                                    ))}
-                                    <label className="aspect-square rounded-xl border-2 border-dashed border-border flex items-center justify-center text-text-muted cursor-pointer hover:bg-gray-50 transition-colors">
-                                        <Plus size={20} className="opacity-30" />
-                                        <input type="file" onChange={handleAdditionalImagesChange} accept="image/*" multiple className="hidden" />
-                                    </label>
-                                </div>
-                            </div>
-
+                            <h3 className="text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit border-b border-border/50 pb-4 mb-6">Action</h3>
                             <button
                                 type="submit"
                                 disabled={loading}
                                 className="w-full py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary/95 transition-all shadow-xl shadow-primary/20 font-outfit uppercase tracking-[0.2em] mt-8 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {loading ? 'Saving Changes...' : 'Publish Product'}
+                                {loading ? 'Saving Changes...' : 'Save Product'}
                             </button>
                         </section>
                     </div>

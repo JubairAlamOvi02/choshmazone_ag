@@ -16,7 +16,7 @@ const CartItem = React.memo(({ item }) => {
                     <h4 className="text-sm md:text-base font-medium text-text-main font-outfit">{item.title}</h4>
                     <button
                         className="text-text-muted hover:text-error transition-colors p-1 -mr-1"
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => removeFromCart(item.cartItemId || item.id)}
                         aria-label="Remove item"
                     >
                         <X size={16} />
@@ -31,7 +31,7 @@ const CartItem = React.memo(({ item }) => {
                     <div className="flex items-center gap-1 border border-border rounded p-0.5">
                         <button
                             className="w-6 h-6 flex items-center justify-center hover:bg-background-alt rounded transition-colors text-text-main"
-                            onClick={() => updateQuantity(item.id, -1)}
+                            onClick={() => updateQuantity(item.cartItemId || item.id, -1)}
                             aria-label="Decrease quantity"
                         >
                             <Minus size={12} />
@@ -39,7 +39,7 @@ const CartItem = React.memo(({ item }) => {
                         <span className="w-6 text-center text-xs font-bold">{item.quantity}</span>
                         <button
                             className="w-6 h-6 flex items-center justify-center hover:bg-background-alt rounded transition-colors text-text-main"
-                            onClick={() => updateQuantity(item.id, 1)}
+                            onClick={() => updateQuantity(item.cartItemId || item.id, 1)}
                             aria-label="Increase quantity"
                         >
                             <Plus size={12} />

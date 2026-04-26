@@ -127,3 +127,55 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   @apply bg-text-muted;
 }
+
+/* Quill Editor Overrides */
+.ql-toolbar.ql-snow {
+  border: none !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  background-color: #f9fafb !important;
+  padding: 8px 12px !important;
+  font-family: inherit !important;
+}
+
+.ql-container.ql-snow {
+  border: none !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+}
+
+.ql-editor {
+  min-height: 200px;
+}
+
+/* Frontend display for quill content */
+.quill-content p {
+  margin-bottom: 1em;
+}
+.quill-content strong {
+  font-weight: 700;
+}
+.quill-content em {
+  font-style: italic;
+}
+.quill-content u {
+  text-decoration: underline;
+}
+.quill-content h1, .quill-content h2, .quill-content h3 {
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+.quill-content ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin-bottom: 1em;
+}
+.quill-content ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin-bottom: 1em;
+}
+.quill-content a {
+  color: var(--color-secondary);
+  text-decoration: underline;
+}
