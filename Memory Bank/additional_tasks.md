@@ -240,3 +240,13 @@
     - [x] Addressed Recharts hydration and width/height issues in the Admin Dashboard.
     - [x] Resolved 400 Bad Request errors during Product saving/variant updates.
 
+## Phase 28: Variant Analytics & Order Intelligence
+- [x] **Order Variant Tracking (Task Id: 561)**:
+    - [x] Documented the `style` column added to the `order_items` schema.
+    - [x] Synced the checkout cart variant into the order's DB record payload for accuracy.
+    - [x] Implemented dynamic UI mapping to extract and display the specific variant image (Color/Size) on both Admin and Customer Order Details views.
+- [x] **Meta Pixel Data Fix (Task Id: 562)**:
+    - [x] Fixed `Purchase` event tracking errors related to `currency` and `value` type mismatches.
+    - [x] Cast purchase totals correctly as floats and normalized `content_ids`.
+- [x] **Recharts Dashboard Optimization (Task Id: 563)**:
+    - [x] Solved flex container height calculation warning `width(-1) and height(-1)` in Admin Dashboard by providing an explicit pixel height bound.

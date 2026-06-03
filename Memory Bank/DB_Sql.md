@@ -7,6 +7,7 @@ CREATE TABLE public.order_items (
   product_id uuid,
   quantity integer NOT NULL,
   unit_price numeric NOT NULL,
+  style text,
   created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
   CONSTRAINT order_items_pkey PRIMARY KEY (id),
   CONSTRAINT order_items_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.orders(id),

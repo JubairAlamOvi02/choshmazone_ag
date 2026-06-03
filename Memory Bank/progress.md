@@ -245,3 +245,11 @@
   - **UX Cleanup**: Removed redundant "Product Highlight" section from both the frontend and admin panel to simplify the interface as requested.
   - **Performance**: Fixed Vite HMR issues by clearing the internal dependency cache after swapping critical packages.
 
+- Task 64 (Order Variant Tracking & Dynamic UI): Completed
+  - **Schema Update**: Documented `style` column to `order_items` table.
+  - **Data Sync**: Modified `orderParams.create` to store selected variant (Color, Size) as `style` during checkout.
+  - **Dynamic Variant Imaging**: Updated Admin and Customer Order Details modals to dynamically pull the specific variant's image based on the chosen `style`, displaying it instead of the default product image.
+- Task 65 (Meta Pixel Analytics Fix): Completed
+  - **Currency Parameter Resolution**: Fixed the `Parameter 'currency' is invalid for event 'Purchase'` error in Facebook Pixel by correctly casting the purchase value to a 2-decimal float (`Number(total.toFixed(2))`) and properly formatting `content_ids` as an array of strings.
+- Task 66 (Admin Dashboard Chart Stability): Completed
+  - **Recharts Warning Fix**: Resolved `The width(-1) and height(-1) of chart should be greater than 0` DOM layout warnings by switching `ResponsiveContainer` height from a percentage (`100%`) to a fixed pixel integer (`400`) within the constrained flex container.
