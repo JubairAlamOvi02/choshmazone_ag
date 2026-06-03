@@ -69,3 +69,8 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **Minification**: Integrated Terser for aggressive code reduction.
     - **LCP Tuning**: Optimized critical path images with `fetchpriority="high"` and eager loading.
     - **Lazy Rendering**: Asynchronous decoding and lazy loading for off-screen product assets.
+- **Rich Text Management**:
+    - **React Quill New**: Integrated `react-quill-new` for full HTML product descriptions, ensuring compatibility with React 19's `findDOMNode` deprecation.
+- **Advanced Inventory Management**:
+    - **Unified Media Gallery**: Drag-and-drop image reordering system in Admin with automatic primary image selection.
+    - **Shopify-Style Variant Table**: Combined option display (Color / Size) for a professional inventory management experience.

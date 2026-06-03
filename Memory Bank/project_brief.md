@@ -29,7 +29,9 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 - **Admin Panel (WordPress-like)**:
     - Secure Login for Admins.
     - **Dashboard**: Overview of orders, customers, and system status with **Live Sales Analytics (Recharts)**.
-    - **Product Management**: Full CRUD operations + Advanced Multi-Image Upload and Gallery management.
+    - **Product Management**: Full CRUD operations + Advanced Multi-Image Upload and **Unified Drag-and-Drop Gallery** management.
+    - **Rich Text Editing**: Full HTML description support with professional formatting controls.
+    - **Shopify-Style Variants**: Efficient variant management table with combined option views (Color / Size).
     - **Order Management**: Monitor sales, update statuses, administrative deletion, and Comprehensive Order Details Modal.
     - **Customer Management**: View registered user list and roles.
     - **Inventory Control**: Manage stock levels and dynamic "Active/Inactive" visibility toggle.

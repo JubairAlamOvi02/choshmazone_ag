@@ -34,6 +34,9 @@
     *   `Media Manager`: Implementation of `URL.createObjectURL` for immediate, low-latency visual feedback during admin image uploads.
     *   **Session Intelligence**: Client-side logic for managing active sessions (`SESSION_VERSION`) and providing "Session Active" choice screens to prevent login loops.
     *   **Chart Optimization**: Component-level hydration tracking (`isMounted`) and debounced `ResponsiveContainer` to ensure Recharts stability in the Admin Dashboard.
+    *   **Rich Text Engine**: Integrated `react-quill-new` for full HTML description support, maintaining React 19 compatibility.
+    *   **Shopify-Style Variants**: Unified variant management UI for Color and Size combinations.
+    *   **Unified Media Grid**: Drag-and-drop gallery with automatic primary image detection.
 *   **PWA** (Implemented): Service Worker (`sw.js`) with offline caching for assets/images and Manifest support.
 *   **Performance Optimization**: 
     - **Code Splitting**: Route-level granularity via `React.lazy` and `Suspense`.
@@ -71,7 +74,7 @@
 *   `category` (Text)
 *   `image_url` (Text) - Main display image
 *   `images` (Text[]) - Support for multiple gallery images
-*   `highlights` (Text) - Bulleted highlights for PDP
+*   `variants` (JSONB) - Complex variant data (Color, Size, Price, Stock, Image)
 *   `spec_frame`, `spec_lens`, `spec_hardware`, `spec_weight` (Text) - Technical specifications
 *   `shipping_info` (Text) - Delivery and returns details
 *   `is_active` (Boolean) - For soft deleting/hiding products (Default: true)

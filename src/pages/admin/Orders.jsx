@@ -125,6 +125,21 @@ const AdminOrders = () => {
         </div>
     );
 
+    const getItemImage = (item) => {
+        if (item.style && item.style !== 'Default' && item.products?.variants) {
+            const variant = item.products.variants.find(v => {
+                const parts = [];
+                if (v.color) parts.push(v.color);
+                if (v.size) parts.push(v.size);
+                return parts.join(', ') === item.style;
+            });
+            if (variant && variant.image_url) {
+                return variant.image_url;
+            }
+        }
+        return item.products?.image_url;
+    };
+
     return (
         <div className="animate-in fade-in duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
@@ -414,13 +429,16 @@ const AdminOrders = () => {
                                                         <td className="px-6 py-4">
                                                             <div className="flex items-center gap-4">
                                                                 <button
-                                                                    onClick={() => item.products?.image_url && setPreviewImage(item.products.image_url)}
+                                                                    onClick={() => {
+                                                                        const imgUrl = getItemImage(item);
+                                                                        if (imgUrl) setPreviewImage(imgUrl);
+                                                                    }}
                                                                     className="w-14 h-14 bg-white rounded-xl border border-border/50 flex items-center justify-center p-1.5 shadow-sm hover:scale-110 hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden group/img"
                                                                 >
-                                                                    {item.products?.image_url ? (
+                                                                    {getItemImage(item) ? (
                                                                         <img
-                                                                            src={item.products.image_url}
-                                                                            alt={item.products.name}
+                                                                            src={getItemImage(item)}
+                                                                            alt={item.products?.name}
                                                                             className="w-full h-full object-contain mix-blend-multiply group-hover/img:scale-110 transition-transform duration-500"
                                                                         />
                                                                     ) : (

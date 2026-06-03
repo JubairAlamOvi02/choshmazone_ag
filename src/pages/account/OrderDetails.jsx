@@ -82,6 +82,21 @@ const OrderDetails = () => {
         // If status is 'completed', assume it's delivered for the timeline visual
         : (order.status === 'completed' ? 3 : 0);
 
+    const getItemImage = (item) => {
+        if (item.style && item.style !== 'Default' && item.products?.variants) {
+            const variant = item.products.variants.find(v => {
+                const parts = [];
+                if (v.color) parts.push(v.color);
+                if (v.size) parts.push(v.size);
+                return parts.join(', ') === item.style;
+            });
+            if (variant && variant.image_url) {
+                return variant.image_url;
+            }
+        }
+        return item.products?.image_url;
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
             <Navbar />
@@ -154,10 +169,10 @@ const OrderDetails = () => {
                                 {order.order_items?.map((item) => (
                                     <div key={item.id} className="flex gap-4 items-start pb-6 border-b border-border/50 last:border-0 last:pb-0">
                                         <div className="w-20 h-24 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0">
-                                            {item.products?.image_url ? (
+                                            {getItemImage(item) ? (
                                                 <img
-                                                    src={item.products.image_url}
-                                                    alt={item.products.name}
+                                                    src={getItemImage(item)}
+                                                    alt={item.products?.name}
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
@@ -168,6 +183,9 @@ const OrderDetails = () => {
                                         </div>
                                         <div className="flex-1">
                                             <h4 className="font-bold text-text-main font-outfit">{item.products?.name || 'Product'}</h4>
+                                            {item.style && item.style !== 'Default' && (
+                                                <p className="text-xs text-text-muted mb-1">Variant: {item.style}</p>
+                                            )}
                                             <p className="text-sm text-text-muted mb-2">Quantity: {item.quantity}</p>
                                             <p className="font-bold text-primary">৳{(item.unit_price || 0).toLocaleString()}</p>
                                         </div>

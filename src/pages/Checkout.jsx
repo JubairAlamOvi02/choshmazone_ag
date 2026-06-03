@@ -177,9 +177,9 @@ const Checkout = () => {
             // Track Purchase event with Facebook Pixel
             if (typeof window !== 'undefined' && window.fbq) {
                 window.fbq('track', 'Purchase', {
-                    value: totalWithDelivery,
+                    value: Number(totalWithDelivery.toFixed(2)),
                     currency: 'BDT',
-                    content_ids: cartItems.map(item => item.id),
+                    content_ids: cartItems.map(item => String(item.id)),
                     content_type: 'product',
                     num_items: cartItems.reduce((acc, item) => acc + item.quantity, 0)
                 });

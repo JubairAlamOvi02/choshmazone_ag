@@ -18,11 +18,22 @@ export const orderParams = {
             // Check if item.id is a valid UUID to avoid database errors with legacy mock data (IDs like 1, 2, 3)
             const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
 
+            let styleStr = item.style || '';
+            if (item.variant) {
+                const parts = [];
+                if (item.variant.color) parts.push(item.variant.color);
+                if (item.variant.size) parts.push(item.variant.size);
+                if (parts.length > 0) {
+                    styleStr = parts.join(', ');
+                }
+            }
+
             return {
                 order_id: order.id,
                 product_id: isUUID ? item.id : null,
                 quantity: item.quantity,
-                unit_price: item.price
+                unit_price: item.price,
+                style: styleStr || 'Default'
             };
         });
 
@@ -44,7 +55,7 @@ export const orderParams = {
                 profiles (full_name, role),
                 order_items (
                     *,
-                    products (name, image_url)
+                    products (name, image_url, variants)
                 )
             `)
             .order('created_at', { ascending: false });
@@ -62,7 +73,7 @@ export const orderParams = {
                 profiles (full_name, role),
                 order_items (
                     *,
-                    products (name, image_url)
+                    products (name, image_url, variants)
                 )
             `)
             .eq('id', id)
