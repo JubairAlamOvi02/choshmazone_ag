@@ -152,7 +152,7 @@ export default async function handler(req, res) {
     xml += `  </channel>
 </rss>`;
 
-    res.setHeader('Content-Type', 'application/xml');
+    res.setHeader('Content-Type', 'text/xml; charset=utf-8');
     res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=600');
     return res.status(200).send(xml);
   } catch (err) {
