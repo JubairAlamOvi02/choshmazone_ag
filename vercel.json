@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/api/catalog.xml",
+      "destination": "/api/catalog"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
