@@ -9,7 +9,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import CartDrawer from './components/Cart/CartDrawer';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
-import PixelTracker from './components/PixelTracker';
+import PageMonitor from './components/PageMonitor';
 
 
 // Loading Component
@@ -45,6 +45,7 @@ const UserOrderDetails = lazy(() => import('./pages/account/OrderDetails'));
 const AdminLogin = lazy(() => import('./pages/admin/Login'));
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
+const AdminCategories = lazy(() => import('./pages/admin/Categories'));
 const AdminProducts = lazy(() => import('./pages/admin/Products'));
 const AdminProductNew = lazy(() => import('./pages/admin/ProductNew'));
 const ProductForm = lazy(() => import('./pages/admin/ProductForm'));
@@ -59,7 +60,7 @@ function App() {
     <ErrorBoundary>
       <Router>
         <ScrollToTop />
-        <PixelTracker />
+        <PageMonitor />
         <ToastProvider>
 
           <AuthProvider>
@@ -111,6 +112,7 @@ function App() {
                         }>
                           <Route index element={<Navigate to="dashboard" replace />} />
                           <Route path="dashboard" element={<AdminDashboard />} />
+                          <Route path="categories" element={<AdminCategories />} />
                           <Route path="products" element={<AdminProducts />} />
                           <Route path="products/new" element={<AdminProductNew />} />
                           <Route path="products/edit/:id" element={<ProductForm />} />

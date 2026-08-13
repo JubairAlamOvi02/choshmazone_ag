@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const PixelTracker = () => {
+const PageMonitor = () => {
     const location = useLocation();
 
     useEffect(() => {
@@ -13,4 +13,4 @@ const PixelTracker = () => {
     return null;
 };
 
-export default PixelTracker;
+export default PageMonitor;

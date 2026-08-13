@@ -1,7 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { categoryParams } from '../../lib/api/categories';
 
 const FilterSidebar = ({ filters, setFilters }) => {
-    const categories = ["All", "Men", "Women", "Unisex"];
+    const [categoriesList, setCategoriesList] = useState([]);
+    
+    useEffect(() => {
+        const loadCategories = async () => {
+            try {
+                const data = await categoryParams.fetchAll();
+                setCategoriesList(data.map(c => c.name));
+            } catch (err) {
+                console.error('Failed to load categories:', err);
+            }
+        };
+        loadCategories();
+    }, []);
+
+    const categories = ["All", ...categoriesList];
     const styles = ["All", "Wayfarer", "Aviator", "Clubmaster", "Round", "Sport", "Shield", "Square"];
 
     const handleCategoryChange = (category) => {

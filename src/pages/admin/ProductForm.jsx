@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { productParams } from '../../lib/api/products';
+import { categoryParams } from '../../lib/api/categories';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import { ChevronLeft, Upload, X, Plus, Package, DollarSign, Layers, Tag, Eye } from 'lucide-react';
@@ -23,16 +24,27 @@ const ProductForm = () => {
         variants: []
     });
     const [mediaItems, setMediaItems] = useState([]);
+    const [categoriesList, setCategoriesList] = useState([]);
     const [draggedIdx, setDraggedIdx] = useState(null);
     const [variantFiles, setVariantFiles] = useState({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        loadCategories();
         if (isEditMode) {
             loadProduct(id);
         }
     }, [id]);
+
+    const loadCategories = async () => {
+        try {
+            const data = await categoryParams.fetchAll();
+            setCategoriesList(data);
+        } catch (err) {
+            console.error('Failed to load categories:', err);
+        }
+    };
 
     const loadProduct = async (productId) => {
         try {
@@ -331,10 +343,9 @@ const ProductForm = () => {
                                         className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit font-bold"
                                     >
                                         <option value="">Select Category</option>
-                                        <option value="Men">Men</option>
-                                        <option value="Women">Women</option>
-                                        <option value="Unisex">Unisex</option>
-                                        <option value="Kids">Kids</option>
+                                        {categoriesList.map(cat => (
+                                            <option key={cat.id} value={cat.name}>{cat.name}</option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div className="space-y-2">
