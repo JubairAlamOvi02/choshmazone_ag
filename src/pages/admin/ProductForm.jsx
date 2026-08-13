@@ -14,6 +14,7 @@ const ProductForm = () => {
     const [formData, setFormData] = useState({
         name: '',
         price: '',
+        color: '',
         description: '',
         category: '',
         style: '',
@@ -199,6 +200,7 @@ const ProductForm = () => {
             const payload = {
                 name: formData.name,
                 price: parseFloat(formData.price),
+                color: formData.color,
                 description: formData.description,
                 stock_quantity: parseInt(formData.stock_quantity),
                 category: formData.category,
@@ -376,7 +378,22 @@ const ProductForm = () => {
 
                         <section className="bg-white p-8 rounded-3xl border border-border/50 shadow-sm space-y-6">
                             <h3 className="text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit border-b border-border/50 pb-4 mb-6">Pricing & Inventory</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-2 text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                        <Tag size={12} />
+                                        Default Color
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="color"
+                                        value={formData.color}
+                                        onChange={handleChange}
+                                        placeholder="e.g. Matte Black"
+                                        required
+                                        className="w-full bg-gray-50 border border-border/50 text-text-main px-4 py-4 rounded-2xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit font-bold"
+                                    />
+                                </div>
                                 <div className="space-y-2">
                                     <label className="flex items-center gap-2 text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
                                         <DollarSign size={12} />

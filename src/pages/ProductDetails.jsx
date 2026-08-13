@@ -112,16 +112,15 @@ const ProductDetails = () => {
         }
     }, [product, isInWishlist]);
 
-    // Handle variant selection updates
     useEffect(() => {
-        if (product && product.variants && product.variants.length > 0) {
+        if (product && (product.color || (product.variants && product.variants.length > 0))) {
             if (!selectedColor && !selectedSize) {
-                // Default to first available variant
-                setSelectedColor(product.variants[0].color || '');
-                setSelectedSize(product.variants[0].size || '');
+                // Default to main product color if exists, else first available variant
+                setSelectedColor(product.color || (product.variants && product.variants.length > 0 ? product.variants[0].color : ''));
+                setSelectedSize(product.variants && product.variants.length > 0 ? product.variants[0].size : '');
             }
             
-            const variant = product.variants.find(v => 
+            const variant = (product.variants || []).find(v => 
                 (v.color === selectedColor || (!v.color && !selectedColor)) && 
                 (v.size === selectedSize || (!v.size && !selectedSize))
             );
@@ -316,14 +315,24 @@ const ProductDetails = () => {
                         </div>
 
                         {/* Variants Selection */}
-                        {product.variants && product.variants.length > 0 && (
+                        {((product.variants && product.variants.length > 0) || product.color) && (() => {
+                            const availableColors = [...new Set([
+                                product.color,
+                                ...(product.variants || []).map(v => v.color)
+                            ].filter(Boolean))];
+                            
+                            const availableSizes = [...new Set([
+                                ...(product.variants || []).map(v => v.size)
+                            ].filter(Boolean))];
+
+                            return (
                             <div className="mb-8 space-y-6">
                                 {/* Colors */}
-                                {product.variants.some(v => v.color) && (
+                                {availableColors.length > 0 && (
                                     <div>
                                         <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-3 block">Color</span>
                                         <div className="flex flex-wrap gap-3">
-                                            {[...new Set(product.variants.map(v => v.color).filter(Boolean))].map(color => (
+                                            {availableColors.map(color => (
                                                 <button
                                                     key={color}
                                                     onClick={() => setSelectedColor(color)}
@@ -341,11 +350,11 @@ const ProductDetails = () => {
                                 )}
                                 
                                 {/* Sizes */}
-                                {product.variants.some(v => v.size) && (
+                                {availableSizes.length > 0 && (
                                     <div>
                                         <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-3 block">Size</span>
                                         <div className="flex flex-wrap gap-3">
-                                            {[...new Set(product.variants.map(v => v.size).filter(Boolean))].map(size => (
+                                            {availableSizes.map(size => (
                                                 <button
                                                     key={size}
                                                     onClick={() => setSelectedSize(size)}
@@ -362,7 +371,8 @@ const ProductDetails = () => {
                                     </div>
                                 )}
                             </div>
-                        )}
+                            );
+                        })()}
 
                         {/* Add to Cart Controls */}
                         <div className="space-y-6 pb-8 border-b border-border mb-8">
