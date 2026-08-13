@@ -252,4 +252,11 @@
 - Task 65 (Meta Pixel Analytics Fix): Completed
   - **Currency Parameter Resolution**: Fixed the `Parameter 'currency' is invalid for event 'Purchase'` error in Facebook Pixel by correctly casting the purchase value to a 2-decimal float (`Number(total.toFixed(2))`) and properly formatting `content_ids` as an array of strings.
 - Task 66 (Admin Dashboard Chart Stability): Completed
-  - **Recharts Warning Fix**: Resolved `The width(-1) and height(-1) of chart should be greater than 0` DOM layout warnings by switching `ResponsiveContainer` height from a percentage (`100%`) to a fixed pixel integer (`400`) within the constrained flex container.
+- Task 67 (Dynamic Category Management): Completed
+  - Added `categories` table and API layer for CRUD operations.
+  - Built new Admin Categories page for dynamic category creation.
+  - Refactored ProductForm and FilterSidebar to consume categories from database instead of hardcoded lists.
+- Task 68 (Default Product Variant System): Completed
+  - Added `color` column to `products` table for default variant mapping.
+  - Reorganized Admin ProductForm's Pricing & Inventory section to mandate a "Default Color".
+  - Updated ProductDetails page to merge the default `product.color` with the `product.variants` list for a seamless shopping experience.

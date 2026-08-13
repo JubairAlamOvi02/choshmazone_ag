@@ -1,6 +1,18 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
+CREATE TABLE public.categories (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  name text NOT NULL,
+  slug text NOT NULL,
+  description text,
+  image_url text,
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  CONSTRAINT categories_pkey PRIMARY KEY (id),
+  CONSTRAINT categories_slug_key UNIQUE (slug)
+);
+
 CREATE TABLE public.order_items (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
   order_id uuid NOT NULL,
@@ -43,6 +55,7 @@ CREATE TABLE public.products (
   lens_technology text,
   lens_color text,
   frame_color text,
+  color text,
   frame_width text,
   lens_width text,
   bridge_width text,

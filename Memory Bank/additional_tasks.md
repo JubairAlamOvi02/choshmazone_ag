@@ -250,3 +250,13 @@
     - [x] Cast purchase totals correctly as floats and normalized `content_ids`.
 - [x] **Recharts Dashboard Optimization (Task Id: 563)**:
     - [x] Solved flex container height calculation warning `width(-1) and height(-1)` in Admin Dashboard by providing an explicit pixel height bound.
+
+## Phase 29: Dynamic Categories & Default Variants
+- [x] **Dynamic Category Management (Task Id: 564)**:
+    - [x] Implemented `categories` table in Supabase.
+    - [x] Created `Categories.jsx` admin page for creating, updating, and deleting categories dynamically.
+    - [x] Refactored `ProductForm.jsx` and `FilterSidebar.jsx` to fetch and use dynamic categories instead of hardcoded lists.
+- [x] **Default Product Variant / Color (Task Id: 565)**:
+    - [x] Added `color` column to the `products` table schema for default variant mapping.
+    - [x] Added a "Default Color" field to the Pricing & Inventory section of `ProductForm.jsx`.
+    - [x] Updated `ProductDetails.jsx` to dynamically merge the default `product.color` with the `variants` array and correctly update the UI.
