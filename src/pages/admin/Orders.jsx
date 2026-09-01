@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { orderParams } from '../../lib/api/orders';
 import { calculateDeliveryCharge } from '../../data/bangladeshLocations';
-import { Trash2, ExternalLink, Filter, Search, MoreVertical, X, Package, User, Mail, Phone, MapPin, CreditCard, ChevronRight } from 'lucide-react';
+import { Trash2, ExternalLink, Filter, Search, MoreVertical, X, Package, User, Mail, Phone, MapPin, CreditCard, ChevronRight, Bell } from 'lucide-react';
+import { testTelegramNotification } from '../../lib/telegramNotifier';
 
 const AdminOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -12,6 +13,7 @@ const AdminOrders = () => {
     const [previewImage, setPreviewImage] = useState(null);
     const [selectedOrders, setSelectedOrders] = useState([]);
     const [isProcessingBulk, setIsProcessingBulk] = useState(false);
+    const [isTestingTelegram, setIsTestingTelegram] = useState(false);
 
     useEffect(() => {
         fetchOrders();
@@ -140,6 +142,18 @@ const AdminOrders = () => {
         return item.products?.image_url;
     };
 
+    const handleTestTelegram = async () => {
+        setIsTestingTelegram(true);
+        try {
+            const res = await testTelegramNotification();
+            alert(res.message);
+        } catch (e) {
+            alert('Failed to send test notification: ' + e.message);
+        } finally {
+            setIsTestingTelegram(false);
+        }
+    };
+
     return (
         <div className="animate-in fade-in duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
@@ -147,7 +161,16 @@ const AdminOrders = () => {
                     <h1 className="text-3xl font-bold text-text-main font-outfit uppercase tracking-tight">Order Management</h1>
                     <p className="text-text-muted font-outfit">Review and manage all customer transactions.</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
+                    <button 
+                        onClick={handleTestTelegram}
+                        disabled={isTestingTelegram}
+                        title="Send a test notification to your phone via Telegram Bot"
+                        className="flex items-center gap-2 px-5 py-3 bg-blue-50 border border-blue-200 text-blue-600 rounded-xl text-sm font-bold hover:bg-blue-100 transition-all font-outfit uppercase tracking-widest shadow-sm disabled:opacity-50"
+                    >
+                        <Bell size={16} className={isTestingTelegram ? 'animate-bounce' : ''} />
+                        {isTestingTelegram ? 'Sending Test...' : 'Test Phone Alert'}
+                    </button>
                     <button className="p-3 bg-white border border-border rounded-xl text-text-muted hover:text-text-main transition-colors">
                         <Search size={20} />
                     </button>

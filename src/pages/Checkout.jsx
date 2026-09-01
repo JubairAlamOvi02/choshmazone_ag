@@ -10,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import { orderParams } from '../lib/api/orders';
 import { supabase } from '../lib/supabaseClient';
 import { getDistricts, getThanas, calculateDeliveryCharge } from '../data/bangladeshLocations';
+import { sendTelegramOrderNotification } from '../lib/telegramNotifier';
 
 const Checkout = () => {
     const { cartItems, cartTotal, clearCart, updateQuantity, resetQuantities, removeFromCart } = useCart();
@@ -145,11 +146,13 @@ const Checkout = () => {
                 } : {}
             };
 
-            await orderParams.create(supabaseOrderData, cartItems);
+            const createdOrder = await orderParams.create(supabaseOrderData, cartItems);
 
             const now = new Date();
+            const orderDisplayId = createdOrder?.id ? createdOrder.id.slice(0, 8).toUpperCase() : `ORD-${Date.now()}`;
+
             const legacyOrderData = {
-                orderId: `ORD-${Date.now()}`,
+                orderId: orderDisplayId,
                 orderDate: now.toLocaleDateString(),
                 orderTime: now.toLocaleTimeString(),
                 ...formData,
@@ -164,6 +167,30 @@ const Checkout = () => {
                 deliveryCharge: deliveryCharge.toFixed(2),
                 totalAmount: totalWithDelivery.toFixed(2)
             };
+
+            // Send real-time order alert to your Telegram Bot (Phone notification)
+            sendTelegramOrderNotification({
+                orderId: orderDisplayId,
+                customerName: formData.name.trim(),
+                phone: formData.phone,
+                email: formData.email,
+                address: formData.address,
+                district: formData.district,
+                thana: formData.thana,
+                paymentMethod: formData.paymentMethod,
+                bkashNumber: formData.bkashNumber,
+                bkashTrxId: formData.bkashTrxId,
+                items: cartItems.map(item => ({
+                    title: item.title,
+                    quantity: item.quantity,
+                    price: item.price,
+                    style: item.style || (item.variant ? [item.variant.color, item.variant.size].filter(Boolean).join(', ') : '')
+                })),
+                deliveryCharge: deliveryCharge,
+                totalAmount: totalWithDelivery,
+                orderDate: now.toLocaleDateString(),
+                orderTime: now.toLocaleTimeString()
+            }).catch(err => console.error("Telegram notification failed:", err));
 
             fetch(import.meta.env.VITE_GOOGLE_SCRIPT_URL, {
                 method: 'POST',
