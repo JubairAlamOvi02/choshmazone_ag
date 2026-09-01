@@ -27,10 +27,13 @@ The project utilizes [Supabase](https://supabase.com/) as a Comprehensive Backen
 *   **Storage**: **Supabase Storage** - Hosting and serving product images.
 
 ## 3. External Integrations
-*   **Order Management**: **Google Sheets API** - Orders are automatically synced to a Google Sheet via a custom **Google Apps Script** for business tracking.
+*   **Real-Time Mobile Notifications**: **Telegram Bot API** - Instant sound push alerts delivered to the store owner's phone on new orders with full customer, item, and payment breakdown.
+*   **Order Management & Backup**: **Google Sheets API** - Orders are automatically synced to a Google Sheet via a custom **Google Apps Script** for business tracking.
 *   **Payments**: 
     *   **bKash**: Digital payment integration for mobile banking.
     *   **Cash on Delivery (COD)**: Support for offline payments.
+*   **Transactional Email**: Google Apps Script acting as a lightweight mail gateway for OTP verification and automated order confirmations.
+*   **Analytics**: **Facebook Pixel / Meta Pixel** with standard event tracking (PageView, ViewContent, AddToCart, InitiateCheckout, Purchase).
 
 ## 4. Key Architectural Features
 *   **Role-Based Access Control (RBAC)**: Distinct permissions for 'Admin' and 'Customer' users.

@@ -367,3 +367,13 @@
   - [x] Added `color` column to the `products` table schema for default variant mapping.
   - [x] Added a "Default Color" field to the Pricing & Inventory section of `ProductForm.jsx`.
   - [x] Updated `ProductDetails.jsx` to dynamically merge the default `product.color` with the `variants` array and correctly update the UI.
+
+## Phase 30: Real-Time Mobile Order Notifications
+- [x] **Telegram Bot Alert System (Task Id: 568)**:
+  - [x] Implemented `telegramNotifier.js` utility using Telegram Bot API for instant sound alerts on phone.
+  - [x] Connected order notifications to `Checkout.jsx` sending customer details, address, ordered items with variants/styles, payment methods (bKash/COD + TrxID), and total amount.
+  - [x] Centralized `VITE_TELEGRAM_BOT_TOKEN` and `VITE_TELEGRAM_CHAT_ID` in `.env` and `.env.example`.
+- [x] **Admin Notification Testing Suite (Task Id: 569)**:
+  - [x] Added interactive "Test Phone Alert" button in Admin Order Management header (`Orders.jsx`).
+  - [x] Verified live bot connectivity and test message delivery.
+

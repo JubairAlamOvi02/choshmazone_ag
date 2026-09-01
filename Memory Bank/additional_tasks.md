@@ -30,8 +30,14 @@
     - Synchronized cart context with checkout-level quantity changes.
 - [x] Admin Productivity Features:
     - Enabled bulk order management via checkboxes and an action-oriented toolbar in the Admin panel.
+- [x] Real-Time Phone Order Notifications (Telegram Bot):
+    - Created `src/lib/telegramNotifier.js` utility for sending instant order notifications via Telegram Bot.
+    - Integrated automatic dispatch in `src/pages/Checkout.jsx` on order placement.
+    - Added interactive "Test Phone Alert" button in `src/pages/admin/Orders.jsx`.
+    - Configured `VITE_TELEGRAM_BOT_TOKEN` and `VITE_TELEGRAM_CHAT_ID` in `.env`.
+    - Verified live bot connectivity and message delivery.
 
-**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, and Social Media branding have been implemented and verified.
+**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, and Real-Time Telegram Order Notifications have been implemented and verified.
 
 ## Next High-Priority Tasks: Admin & Backend
 - [x] **Architecture Design**: Create `system_architecture.md` detailing Schema and Auth flow. (Completed)

@@ -33,6 +33,7 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
     - **Rich Text Editing**: Full HTML description support with professional formatting controls.
     - **Shopify-Style Variants**: Efficient variant management table with combined option views (Color / Size).
     - **Order Management**: Monitor sales, update statuses, administrative deletion, and Comprehensive Order Details Modal.
+    - **Real-Time Mobile Alerts**: Instant push notifications with sound directly to the store owner's phone via Telegram Bot on new orders, plus a built-in "Test Phone Alert" feature in the Admin panel.
     - **Customer Management**: View registered user list and roles.
     - **Inventory Control**: Manage stock levels and dynamic "Active/Inactive" visibility toggle.
     - **Database Visibility**: Access to schemas and tables for debugging.
@@ -46,4 +47,6 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 ## 6. Chosen Tech Stack
 - **Frontend**: React (Vite), Lucide Icons, Tailwind CSS v4.
 - **Backend/Data**: **Supabase** (PostgreSQL, Auth, Storage).
-- **Redundancy**: Google Sheets Integration for order backups.
+- **Redundancy & Email**: Google Sheets Integration for order backups + Google Apps Script for transactional emails.
+- **Mobile Notification**: Telegram Bot API for instant sound alerts on phone.
+

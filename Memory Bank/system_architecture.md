@@ -34,9 +34,10 @@
     *   `Media Manager`: Implementation of `URL.createObjectURL` for immediate, low-latency visual feedback during admin image uploads.
     *   **Session Intelligence**: Client-side logic for managing active sessions (`SESSION_VERSION`) and providing "Session Active" choice screens to prevent login loops.
     *   **Chart Optimization**: Component-level hydration tracking (`isMounted`) and debounced `ResponsiveContainer` to ensure Recharts stability in the Admin Dashboard.
-    *   **Rich Text Engine**: Integrated `react-quill-new` for full HTML description support, maintaining React 19 compatibility.
-    *   **Shopify-Style Variants**: Unified variant management UI for Color and Size combinations.
-    *   **Unified Media Grid**: Drag-and-drop gallery with automatic primary image detection.
+    *   `Rich Text Engine`: Integrated `react-quill-new` for full HTML description support, maintaining React 19 compatibility.
+    *   `Shopify-Style Variants`: Unified variant management UI for Color and Size combinations.
+    *   `Unified Media Grid`: Drag-and-drop gallery with automatic primary image detection.
+    *   `Telegram Notifier`: Real-time instant phone push alerts for orders via Telegram Bot API with interactive test suite in Admin Orders.
 *   **PWA** (Implemented): Service Worker (`sw.js`) with offline caching for assets/images and Manifest support.
 *   **Performance Optimization**: 
     - **Code Splitting**: Route-level granularity via `React.lazy` and `Suspense`.
@@ -173,3 +174,8 @@ Given the constraints of traditional cPanel hosting (MySQL-centric) versus our m
 ### External API Strategy: Google Apps Script
 *   **Protocol**: `POST` requests with `mode: 'no-cors'`.
 *   **Rationale**: Browser CORS policies strictly block cross-origin requests to Google Scripts unless the script is deployed as a Web App with access set to "Anyone" and the client uses opaque (`no-cors`) requests. This allows data submission (fire-and-forget) without requiring complex backend proxies.
+
+### Mobile Notification Strategy: Telegram Bot API
+*   **Protocol**: HTTPS `POST` directly to `https://api.telegram.org/bot<TOKEN>/sendMessage` with HTML formatting.
+*   **Rationale**: Zero cost, zero SMS/subscription fees, instant sound push notifications delivered directly to the store owner's mobile device (iOS/Android) upon order creation. Contains comprehensive customer, shipping, itemized variant, and payment breakdown. Includes client-side fallback to ensure checkout never fails even if notification services encounter network anomalies.
+
