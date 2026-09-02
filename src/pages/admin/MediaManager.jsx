@@ -4,7 +4,7 @@ import { settingsParams } from '../../lib/api/settings';
 import { productParams } from '../../lib/api/products';
 import { categoryParams } from '../../lib/api/categories';
 import { getCategoryFallbackImage } from '../../components/FeaturedCollections';
-import { Upload, X, Save, Image as ImageIcon, Layout, Box, CheckCircle2, AlertCircle, RefreshCw, ShoppingBag, Sparkles, Type, Link as LinkIcon, Eye } from 'lucide-react';
+import { Upload, X, Save, Image as ImageIcon, Layout, Box, CheckCircle2, AlertCircle, RefreshCw, ShoppingBag, Sparkles, Type, Link as LinkIcon, Eye, Layers } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import heroBannerFallback from '../../assets/hero_banner.png';
 import promoBannerFallback from '../../assets/promo_banner.jpg';
@@ -24,6 +24,10 @@ const AdminMedia = () => {
         promo_banner_description: 'Get up to 50% off on selected styles. Upgrade your look for the sunny days ahead.',
         promo_banner_btn_text: 'Shop Sale',
         promo_banner_btn_link: '/shop',
+        collections_hero_bg: heroBannerFallback,
+        collections_hero_badge: 'Curated Eyewear',
+        collections_hero_title: 'Eyewear Collections',
+        collections_hero_description: 'Explore our complete range of handcrafted eyewear designed for every style, gender, and occasion.',
         men_collection: menFallback,
         women_collection: womenFallback,
         unisex_collection: unisexFallback,
@@ -514,6 +518,153 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                                                 {getSettingValue('promo_banner_btn_text') || 'Shop Sale'}
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* SECTION: Collections Page Hero Banner Editor with Live Preview */}
+                    <div className="bg-white rounded-[2.5rem] border border-border/60 p-6 md:p-10 shadow-sm">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-border/50 mb-8">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
+                                    <Layers size={24} className="text-primary" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-bold text-text-main font-outfit uppercase tracking-tight flex items-center gap-2">
+                                        Collections Page Hero Header
+                                        {(previewAssets.collections_hero_bg || previewAssets.collections_hero_badge || previewAssets.collections_hero_title || previewAssets.collections_hero_description) && (
+                                            <span className="text-[10px] bg-primary/10 text-primary font-bold px-2.5 py-1 rounded-full uppercase animate-pulse">Draft</span>
+                                        )}
+                                    </h2>
+                                    <p className="text-text-muted font-outfit text-xs md:text-sm">Customize background image, badge, title, and description for the Collections page header.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                            {/* Form inputs */}
+                            <div className="lg:col-span-6 space-y-6">
+                                {/* Image Selector */}
+                                <div>
+                                    <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2">
+                                        Hero Background Image
+                                    </label>
+                                    <div className="flex items-center gap-4">
+                                        <div className="relative w-28 h-20 rounded-2xl overflow-hidden bg-gray-100 border border-border flex-shrink-0">
+                                            <img
+                                                src={getSettingValue('collections_hero_bg') || heroBannerFallback}
+                                                alt="Collections hero preview"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            <label className="cursor-pointer px-4 py-2 bg-gray-100 hover:bg-primary hover:text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-colors inline-flex items-center gap-2">
+                                                <Upload size={14} />
+                                                Upload Image
+                                                <input
+                                                    type="file"
+                                                    className="hidden"
+                                                    onChange={(e) => handleSiteAssetUpload(e, 'collections_hero_bg')}
+                                                    disabled={saving}
+                                                    accept="image/*"
+                                                />
+                                            </label>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectingFor({ type: 'site', key: 'collections_hero_bg' });
+                                                    setShowLibrary(true);
+                                                }}
+                                                disabled={saving}
+                                                className="px-4 py-2 bg-gray-100 hover:bg-text-main hover:text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-colors inline-flex items-center gap-2"
+                                            >
+                                                <ImageIcon size={14} />
+                                                Choose Library
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Badge */}
+                                <div>
+                                    <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2 flex items-center gap-1.5">
+                                        <Layers size={14} className="text-secondary" /> Badge / Tagline Text
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={getSettingValue('collections_hero_badge')}
+                                        onChange={(e) => handleTextChange('collections_hero_badge', e.target.value)}
+                                        placeholder="e.g. Curated Eyewear"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl text-sm font-outfit focus:bg-white focus:border-primary outline-none transition-all"
+                                    />
+                                </div>
+
+                                {/* Title */}
+                                <div>
+                                    <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2 flex items-center gap-1.5">
+                                        <Type size={14} className="text-primary" /> Main Heading / Title
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={getSettingValue('collections_hero_title')}
+                                        onChange={(e) => handleTextChange('collections_hero_title', e.target.value)}
+                                        placeholder="e.g. Eyewear Collections"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl text-sm font-outfit font-bold focus:bg-white focus:border-primary outline-none transition-all"
+                                    />
+                                </div>
+
+                                {/* Description */}
+                                <div>
+                                    <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2 flex items-center gap-1.5">
+                                        <Type size={14} className="text-primary" /> Subtitle / Description Text
+                                    </label>
+                                    <textarea
+                                        rows={3}
+                                        value={getSettingValue('collections_hero_description')}
+                                        onChange={(e) => handleTextChange('collections_hero_description', e.target.value)}
+                                        placeholder="e.g. Explore our complete range of handcrafted eyewear designed for every style, gender, and occasion."
+                                        className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl text-sm font-outfit focus:bg-white focus:border-primary outline-none transition-all resize-none"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Live Interactive Preview Box */}
+                            <div className="lg:col-span-6 sticky top-24">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <Eye size={16} className="text-primary" />
+                                    <span className="text-xs font-bold font-outfit uppercase tracking-widest text-text-muted">Live Collections Page Preview</span>
+                                </div>
+
+                                <div className="relative rounded-3xl overflow-hidden shadow-xl border border-border/80 min-h-[300px] flex items-center justify-center p-8 text-center group bg-gray-900">
+                                    {/* Image */}
+                                    <img
+                                        src={getSettingValue('collections_hero_bg') || heroBannerFallback}
+                                        alt="Collections hero preview"
+                                        className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                                    />
+                                    {/* Overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/60 to-black/75 backdrop-blur-[0.5px]"></div>
+
+                                    {/* Foreground Content */}
+                                    <div className="relative z-10 max-w-md text-white">
+                                        {getSettingValue('collections_hero_badge') && (
+                                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-secondary/20 backdrop-blur-md border border-secondary/40 rounded-full mb-3 text-secondary">
+                                                <Layers size={12} className="text-secondary" />
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] font-outfit">
+                                                    {getSettingValue('collections_hero_badge')}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        <h3 className="text-2xl sm:text-3xl font-bold font-outfit uppercase tracking-tight text-white mb-2 drop-shadow-md">
+                                            {getSettingValue('collections_hero_title') || 'Eyewear Collections'}
+                                        </h3>
+
+                                        <p className="text-xs sm:text-sm text-white/90 font-outfit line-clamp-3 leading-relaxed drop-shadow">
+                                            {getSettingValue('collections_hero_description') || 'Explore our complete range of handcrafted eyewear designed for every style, gender, and occasion.'}
+                                        </p>
                                     </div>
                                 </div>
                             </div>

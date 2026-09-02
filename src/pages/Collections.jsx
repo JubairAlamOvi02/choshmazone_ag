@@ -6,11 +6,18 @@ import FeaturedCollections, { getCategoryFallbackImage } from '../components/Fea
 import { categoryParams } from '../lib/api/categories';
 import { settingsParams } from '../lib/api/settings';
 import { ArrowRight, Sparkles, Layers, Grid } from 'lucide-react';
+import heroBannerFallback from '../assets/hero_banner.png';
 
 const Collections = () => {
     const navigate = useNavigate();
     const [allCategories, setAllCategories] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [heroSettings, setHeroSettings] = useState({
+        bgImage: heroBannerFallback,
+        badge: 'Curated Eyewear',
+        title: 'Eyewear Collections',
+        description: 'Explore our complete range of handcrafted eyewear designed for every style, gender, and occasion.'
+    });
 
     useEffect(() => {
         const fetchAllCollections = async () => {
@@ -22,6 +29,13 @@ const Collections = () => {
                 ]);
 
                 const getSetting = (key) => settingsData.find(s => s.key === key)?.value;
+
+                setHeroSettings({
+                    bgImage: getSetting('collections_hero_bg') || heroBannerFallback,
+                    badge: getSetting('collections_hero_badge') !== undefined ? getSetting('collections_hero_badge') : 'Curated Eyewear',
+                    title: getSetting('collections_hero_title') || 'Eyewear Collections',
+                    description: getSetting('collections_hero_description') || 'Explore our complete range of handcrafted eyewear designed for every style, gender, and occasion.'
+                });
 
                 // Base fallback categories if empty
                 const list = categoriesData.length > 0 ? categoriesData : [
@@ -68,16 +82,31 @@ const Collections = () => {
             
             <main>
                 {/* Hero Header */}
-                <section className="bg-gray-50/70 border-b border-border/50 py-16 md:py-24 text-center">
-                    <div className="container mx-auto px-4">
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-widest font-outfit mb-4">
-                            <Layers size={14} /> Curated Eyewear
-                        </div>
-                        <h1 className="text-4xl md:text-6xl font-bold font-outfit uppercase tracking-tighter text-text-main mb-4">
-                            Eyewear Collections
+                <section className="relative py-20 md:py-28 text-center overflow-hidden bg-gray-900 border-b border-border/40">
+                    {/* Background Image */}
+                    {heroSettings.bgImage && (
+                        <img
+                            src={heroSettings.bgImage}
+                            alt={heroSettings.title}
+                            className="absolute inset-0 w-full h-full object-cover object-center scale-105 transition-transform duration-1000 ease-out hover:scale-110"
+                        />
+                    )}
+
+                    {/* Dark/Warm Premium Gradient Overlay for high text contrast */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/60 to-black/75 backdrop-blur-[0.5px]"></div>
+
+                    <div className="relative z-10 container mx-auto px-4 max-w-4xl">
+                        {heroSettings.badge && (
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-secondary/20 backdrop-blur-md border border-secondary/40 text-secondary rounded-full text-xs font-bold uppercase tracking-widest font-outfit mb-5">
+                                <Layers size={14} className="text-secondary" />
+                                <span>{heroSettings.badge}</span>
+                            </div>
+                        )}
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold font-outfit uppercase tracking-tight text-white mb-4 drop-shadow-2xl">
+                            {heroSettings.title}
                         </h1>
-                        <p className="text-base md:text-xl text-text-muted font-outfit max-w-2xl mx-auto">
-                            Explore our complete range of handcrafted eyewear designed for every style, gender, and occasion.
+                        <p className="text-sm sm:text-base md:text-xl text-white/90 font-outfit max-w-2xl mx-auto leading-relaxed drop-shadow-md">
+                            {heroSettings.description}
                         </p>
                     </div>
                 </section>
