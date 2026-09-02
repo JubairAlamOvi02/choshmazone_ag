@@ -44,8 +44,16 @@
     - Removed hardcoded 3-category limit; all 5 existing categories (`Eye Glasses`, `Kids`, `Men`, `Unisex`, `Women`) and any future categories are dynamically loaded.
     - Added image upload and "Featured" status toggle directly inside Admin Categories and Media Manager.
     - Re-architected `/collections` page: upper section presents "All Collections" and lower section presents "Featured Collections".
+- [x] Collections Page Hero Banner Customization:
+    - Transformed the Collections page header into a visual hero banner with background image support.
+    - Made background image, badge tagline, title, and description fully customizable from the Admin Media & Content Manager.
+    - Added a real-time live preview module in `MediaManager.jsx` for instant visual validation before publishing.
+- [x] Homepage Hero Banner Full Customization & Button Design Dropdown Controls:
+    - Connected all Hero Banner elements to Supabase `site_settings` (`hero_banner_image`, `hero_banner_badge`, `hero_banner_title`, `hero_banner_highlight`, `hero_banner_description`, `hero_banner_btn_text`, `hero_banner_btn_link`, `hero_banner_btn_style`, `hero_banner_btn_shape`, `hero_banner_btn_size`, `hero_banner_btn_icon`).
+    - Added comprehensive button styling controls via dropdown selectors (Colors/Styles: Dark, Gold, White, Outlines, Glass, Gradient; Corner Shapes: Square, Soft Square, Rounded, Pill; Sizes: Medium, Large, Extra Large; Icons: Arrow, Sparkle, Bag).
+    - Built a responsive real-time Live Homepage Preview sticky card in the Admin Media & Content Manager.
 
-**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, and Category/Collections management have been implemented and verified.
+**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, Category/Collections management, Collections Hero Header customization, and Homepage Hero Banner customization with button design dropdowns have been implemented and verified.
 
 
 ## Next High-Priority Tasks: Admin & Backend

@@ -39,7 +39,9 @@
     *   `Unified Media Grid`: Drag-and-drop gallery with automatic primary image detection.
     *   `Telegram Notifier`: Real-time instant phone push alerts for orders via Telegram Bot API with interactive test suite in Admin Orders.
     *   `Promotional Content Engine`: Dynamic background image and live editable text for homepage banners via `site_settings`.
+    *   `Hero Banner Dynamic Engine`: Database-driven Hero section on homepage with customizable photography, tag/badge, two-part heading with accent gold word, multiline description, and button styling token selector engine (Color/Style, Shape, Size, Icon) with Live Homepage Preview.
     *   `Dynamic Category & Collections System`: Database-driven category management with featured status toggling and dual-level Collections page architecture (All Collections + Featured Collections).
+    *   `Collections Hero Banner Engine`: Dynamic background image and live real-time editable text customizer (badge, title, subtitle) for `/collections` header powered by `site_settings`.
 *   **PWA** (Implemented): Service Worker (`sw.js`) with offline caching for assets/images and Manifest support.
 *   **Performance Optimization**: 
     - **Code Splitting**: Route-level granularity via `React.lazy` and `Suspense`.

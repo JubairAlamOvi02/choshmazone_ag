@@ -280,5 +280,17 @@
 - Task 72 (Global Site Settings Storage Engine): Completed
   - Created `site_settings` table definition and RLS policies (`create_site_settings.sql`, `supabase_schema.sql`).
   - Integrated `settingsParams` API with automatic client-side fallback caching and upsert functionality.
-
-
+- Task 73 (Collections Page Hero Banner Customization & Background Engine): Completed
+  - Transformed the plain Collections header into a visual hero banner with background image support and dark gradient overlay.
+  - Connected `collections_hero_bg`, `collections_hero_badge`, `collections_hero_title`, and `collections_hero_description` to `site_settings`.
+  - Added dedicated Collections Page Hero Header editor section in Admin Media & Content Manager (`MediaManager.jsx`) with live real-time interactive preview.
+- Task 74 (Hero Banner Full Customization & Button Design Dropdown Controls): Completed
+  - Transformed the homepage Hero Banner into a fully dynamic section driven by Supabase `site_settings`.
+  - Added full admin customizer for Hero background image (with upload & library picker), tag/badge text, two-line heading with gold accent word (`hero_banner_title` & `hero_banner_highlight`), and multiline description.
+  - Built comprehensive Button Design dropdown selectors:
+    - **Color & Style**: Dark Luxury, Golden Accent, Crisp White, Gold Outline, White Outline, Glassmorphism, Royal Gold Gradient.
+    - **Corner Shape**: Square (`rounded-none`), Soft Square (`rounded-md`), Modern Rounded (`rounded-xl`), Pill/Capsule (`rounded-full`).
+    - **Button Size**: Medium, Large, Extra Large.
+    - **Button Icon**: None, Right Arrow (→), Sparkle (✨), Shopping Bag (🛍️).
+  - Integrated real-time Live Homepage Preview for the Hero section in `MediaManager.jsx`.
+  - Updated frontend `Hero.jsx` component to dynamically render all custom settings and styles with robust fallbacks.

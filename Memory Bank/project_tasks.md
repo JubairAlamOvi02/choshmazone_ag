@@ -400,4 +400,25 @@
   - [x] Overhauled `Collections.jsx` to feature **All Collections** on the upper half with catalog browsing cards.
   - [x] Structured **Featured Collections** on the lower half showcasing curated highlights.
 
+## Phase 33: Collections Page Hero Header Customization
+- [x] **Collections Hero Visual Background Engine (Task Id: 575)**:
+  - [x] Converted the plain static header in `Collections.jsx` into a hero banner with background image support.
+  - [x] Added high-contrast dark gradient overlay ensuring readability on light or dark imagery.
+  - [x] Dynamically integrated `collections_hero_bg`, `collections_hero_badge`, `collections_hero_title`, and `collections_hero_description` with `site_settings`.
+- [x] **Admin Collections Hero Customizer (Task Id: 576)**:
+  - [x] Added a dedicated "Collections Page Hero Header" management block inside `MediaManager.jsx`.
+  - [x] Included image uploader, asset library picker, badge tagline input, main title input, and description textarea.
+  - [x] Implemented a real-time live interactive preview card replicating the Collections page layout.
 
+## Phase 34: Homepage Hero Banner Customization & Button Design Controls
+- [x] **Hero Banner Dynamic Engine (Task Id: 577)**:
+  - [x] Connected frontend `Hero.jsx` component to Supabase `site_settings`.
+  - [x] Made background image, badge, two-part heading with gold accent word, and description fully dynamic.
+  - [x] Integrated dynamic button design generator supporting custom styles, shapes, sizes, and icons with seamless fallbacks.
+- [x] **Admin Hero Banner Customizer & Button Design Dropdowns (Task Id: 578)**:
+  - [x] Added dedicated "Hero Banner (Home Page)" section in `MediaManager.jsx` matching the Promotional Banner card layout.
+  - [x] Implemented dropdown selectors for Button Color/Style (*Dark Luxury, Golden Accent, Crisp White, Gold Outline, White Outline, Glassmorphism, Royal Gold Gradient*).
+  - [x] Implemented dropdown selectors for Button Corner Shape (*Square, Soft Square, Rounded, Pill/Capsule*).
+  - [x] Implemented dropdown selectors for Button Size (*Medium, Large, Extra Large*).
+  - [x] Implemented dropdown selectors for Button Icon (*None, Arrow, Sparkle, Shopping Bag*).
+  - [x] Built a real-time Live Homepage Preview sticky panel with instant visual feedback.

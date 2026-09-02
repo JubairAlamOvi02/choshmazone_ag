@@ -79,6 +79,10 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **Shopify-Style Variant Table**: Combined option display (Color / Size) for a professional inventory management experience.
 - **Dynamic CMS & Site Settings Engine**:
     - **Global Site Settings (`site_settings`)**: PostgreSQL key-value persistence layer for promotional banners, brand visual assets, and storefront text.
+    - **Homepage Hero Banner Customizer**: Complete customizer for background imagery, badge text, split title with gold accent highlight, multiline description, and live real-time sticky preview.
+    - **Button Design Dropdown Selector Engine**: Selectable styling tokens for CTA buttons (Colors: Dark Luxury, Gold Accent, Crisp White, Outlines, Glassmorphic blur, Gold Gradient; Shapes: Square, Soft Square, Rounded, Pill; Sizes: Medium, Large, Extra Large; Icons: Arrow, Sparkle, Shopping Bag).
     - **Live Content Preview**: Admin module with real-time homepage banner preview as admins edit copy and upload photography.
     - **Category & Collection Architecture**: Dynamic database-driven category collections with instant featured toggling and dual-level Collections page layout (All Collections + Featured Highlights).
+    - **Collections Hero Customizer**: Real-time admin customizer for background images, badge, title, and description for the Collections page header.
+
 

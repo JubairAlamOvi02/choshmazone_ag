@@ -4,7 +4,12 @@ import { settingsParams } from '../../lib/api/settings';
 import { productParams } from '../../lib/api/products';
 import { categoryParams } from '../../lib/api/categories';
 import { getCategoryFallbackImage } from '../../components/FeaturedCollections';
-import { Upload, X, Save, Image as ImageIcon, Layout, Box, CheckCircle2, AlertCircle, RefreshCw, ShoppingBag, Sparkles, Type, Link as LinkIcon, Eye, Layers } from 'lucide-react';
+import { HERO_BUTTON_STYLES, HERO_BUTTON_SHAPES, HERO_BUTTON_SIZES } from '../../components/Hero';
+import {
+    Upload, X, Save, Image as ImageIcon, Layout, Box, CheckCircle2,
+    AlertCircle, RefreshCw, ShoppingBag, Sparkles, Type, Link as LinkIcon,
+    Eye, Layers, Palette, ArrowRight
+} from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import heroBannerFallback from '../../assets/hero_banner.png';
 import promoBannerFallback from '../../assets/promo_banner.jpg';
@@ -16,6 +21,17 @@ const AdminMedia = () => {
     const navigate = useNavigate();
     const [siteAssets, setSiteAssets] = useState({
         hero_banner: heroBannerFallback,
+        hero_banner_image: heroBannerFallback,
+        hero_banner_badge: 'Elite Vision • Luxury Style',
+        hero_banner_title: 'See the World',
+        hero_banner_highlight: 'Clearly',
+        hero_banner_description: 'Experience premium vision with our handcrafted eyewear collection, designed for those who demand the perfect blend of performance and luxury.',
+        hero_banner_btn_text: 'Shop Collection',
+        hero_banner_btn_link: '/shop',
+        hero_banner_btn_style: 'dark',
+        hero_banner_btn_shape: 'rounded-md',
+        hero_banner_btn_size: 'large',
+        hero_banner_btn_icon: 'none',
         logo_main: '',
         footer_logo: '',
         promo_banner_image: promoBannerFallback,
@@ -115,12 +131,19 @@ const AdminMedia = () => {
         }
     };
 
-
     const handleSelectFromLibrary = (url) => {
         if (!selectingFor) return;
 
         if (selectingFor.type === 'site') {
-            setPreviewAssets(prev => ({ ...prev, [selectingFor.key]: url }));
+            if (selectingFor.key === 'hero_banner_image' || selectingFor.key === 'hero_banner') {
+                setPreviewAssets(prev => ({
+                    ...prev,
+                    hero_banner_image: url,
+                    hero_banner: url
+                }));
+            } else {
+                setPreviewAssets(prev => ({ ...prev, [selectingFor.key]: url }));
+            }
             showToast('Preview updated', 'info');
         } else if (selectingFor.type === 'product') {
             setPendingProducts(prev => ({ ...prev, [selectingFor.id]: url }));
@@ -172,7 +195,15 @@ const AdminMedia = () => {
             try {
                 setSaving(true);
                 const url = await settingsParams.uploadAsset(file);
-                setPreviewAssets(prev => ({ ...prev, [key]: url }));
+                if (key === 'hero_banner_image' || key === 'hero_banner') {
+                    setPreviewAssets(prev => ({
+                        ...prev,
+                        hero_banner_image: url,
+                        hero_banner: url
+                    }));
+                } else {
+                    setPreviewAssets(prev => ({ ...prev, [key]: url }));
+                }
 
                 // Refresh library to show new image
                 const updatedLibrary = await settingsParams.listAssets();
@@ -207,7 +238,7 @@ const AdminMedia = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-vh-[400px]">
+            <div className="flex items-center justify-center min-h-[400px]">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
             </div>
         );
@@ -287,60 +318,294 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                     </div>
                 </div>
             )}
+
             {activeTab === 'site' ? (
                 <div className="space-y-12 pb-32">
-                    {/* SECTION 1: Brand & Hero Assets */}
-                    <div>
-                        <div className="mb-6">
-                            <h2 className="text-xl font-bold text-text-main font-outfit uppercase tracking-tight flex items-center gap-3">
-                                <Layout className="text-primary" size={20} />
-                                Header & Brand Assets
-                            </h2>
-                            <p className="text-text-muted font-outfit text-sm">Update the primary hero banner image and store logos.</p>
+                    {/* SECTION 1: Homepage Hero Banner Editor with Live Preview */}
+                    <div className="bg-white rounded-[2.5rem] border border-border/60 p-6 md:p-10 shadow-sm">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-border/50 mb-8">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
+                                    <Layout size={24} className="text-primary" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-bold text-text-main font-outfit uppercase tracking-tight flex items-center gap-2">
+                                        Hero Banner (Home Page)
+                                        {(previewAssets.hero_banner_image || previewAssets.hero_banner || previewAssets.hero_banner_title || previewAssets.hero_banner_highlight || previewAssets.hero_banner_description || previewAssets.hero_banner_badge || previewAssets.hero_banner_btn_text || previewAssets.hero_banner_btn_link || previewAssets.hero_banner_btn_style || previewAssets.hero_banner_btn_shape || previewAssets.hero_banner_btn_size || previewAssets.hero_banner_btn_icon) && (
+                                            <span className="text-[10px] bg-primary/10 text-primary font-bold px-2.5 py-1 rounded-full uppercase animate-pulse">Draft</span>
+                                        )}
+                                    </h2>
+                                    <p className="text-text-muted font-outfit text-xs md:text-sm">Customize background image, headline typography, subtext, and CTA button styling.</p>
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {/* Hero Banner Card */}
-                            <AssetCard
-                                title="Hero Banner"
-                                description="Main landing image"
-                                imageUrl={previewAssets.hero_banner || siteAssets.hero_banner}
-                                isPending={!!previewAssets.hero_banner}
-                                onUpload={(e) => handleSiteAssetUpload(e, 'hero_banner')}
-                                onSelect={() => {
-                                    setSelectingFor({ type: 'site', key: 'hero_banner' });
-                                    setShowLibrary(true);
-                                }}
-                                saving={saving}
-                            />
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                            {/* Form inputs */}
+                            <div className="lg:col-span-6 space-y-6">
+                                {/* Image Selector */}
+                                <div>
+                                    <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2">
+                                        Hero Background Image
+                                    </label>
+                                    <div className="flex items-center gap-4">
+                                        <div className="relative w-28 h-20 rounded-2xl overflow-hidden bg-gray-100 border border-border flex-shrink-0">
+                                            <img
+                                                src={getSettingValue('hero_banner_image') || getSettingValue('hero_banner') || heroBannerFallback}
+                                                alt="Hero banner preview"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            <label className="cursor-pointer px-4 py-2 bg-gray-100 hover:bg-primary hover:text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-colors inline-flex items-center gap-2">
+                                                <Upload size={14} />
+                                                Upload Image
+                                                <input
+                                                    type="file"
+                                                    className="hidden"
+                                                    onChange={(e) => handleSiteAssetUpload(e, 'hero_banner_image')}
+                                                    disabled={saving}
+                                                    accept="image/*"
+                                                />
+                                            </label>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectingFor({ type: 'site', key: 'hero_banner_image' });
+                                                    setShowLibrary(true);
+                                                }}
+                                                disabled={saving}
+                                                className="px-4 py-2 bg-gray-100 hover:bg-text-main hover:text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-colors inline-flex items-center gap-2"
+                                            >
+                                                <ImageIcon size={14} />
+                                                Choose Library
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
 
-                            {/* Logo Card */}
-                            <AssetCard
-                                title="Main Logo"
-                                description="Displayed in Navbar"
-                                imageUrl={previewAssets.logo_main || siteAssets.logo_main}
-                                isPending={!!previewAssets.logo_main}
-                                onUpload={(e) => handleSiteAssetUpload(e, 'logo_main')}
-                                onSelect={() => {
-                                    setSelectingFor({ type: 'site', key: 'logo_main' });
-                                    setShowLibrary(true);
-                                }}
-                                saving={saving}
-                            />
+                                {/* Tag / Badge */}
+                                <div>
+                                    <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2 flex items-center gap-1.5">
+                                        <Sparkles size={14} className="text-secondary" /> Tag / Badge Text (Optional)
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={getSettingValue('hero_banner_badge')}
+                                        onChange={(e) => handleTextChange('hero_banner_badge', e.target.value)}
+                                        placeholder="e.g. Elite Vision • Luxury Style"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl text-sm font-outfit focus:bg-white focus:border-primary outline-none transition-all"
+                                    />
+                                </div>
 
-                            {/* Footer Logo Card */}
-                            <AssetCard
-                                title="Footer Logo"
-                                description="Secondary branding"
-                                imageUrl={previewAssets.footer_logo || siteAssets.footer_logo}
-                                isPending={!!previewAssets.footer_logo}
-                                onUpload={(e) => handleSiteAssetUpload(e, 'footer_logo')}
-                                onSelect={() => {
-                                    setSelectingFor({ type: 'site', key: 'footer_logo' });
-                                    setShowLibrary(true);
-                                }}
-                                saving={saving}
-                            />
+                                {/* Title & Accent Row */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2 flex items-center gap-1.5">
+                                            <Type size={14} className="text-primary" /> Main Heading (Line 1)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={getSettingValue('hero_banner_title')}
+                                            onChange={(e) => handleTextChange('hero_banner_title', e.target.value)}
+                                            placeholder="e.g. See the World"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl text-sm font-outfit font-bold focus:bg-white focus:border-primary outline-none transition-all"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2 flex items-center gap-1.5">
+                                            <Sparkles size={14} className="text-amber-500" /> Accent Word / Line 2 (Gold)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={getSettingValue('hero_banner_highlight')}
+                                            onChange={(e) => handleTextChange('hero_banner_highlight', e.target.value)}
+                                            placeholder="e.g. Clearly"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl text-sm font-outfit font-bold focus:bg-white focus:border-primary outline-none transition-all text-amber-700"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Description */}
+                                <div>
+                                    <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2 flex items-center gap-1.5">
+                                        <Type size={14} className="text-primary" /> Subtitle / Description Text
+                                    </label>
+                                    <textarea
+                                        rows={3}
+                                        value={getSettingValue('hero_banner_description')}
+                                        onChange={(e) => handleTextChange('hero_banner_description', e.target.value)}
+                                        placeholder="e.g. Experience premium vision with our handcrafted eyewear collection..."
+                                        className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl text-sm font-outfit focus:bg-white focus:border-primary outline-none transition-all resize-none"
+                                    />
+                                </div>
+
+                                {/* Button Text & Link Row */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2">
+                                            Button Text
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={getSettingValue('hero_banner_btn_text')}
+                                            onChange={(e) => handleTextChange('hero_banner_btn_text', e.target.value)}
+                                            placeholder="e.g. Shop Collection"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl text-sm font-outfit focus:bg-white focus:border-primary outline-none transition-all"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2 flex items-center gap-1.5">
+                                            <LinkIcon size={14} className="text-text-muted" /> Button Link (URL)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={getSettingValue('hero_banner_btn_link')}
+                                            onChange={(e) => handleTextChange('hero_banner_btn_link', e.target.value)}
+                                            placeholder="e.g. /shop"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl text-sm font-outfit focus:bg-white focus:border-primary outline-none transition-all"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Button Style & Appearance Controls */}
+                                <div className="p-5 bg-gray-50/80 rounded-2xl border border-border/80 space-y-4">
+                                    <div className="flex items-center gap-2">
+                                        <Palette size={16} className="text-primary" />
+                                        <span className="text-xs font-bold font-outfit uppercase tracking-wider text-text-main">Button Design & Appearance</span>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {/* Color / Style Dropdown */}
+                                        <div>
+                                            <label className="block text-[11px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1.5">
+                                                Color & Style
+                                            </label>
+                                            <select
+                                                value={getSettingValue('hero_banner_btn_style') || 'dark'}
+                                                onChange={(e) => handleTextChange('hero_banner_btn_style', e.target.value)}
+                                                className="w-full px-3 py-2.5 bg-white border border-border rounded-xl text-xs font-outfit font-medium focus:border-primary outline-none cursor-pointer"
+                                            >
+                                                <option value="dark">Dark Luxury (Black with White)</option>
+                                                <option value="gold">Golden Accent (Gold with Black)</option>
+                                                <option value="white">Crisp White (White with Black)</option>
+                                                <option value="outline_gold">Gold Outline (Transparent / Gold Border)</option>
+                                                <option value="outline_white">White Outline (Transparent / White Border)</option>
+                                                <option value="glass">Glassmorphism (Frosted Glass)</option>
+                                                <option value="gradient_gold">Royal Gold Gradient</option>
+                                            </select>
+                                        </div>
+
+                                        {/* Corner Shape Dropdown */}
+                                        <div>
+                                            <label className="block text-[11px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1.5">
+                                                Corner Shape
+                                            </label>
+                                            <select
+                                                value={getSettingValue('hero_banner_btn_shape') || 'rounded-md'}
+                                                onChange={(e) => handleTextChange('hero_banner_btn_shape', e.target.value)}
+                                                className="w-full px-3 py-2.5 bg-white border border-border rounded-xl text-xs font-outfit font-medium focus:border-primary outline-none cursor-pointer"
+                                            >
+                                                <option value="rounded-none">Square (Sharp Corners)</option>
+                                                <option value="rounded-md">Soft Square (Subtle 6px)</option>
+                                                <option value="rounded-xl">Rounded (Modern 12px)</option>
+                                                <option value="rounded-full">Pill / Capsule (Fully Rounded)</option>
+                                            </select>
+                                        </div>
+
+                                        {/* Size Dropdown */}
+                                        <div>
+                                            <label className="block text-[11px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1.5">
+                                                Button Size
+                                            </label>
+                                            <select
+                                                value={getSettingValue('hero_banner_btn_size') || 'large'}
+                                                onChange={(e) => handleTextChange('hero_banner_btn_size', e.target.value)}
+                                                className="w-full px-3 py-2.5 bg-white border border-border rounded-xl text-xs font-outfit font-medium focus:border-primary outline-none cursor-pointer"
+                                            >
+                                                <option value="medium">Medium (Standard)</option>
+                                                <option value="large">Large (Prominent)</option>
+                                                <option value="xlarge">Extra Large (Hero Impact)</option>
+                                            </select>
+                                        </div>
+
+                                        {/* Icon Dropdown */}
+                                        <div>
+                                            <label className="block text-[11px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1.5">
+                                                Button Icon
+                                            </label>
+                                            <select
+                                                value={getSettingValue('hero_banner_btn_icon') || 'none'}
+                                                onChange={(e) => handleTextChange('hero_banner_btn_icon', e.target.value)}
+                                                className="w-full px-3 py-2.5 bg-white border border-border rounded-xl text-xs font-outfit font-medium focus:border-primary outline-none cursor-pointer"
+                                            >
+                                                <option value="none">No Icon</option>
+                                                <option value="arrow">Right Arrow (→)</option>
+                                                <option value="sparkle">Sparkle (✨)</option>
+                                                <option value="bag">Shopping Bag (🛍️)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Live Interactive Hero Preview Box */}
+                            <div className="lg:col-span-6 sticky top-24">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <Eye size={16} className="text-primary" />
+                                    <span className="text-xs font-bold font-outfit uppercase tracking-widest text-text-muted">Live Homepage Preview</span>
+                                </div>
+
+                                <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-border/80 min-h-[380px] flex items-center p-8 group bg-gray-950 text-left">
+                                    {/* Image */}
+                                    <img
+                                        src={getSettingValue('hero_banner_image') || getSettingValue('hero_banner') || heroBannerFallback}
+                                        alt="Hero preview"
+                                        className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                                    />
+                                    {/* Overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-transparent"></div>
+
+                                    {/* Foreground Content */}
+                                    <div className="relative z-10 max-w-md text-white">
+                                        {getSettingValue('hero_banner_badge') && (
+                                            <div className="inline-block px-3 py-1 bg-secondary/20 backdrop-blur-md border border-secondary/30 rounded-full mb-4">
+                                                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.25em] text-secondary font-outfit">
+                                                    {getSettingValue('hero_banner_badge')}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-outfit uppercase tracking-tight text-white mb-3 drop-shadow-lg leading-tight">
+                                            {getSettingValue('hero_banner_title') || 'See the World'} {getSettingValue('hero_banner_highlight') && <br />}
+                                            {getSettingValue('hero_banner_highlight') && (
+                                                <span className="text-secondary">{getSettingValue('hero_banner_highlight')}</span>
+                                            )}
+                                        </h3>
+
+                                        <p className="text-xs sm:text-sm text-white/90 font-outfit mb-6 line-clamp-3 leading-relaxed drop-shadow">
+                                            {getSettingValue('hero_banner_description') || 'Experience premium vision with our handcrafted eyewear collection, designed for those who demand the perfect blend of performance and luxury.'}
+                                        </p>
+
+                                        <div className="inline-block">
+                                            <div
+                                                className={`inline-flex items-center justify-center gap-2 font-outfit uppercase tracking-wider transition-all duration-300 ${HERO_BUTTON_STYLES[getSettingValue('hero_banner_btn_style') || 'dark']} ${HERO_BUTTON_SHAPES[getSettingValue('hero_banner_btn_shape') || 'rounded-md']} ${HERO_BUTTON_SIZES[getSettingValue('hero_banner_btn_size') || 'large']}`}
+                                            >
+                                                <span>{getSettingValue('hero_banner_btn_text') || 'Shop Collection'}</span>
+                                                {getSettingValue('hero_banner_btn_icon') === 'arrow' && (
+                                                    <ArrowRight size={16} />
+                                                )}
+                                                {getSettingValue('hero_banner_btn_icon') === 'sparkle' && (
+                                                    <Sparkles size={16} className="text-secondary" />
+                                                )}
+                                                {getSettingValue('hero_banner_btn_icon') === 'bag' && (
+                                                    <ShoppingBag size={16} />
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -524,7 +789,7 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                         </div>
                     </div>
 
-                    {/* SECTION: Collections Page Hero Banner Editor with Live Preview */}
+                    {/* SECTION 3: Collections Page Hero Banner Editor with Live Preview */}
                     <div className="bg-white rounded-[2.5rem] border border-border/60 p-6 md:p-10 shadow-sm">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-border/50 mb-8">
                             <div className="flex items-center gap-3">
@@ -671,7 +936,48 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                         </div>
                     </div>
 
-                    {/* SECTION 3: Dynamic Category Collections */}
+                    {/* SECTION 4: Brand Identity & Logos */}
+                    <div>
+                        <div className="mb-6">
+                            <h2 className="text-xl font-bold text-text-main font-outfit uppercase tracking-tight flex items-center gap-3">
+                                <Layout className="text-primary" size={20} />
+                                Brand Logos & Store Identity
+                            </h2>
+                            <p className="text-text-muted font-outfit text-sm">Update the primary website logo and footer identity graphics.</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl">
+                            {/* Logo Card */}
+                            <AssetCard
+                                title="Main Logo"
+                                description="Displayed in Navbar & Header"
+                                imageUrl={previewAssets.logo_main || siteAssets.logo_main}
+                                isPending={!!previewAssets.logo_main}
+                                onUpload={(e) => handleSiteAssetUpload(e, 'logo_main')}
+                                onSelect={() => {
+                                    setSelectingFor({ type: 'site', key: 'logo_main' });
+                                    setShowLibrary(true);
+                                }}
+                                saving={saving}
+                            />
+
+                            {/* Footer Logo Card */}
+                            <AssetCard
+                                title="Footer Logo"
+                                description="Displayed in Footer branding"
+                                imageUrl={previewAssets.footer_logo || siteAssets.footer_logo}
+                                isPending={!!previewAssets.footer_logo}
+                                onUpload={(e) => handleSiteAssetUpload(e, 'footer_logo')}
+                                onSelect={() => {
+                                    setSelectingFor({ type: 'site', key: 'footer_logo' });
+                                    setShowLibrary(true);
+                                }}
+                                saving={saving}
+                            />
+                        </div>
+                    </div>
+
+                    {/* SECTION 5: Dynamic Category Collections */}
                     <div>
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                             <div>
