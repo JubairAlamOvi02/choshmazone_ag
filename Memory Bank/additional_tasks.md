@@ -36,8 +36,17 @@
     - Added interactive "Test Phone Alert" button in `src/pages/admin/Orders.jsx`.
     - Configured `VITE_TELEGRAM_BOT_TOKEN` and `VITE_TELEGRAM_CHAT_ID` in `.env`.
     - Verified live bot connectivity and message delivery.
+- [x] Homepage Promotional Banner Full Customization:
+    - Added background image support with cinematic default (`promo_banner.jpg`) and high-contrast dark luxury gradient overlay.
+    - Made all text (Badge, Heading/Title, Description, Button Label, Destination URL) fully editable from the Admin Panel.
+    - Added real-time Live Homepage Preview in the Admin Media & Content Manager.
+- [x] Dynamic Featured Collections & Dual-Level Collections Page:
+    - Removed hardcoded 3-category limit; all 5 existing categories (`Eye Glasses`, `Kids`, `Men`, `Unisex`, `Women`) and any future categories are dynamically loaded.
+    - Added image upload and "Featured" status toggle directly inside Admin Categories and Media Manager.
+    - Re-architected `/collections` page: upper section presents "All Collections" and lower section presents "Featured Collections".
 
-**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, and Real-Time Telegram Order Notifications have been implemented and verified.
+**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, and Category/Collections management have been implemented and verified.
+
 
 ## Next High-Priority Tasks: Admin & Backend
 - [x] **Architecture Design**: Create `system_architecture.md` detailing Schema and Auth flow. (Completed)

@@ -77,3 +77,8 @@ The application utilizes a **Mobile-First Responsive Strategy**:
 - **Advanced Inventory Management**:
     - **Unified Media Gallery**: Drag-and-drop image reordering system in Admin with automatic primary image selection.
     - **Shopify-Style Variant Table**: Combined option display (Color / Size) for a professional inventory management experience.
+- **Dynamic CMS & Site Settings Engine**:
+    - **Global Site Settings (`site_settings`)**: PostgreSQL key-value persistence layer for promotional banners, brand visual assets, and storefront text.
+    - **Live Content Preview**: Admin module with real-time homepage banner preview as admins edit copy and upload photography.
+    - **Category & Collection Architecture**: Dynamic database-driven category collections with instant featured toggling and dual-level Collections page layout (All Collections + Featured Highlights).
+

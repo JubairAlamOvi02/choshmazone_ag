@@ -377,3 +377,27 @@
   - [x] Added interactive "Test Phone Alert" button in Admin Order Management header (`Orders.jsx`).
   - [x] Verified live bot connectivity and test message delivery.
 
+## Phase 31: Dynamic Storefront Content & Global Site Settings
+- [x] **Promotional Banner Background & Text Engine (Task Id: 570)**:
+  - [x] Generated and integrated cinematic luxury banner image (`promo_banner.jpg`) as the primary default.
+  - [x] Transformed `PromotionalBanner.jsx` to dynamically load background image, badge, title, description, button text, and link from `site_settings`.
+  - [x] Implemented luxury dark/warm gradient overlay to maintain high-contrast readability across all screens.
+- [x] **Admin Media & Content Manager Overhaul (Task Id: 571)**:
+  - [x] Extended `MediaManager.jsx` with full text controls for the homepage Promotional Banner.
+  - [x] Built interactive Live Homepage Preview right inside the Admin panel for real-time visual feedback.
+  - [x] Added unified "Save & Publish" flow linking to `site_settings`.
+
+## Phase 32: Category Expansion & Dual-Level Collections Architecture
+- [x] **Dynamic Featured Collections Component (Task Id: 572)**:
+  - [x] Eliminated the hardcoded 3-category limit (`Men`, `Women`, `Unisex`) in `FeaturedCollections.jsx`.
+  - [x] Connected component to live Supabase categories, supporting any number of dynamic categories (`Eye Glasses`, `Kids`, `Men`, `Unisex`, `Women`, etc.).
+  - [x] Implemented responsive adaptive grid layouts (1 to 5+ columns).
+- [x] **Admin Category Management & Featured Toggle (Task Id: 573)**:
+  - [x] Enhanced `Categories.jsx` with instant "Featured" toggling (★ / ☆) for each category.
+  - [x] Added direct image upload and thumbnail preview for all categories in `Categories.jsx` and `MediaManager.jsx`.
+  - [x] Enabled setting "Show in Featured Collections" directly during category creation.
+- [x] **Dual-Level Collections Page Layout (Task Id: 574)**:
+  - [x] Overhauled `Collections.jsx` to feature **All Collections** on the upper half with catalog browsing cards.
+  - [x] Structured **Featured Collections** on the lower half showcasing curated highlights.
+
+

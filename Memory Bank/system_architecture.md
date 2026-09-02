@@ -38,6 +38,8 @@
     *   `Shopify-Style Variants`: Unified variant management UI for Color and Size combinations.
     *   `Unified Media Grid`: Drag-and-drop gallery with automatic primary image detection.
     *   `Telegram Notifier`: Real-time instant phone push alerts for orders via Telegram Bot API with interactive test suite in Admin Orders.
+    *   `Promotional Content Engine`: Dynamic background image and live editable text for homepage banners via `site_settings`.
+    *   `Dynamic Category & Collections System`: Database-driven category management with featured status toggling and dual-level Collections page architecture (All Collections + Featured Collections).
 *   **PWA** (Implemented): Service Worker (`sw.js`) with offline caching for assets/images and Manifest support.
 *   **Performance Optimization**: 
     - **Code Splitting**: Route-level granularity via `React.lazy` and `Suspense`.
@@ -109,10 +111,23 @@
 *   `comment` (Text)
 *   `created_at` (Timestamp)
 
+#### 6. `categories`
+*Dynamic category definitions and collections.*
+*   `id` (UUID, Primary Key)
+*   `name` (Text, Unique)
+*   `created_at` (Timestamp)
+
+#### 7. `site_settings`
+*Global key-value storage for banners, promotional texts, and store styling.*
+*   `key` (Text, Primary Key)
+*   `value` (Text)
+*   `updated_at` (Timestamp)
+
 ### B. Relationships
 *   `profiles` 1:N `orders`
 *   `orders` 1:N `order_items`
 *   `products` 1:N `order_items`
+
 
 ---
 

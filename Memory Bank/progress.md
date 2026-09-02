@@ -266,4 +266,19 @@
   - Added "Test Phone Alert" button with visual feedback in `src/pages/admin/Orders.jsx` to test and verify bot connection anytime.
   - Configured `VITE_TELEGRAM_BOT_TOKEN` and `VITE_TELEGRAM_CHAT_ID` in `.env` and `.env.example`.
   - Verified live test delivery to Telegram app.
+- Task 70 (Promotional Banner Background Image & Dynamic Text Customization): Completed
+  - Generated and added high-resolution cinematic eyewear background asset (`promo_banner.jpg`) for the promotional section.
+  - Transformed `src/components/PromotionalBanner.jsx` to dynamically load background image, badge tagline, headline, description, button label, and destination link from `site_settings`.
+  - Added luxury dark/warm gradient overlay to maintain high-contrast readability over any background photography.
+  - Upgraded Admin Media Manager (`src/pages/admin/MediaManager.jsx`) into a comprehensive "Media & Content Manager" with text inputs, image picker, and live real-time homepage preview.
+- Task 71 (Dynamic Category Management & Dual-Level Collections Page): Completed
+  - Removed hardcoded 3-category limit (`Men`, `Women`, `Unisex`) from `FeaturedCollections.jsx` and connected it to live Supabase categories (`categoryParams.fetchAll()`).
+  - Added "Featured" toggle (★ / ☆) and category image upload/change controls directly in `src/pages/admin/Categories.jsx` and `src/pages/admin/MediaManager.jsx`.
+  - Redesigned `src/pages/Collections.jsx` with a dual-level layout:
+    - **Upper Section ("All Collections")**: Complete grid displaying all existing store categories with view catalog CTAs and instant shop navigation.
+    - **Lower Section ("Featured Collections")**: Curated highlight cards showing only categories marked as Featured in the Admin panel.
+- Task 72 (Global Site Settings Storage Engine): Completed
+  - Created `site_settings` table definition and RLS policies (`create_site_settings.sql`, `supabase_schema.sql`).
+  - Integrated `settingsParams` API with automatic client-side fallback caching and upsert functionality.
+
 

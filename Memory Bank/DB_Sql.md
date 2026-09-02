@@ -99,3 +99,10 @@ CREATE TABLE public.wishlist (
   CONSTRAINT wishlist_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id),
   CONSTRAINT wishlist_unique_item UNIQUE (user_id, product_id)
 );
+
+CREATE TABLE public.site_settings (
+  key text NOT NULL,
+  value text NOT NULL,
+  updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+  CONSTRAINT site_settings_pkey PRIMARY KEY (key)
+);
