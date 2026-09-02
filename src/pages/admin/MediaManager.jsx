@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { settingsParams } from '../../lib/api/settings';
 import { productParams } from '../../lib/api/products';
+import { categoryParams } from '../../lib/api/categories';
+import { getCategoryFallbackImage } from '../../components/FeaturedCollections';
 import { Upload, X, Save, Image as ImageIcon, Layout, Box, CheckCircle2, AlertCircle, RefreshCw, ShoppingBag, Sparkles, Type, Link as LinkIcon, Eye } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import heroBannerFallback from '../../assets/hero_banner.png';
@@ -10,6 +13,7 @@ import womenFallback from '../../assets/product_3.png';
 import unisexFallback from '../../assets/product_4.png';
 
 const AdminMedia = () => {
+    const navigate = useNavigate();
     const [siteAssets, setSiteAssets] = useState({
         hero_banner: heroBannerFallback,
         logo_main: '',
@@ -28,6 +32,8 @@ const AdminMedia = () => {
     const [pendingProducts, setPendingProducts] = useState({}); // productId -> newUrl
     const [tableMissing, setTableMissing] = useState(false);
     const [products, setProducts] = useState([]);
+    const [adminCategories, setAdminCategories] = useState([]);
+    const [featuredCategories, setFeaturedCategories] = useState([]);
     const [library, setLibrary] = useState([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -57,21 +63,44 @@ const AdminMedia = () => {
             setLoading(true);
             setTableMissing(false);
 
-            // Fetch Products for quick view
-            const productsData = await productParams.fetchAll();
-            setProducts(productsData);
+            // Fetch Products, Categories, Library Assets, Settings in parallel
+            const [productsData, categoriesData, assets, settings] = await Promise.all([
+                productParams.fetchAll(),
+                categoryParams.fetchAll(),
+                settingsParams.listAssets(),
+                settingsParams.fetchAll()
+            ]);
 
-            // Fetch Library Assets
-            const assets = await settingsParams.listAssets();
+            setProducts(productsData);
+            setAdminCategories(categoriesData.length > 0 ? categoriesData : [
+                { id: '1', name: 'Eye Glasses' },
+                { id: '2', name: 'Kids' },
+                { id: '3', name: 'Men' },
+                { id: '4', name: 'Unisex' },
+                { id: '5', name: 'Women' }
+            ]);
             setLibrary(assets);
 
             // Fetch Site Settings
-            const settings = await settingsParams.fetchAll();
             const assetsObj = {};
             settings.forEach(s => {
                 if (s.value !== undefined && s.value !== null) assetsObj[s.key] = s.value;
             });
             setSiteAssets(prev => ({ ...prev, ...assetsObj }));
+
+            // Featured list
+            const featuredSetting = assetsObj['featured_categories'];
+            let featured = [];
+            if (featuredSetting) {
+                try {
+                    featured = typeof featuredSetting === 'string' ? JSON.parse(featuredSetting) : featuredSetting;
+                } catch {
+                    featured = featuredSetting.split(',').map(s => s.trim());
+                }
+            } else {
+                featured = categoriesData.map(c => c.name);
+            }
+            setFeaturedCategories(featured);
         } catch (err) {
             console.error('Error fetching media data:', err);
             if (err.code === '42P01') {
@@ -81,6 +110,7 @@ const AdminMedia = () => {
             setLoading(false);
         }
     };
+
 
     const handleSelectFromLibrary = (url) => {
         if (!selectingFor) return;
@@ -490,55 +520,49 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                         </div>
                     </div>
 
-                    {/* SECTION 3: Collection Category Images */}
+                    {/* SECTION 3: Dynamic Category Collections */}
                     <div>
-                        <div className="mb-6">
-                            <h2 className="text-xl font-bold text-text-main font-outfit uppercase tracking-tight flex items-center gap-3">
-                                <ShoppingBag className="text-primary" size={20} />
-                                Homepage Collections
-                            </h2>
-                            <p className="text-text-muted font-outfit text-sm">Update the large category cards on your home page.</p>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                            <div>
+                                <h2 className="text-xl font-bold text-text-main font-outfit uppercase tracking-tight flex items-center gap-3">
+                                    <ShoppingBag className="text-primary" size={20} />
+                                    Homepage & Store Collections
+                                </h2>
+                                <p className="text-text-muted font-outfit text-sm">Update images and choose which categories appear in Featured Collections.</p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => navigate('/admin/categories')}
+                                className="self-start sm:self-auto px-4 py-2 bg-gray-100 hover:bg-primary hover:text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-all"
+                            >
+                                Manage Categories & Tags →
+                            </button>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            <AssetCard
-                                title="Men Collection"
-                                description="Men's category image"
-                                imageUrl={previewAssets.men_collection || siteAssets.men_collection}
-                                isPending={!!previewAssets.men_collection}
-                                onUpload={(e) => handleSiteAssetUpload(e, 'men_collection')}
-                                onSelect={() => {
-                                    setSelectingFor({ type: 'site', key: 'men_collection' });
-                                    setShowLibrary(true);
-                                }}
-                                saving={saving}
-                            />
+                            {adminCategories.map((cat) => {
+                                const normalizedKey = `category_img_${cat.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+                                const isFeatured = featuredCategories.includes(cat.name);
+                                const fallbackImg = getCategoryFallbackImage(cat.name);
+                                const currentImg = previewAssets[normalizedKey] || siteAssets[normalizedKey] || previewAssets[`${cat.name.toLowerCase()}_collection`] || siteAssets[`${cat.name.toLowerCase()}_collection`] || fallbackImg;
 
-                            <AssetCard
-                                title="Women Collection"
-                                description="Women's category image"
-                                imageUrl={previewAssets.women_collection || siteAssets.women_collection}
-                                isPending={!!previewAssets.women_collection}
-                                onUpload={(e) => handleSiteAssetUpload(e, 'women_collection')}
-                                onSelect={() => {
-                                    setSelectingFor({ type: 'site', key: 'women_collection' });
-                                    setShowLibrary(true);
-                                }}
-                                saving={saving}
-                            />
-
-                            <AssetCard
-                                title="Unisex Collection"
-                                description="Unisex category image"
-                                imageUrl={previewAssets.unisex_collection || siteAssets.unisex_collection}
-                                isPending={!!previewAssets.unisex_collection}
-                                onUpload={(e) => handleSiteAssetUpload(e, 'unisex_collection')}
-                                onSelect={() => {
-                                    setSelectingFor({ type: 'site', key: 'unisex_collection' });
-                                    setShowLibrary(true);
-                                }}
-                                saving={saving}
-                            />
+                                return (
+                                    <div key={cat.id} className="relative">
+                                        <AssetCard
+                                            title={`${cat.name} Collection`}
+                                            description={`${isFeatured ? '★ Featured Collection' : 'Standard Category'}`}
+                                            imageUrl={currentImg}
+                                            isPending={!!previewAssets[normalizedKey] || !!previewAssets[`${cat.name.toLowerCase()}_collection`]}
+                                            onUpload={(e) => handleSiteAssetUpload(e, normalizedKey)}
+                                            onSelect={() => {
+                                                setSelectingFor({ type: 'site', key: normalizedKey });
+                                                setShowLibrary(true);
+                                            }}
+                                            saving={saving}
+                                        />
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>

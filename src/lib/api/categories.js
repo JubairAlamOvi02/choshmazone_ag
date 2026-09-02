@@ -1,4 +1,5 @@
 import { supabase } from '../supabaseClient';
+import { settingsParams } from './settings';
 
 export const categoryParams = {
     fetchAll: async () => {
@@ -22,6 +23,20 @@ export const categoryParams = {
         return data;
     },
 
+    update: async (id, updateData) => {
+        const { data, error } = await supabase
+            .from('categories')
+            .update(updateData)
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) {
+            console.warn('[Categories] Table update warning:', error.message);
+        }
+        return data;
+    },
+
     delete: async (id) => {
         const { error } = await supabase
             .from('categories')
@@ -30,5 +45,10 @@ export const categoryParams = {
             
         if (error) throw error;
         return true;
+    },
+
+    uploadImage: async (file) => {
+        return await settingsParams.uploadAsset(file, 'categories');
     }
 };
+
