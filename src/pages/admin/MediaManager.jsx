@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { settingsParams } from '../../lib/api/settings';
 import { productParams } from '../../lib/api/products';
-import { Upload, X, Save, Image as ImageIcon, Layout, Box, CheckCircle2, AlertCircle, RefreshCw, ShoppingBag } from 'lucide-react';
+import { Upload, X, Save, Image as ImageIcon, Layout, Box, CheckCircle2, AlertCircle, RefreshCw, ShoppingBag, Sparkles, Type, Link as LinkIcon, Eye } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import heroBannerFallback from '../../assets/hero_banner.png';
+import promoBannerFallback from '../../assets/promo_banner.jpg';
 import menFallback from '../../assets/product_1.png';
 import womenFallback from '../../assets/product_3.png';
 import unisexFallback from '../../assets/product_4.png';
@@ -13,6 +14,12 @@ const AdminMedia = () => {
         hero_banner: heroBannerFallback,
         logo_main: '',
         footer_logo: '',
+        promo_banner_image: promoBannerFallback,
+        promo_banner_badge: 'Limited Time Offer',
+        promo_banner_title: 'Summer Sale',
+        promo_banner_description: 'Get up to 50% off on selected styles. Upgrade your look for the sunny days ahead.',
+        promo_banner_btn_text: 'Shop Sale',
+        promo_banner_btn_link: '/shop',
         men_collection: menFallback,
         women_collection: womenFallback,
         unisex_collection: unisexFallback,
@@ -30,6 +37,16 @@ const AdminMedia = () => {
     const { showToast } = useToast();
 
     const hasChanges = Object.keys(previewAssets).length > 0 || Object.keys(pendingProducts).length > 0;
+
+    const getSettingValue = (key) => {
+        if (previewAssets[key] !== undefined) return previewAssets[key];
+        if (siteAssets[key] !== undefined) return siteAssets[key];
+        return '';
+    };
+
+    const handleTextChange = (key, value) => {
+        setPreviewAssets(prev => ({ ...prev, [key]: value }));
+    };
 
     useEffect(() => {
         fetchData();
@@ -52,7 +69,7 @@ const AdminMedia = () => {
             const settings = await settingsParams.fetchAll();
             const assetsObj = {};
             settings.forEach(s => {
-                if (s.value) assetsObj[s.key] = s.value;
+                if (s.value !== undefined && s.value !== null) assetsObj[s.key] = s.value;
             });
             setSiteAssets(prev => ({ ...prev, ...assetsObj }));
         } catch (err) {
@@ -166,8 +183,8 @@ const AdminMedia = () => {
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                 <div>
-                    <h1 className="text-3xl font-bold text-text-main font-outfit uppercase tracking-tight">Media Manager</h1>
-                    <p className="text-text-muted font-outfit">Control all visual assets across your entire store.</p>
+                    <h1 className="text-3xl font-bold text-text-main font-outfit uppercase tracking-tight">Media & Content Manager</h1>
+                    <p className="text-text-muted font-outfit">Control all visual banners, text content, and store assets across your website.</p>
                 </div>
 
                 <div className="flex bg-white/50 backdrop-blur-md p-1 rounded-2xl border border-border/50">
@@ -176,7 +193,7 @@ const AdminMedia = () => {
                         className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${activeTab === 'site' ? 'bg-primary text-white shadow-lg' : 'text-text-muted hover:text-text-main'}`}
                     >
                         <Layout size={14} />
-                        Global Assets
+                        Global Assets & Content
                     </button>
                     <button
                         onClick={() => setActiveTab('products')}
@@ -197,7 +214,7 @@ const AdminMedia = () => {
                         <div className="flex-1">
                             <h3 className="text-lg font-bold text-amber-900 font-outfit uppercase tracking-tight mb-2">Supabase Table Required</h3>
                             <p className="text-amber-800 font-outfit text-sm mb-6 leading-relaxed">
-                                To save persistent global assets (Hero, Logo, etc.), you need to create the <code className="bg-amber-100 px-2 py-0.5 rounded font-bold">site_settings</code> table in your Supabase SQL Editor.
+                                To save persistent global assets (Banners, Text, Logos, etc.), you need to create the <code className="bg-amber-100 px-2 py-0.5 rounded font-bold">site_settings</code> table in your Supabase SQL Editor.
                             </p>
                             <div className="bg-gray-900 rounded-2xl p-6 relative group">
                                 <pre className="text-emerald-400 text-[11px] font-mono overflow-x-auto custom-scrollbar leading-relaxed">
@@ -237,96 +254,293 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                 </div>
             )}
             {activeTab === 'site' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-32">
-                    {/* Hero Banner Card */}
-                    <AssetCard
-                        title="Hero Banner"
-                        description="Main landing image"
-                        imageUrl={previewAssets.hero_banner || siteAssets.hero_banner}
-                        isPending={!!previewAssets.hero_banner}
-                        onUpload={(e) => handleSiteAssetUpload(e, 'hero_banner')}
-                        onSelect={() => {
-                            setSelectingFor({ type: 'site', key: 'hero_banner' });
-                            setShowLibrary(true);
-                        }}
-                        saving={saving}
-                    />
+                <div className="space-y-12 pb-32">
+                    {/* SECTION 1: Brand & Hero Assets */}
+                    <div>
+                        <div className="mb-6">
+                            <h2 className="text-xl font-bold text-text-main font-outfit uppercase tracking-tight flex items-center gap-3">
+                                <Layout className="text-primary" size={20} />
+                                Header & Brand Assets
+                            </h2>
+                            <p className="text-text-muted font-outfit text-sm">Update the primary hero banner image and store logos.</p>
+                        </div>
 
-                    {/* Logo Card */}
-                    <AssetCard
-                        title="Main Logo"
-                        description="Displayed in Navbar"
-                        imageUrl={previewAssets.logo_main || siteAssets.logo_main}
-                        isPending={!!previewAssets.logo_main}
-                        onUpload={(e) => handleSiteAssetUpload(e, 'logo_main')}
-                        onSelect={() => {
-                            setSelectingFor({ type: 'site', key: 'logo_main' });
-                            setShowLibrary(true);
-                        }}
-                        saving={saving}
-                    />
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {/* Hero Banner Card */}
+                            <AssetCard
+                                title="Hero Banner"
+                                description="Main landing image"
+                                imageUrl={previewAssets.hero_banner || siteAssets.hero_banner}
+                                isPending={!!previewAssets.hero_banner}
+                                onUpload={(e) => handleSiteAssetUpload(e, 'hero_banner')}
+                                onSelect={() => {
+                                    setSelectingFor({ type: 'site', key: 'hero_banner' });
+                                    setShowLibrary(true);
+                                }}
+                                saving={saving}
+                            />
 
-                    {/* Footer Logo Card */}
-                    <AssetCard
-                        title="Footer Logo"
-                        description="Secondary branding"
-                        imageUrl={previewAssets.footer_logo || siteAssets.footer_logo}
-                        isPending={!!previewAssets.footer_logo}
-                        onUpload={(e) => handleSiteAssetUpload(e, 'footer_logo')}
-                        onSelect={() => {
-                            setSelectingFor({ type: 'site', key: 'footer_logo' });
-                            setShowLibrary(true);
-                        }}
-                        saving={saving}
-                    />
+                            {/* Logo Card */}
+                            <AssetCard
+                                title="Main Logo"
+                                description="Displayed in Navbar"
+                                imageUrl={previewAssets.logo_main || siteAssets.logo_main}
+                                isPending={!!previewAssets.logo_main}
+                                onUpload={(e) => handleSiteAssetUpload(e, 'logo_main')}
+                                onSelect={() => {
+                                    setSelectingFor({ type: 'site', key: 'logo_main' });
+                                    setShowLibrary(true);
+                                }}
+                                saving={saving}
+                            />
 
-                    {/* Collection Images */}
-                    <div className="col-span-full mt-10 mb-6">
-                        <h2 className="text-xl font-bold text-text-main font-outfit uppercase tracking-tight flex items-center gap-3">
-                            <ShoppingBag className="text-primary" size={20} />
-                            Homepage Collections
-                        </h2>
-                        <p className="text-text-muted font-outfit text-sm">Update the large category cards on your home page.</p>
+                            {/* Footer Logo Card */}
+                            <AssetCard
+                                title="Footer Logo"
+                                description="Secondary branding"
+                                imageUrl={previewAssets.footer_logo || siteAssets.footer_logo}
+                                isPending={!!previewAssets.footer_logo}
+                                onUpload={(e) => handleSiteAssetUpload(e, 'footer_logo')}
+                                onSelect={() => {
+                                    setSelectingFor({ type: 'site', key: 'footer_logo' });
+                                    setShowLibrary(true);
+                                }}
+                                saving={saving}
+                            />
+                        </div>
                     </div>
 
-                    <AssetCard
-                        title="Men Collection"
-                        description="Men's category image"
-                        imageUrl={previewAssets.men_collection || siteAssets.men_collection}
-                        isPending={!!previewAssets.men_collection}
-                        onUpload={(e) => handleSiteAssetUpload(e, 'men_collection')}
-                        onSelect={() => {
-                            setSelectingFor({ type: 'site', key: 'men_collection' });
-                            setShowLibrary(true);
-                        }}
-                        saving={saving}
-                    />
+                    {/* SECTION 2: Homepage Promotional Banner Editor with Live Preview */}
+                    <div className="bg-white rounded-[2.5rem] border border-border/60 p-6 md:p-10 shadow-sm">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-border/50 mb-8">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-secondary/20 text-secondary-dark rounded-2xl flex items-center justify-center">
+                                    <Sparkles size={24} className="text-amber-600" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-bold text-text-main font-outfit uppercase tracking-tight flex items-center gap-2">
+                                        Promotional Banner (Home Page)
+                                        {(previewAssets.promo_banner_image || previewAssets.promo_banner_title || previewAssets.promo_banner_description || previewAssets.promo_banner_badge || previewAssets.promo_banner_btn_text || previewAssets.promo_banner_btn_link) && (
+                                            <span className="text-[10px] bg-primary/10 text-primary font-bold px-2.5 py-1 rounded-full uppercase animate-pulse">Draft</span>
+                                        )}
+                                    </h2>
+                                    <p className="text-text-muted font-outfit text-xs md:text-sm">Customize background image and all text shown in the middle promotional section.</p>
+                                </div>
+                            </div>
+                        </div>
 
-                    <AssetCard
-                        title="Women Collection"
-                        description="Women's category image"
-                        imageUrl={previewAssets.women_collection || siteAssets.women_collection}
-                        isPending={!!previewAssets.women_collection}
-                        onUpload={(e) => handleSiteAssetUpload(e, 'women_collection')}
-                        onSelect={() => {
-                            setSelectingFor({ type: 'site', key: 'women_collection' });
-                            setShowLibrary(true);
-                        }}
-                        saving={saving}
-                    />
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                            {/* Form inputs */}
+                            <div className="lg:col-span-6 space-y-6">
+                                {/* Image Selector */}
+                                <div>
+                                    <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2">
+                                        Banner Background Image
+                                    </label>
+                                    <div className="flex items-center gap-4">
+                                        <div className="relative w-28 h-20 rounded-2xl overflow-hidden bg-gray-100 border border-border flex-shrink-0">
+                                            <img
+                                                src={getSettingValue('promo_banner_image') || promoBannerFallback}
+                                                alt="Promo banner preview"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            <label className="cursor-pointer px-4 py-2 bg-gray-100 hover:bg-primary hover:text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-colors inline-flex items-center gap-2">
+                                                <Upload size={14} />
+                                                Upload Image
+                                                <input
+                                                    type="file"
+                                                    className="hidden"
+                                                    onChange={(e) => handleSiteAssetUpload(e, 'promo_banner_image')}
+                                                    disabled={saving}
+                                                    accept="image/*"
+                                                />
+                                            </label>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectingFor({ type: 'site', key: 'promo_banner_image' });
+                                                    setShowLibrary(true);
+                                                }}
+                                                disabled={saving}
+                                                className="px-4 py-2 bg-gray-100 hover:bg-text-main hover:text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-colors inline-flex items-center gap-2"
+                                            >
+                                                <ImageIcon size={14} />
+                                                Choose Library
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
 
-                    <AssetCard
-                        title="Unisex Collection"
-                        description="Unisex category image"
-                        imageUrl={previewAssets.unisex_collection || siteAssets.unisex_collection}
-                        isPending={!!previewAssets.unisex_collection}
-                        onUpload={(e) => handleSiteAssetUpload(e, 'unisex_collection')}
-                        onSelect={() => {
-                            setSelectingFor({ type: 'site', key: 'unisex_collection' });
-                            setShowLibrary(true);
-                        }}
-                        saving={saving}
-                    />
+                                {/* Badge */}
+                                <div>
+                                    <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2 flex items-center gap-1.5">
+                                        <Sparkles size={14} className="text-secondary" /> Tag / Badge Text (Optional)
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={getSettingValue('promo_banner_badge')}
+                                        onChange={(e) => handleTextChange('promo_banner_badge', e.target.value)}
+                                        placeholder="e.g. Summer Exclusive, Limited Edition"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl text-sm font-outfit focus:bg-white focus:border-primary outline-none transition-all"
+                                    />
+                                </div>
+
+                                {/* Title */}
+                                <div>
+                                    <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2 flex items-center gap-1.5">
+                                        <Type size={14} className="text-primary" /> Main Heading / Title
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={getSettingValue('promo_banner_title')}
+                                        onChange={(e) => handleTextChange('promo_banner_title', e.target.value)}
+                                        placeholder="e.g. Summer Sale"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl text-sm font-outfit font-bold focus:bg-white focus:border-primary outline-none transition-all"
+                                    />
+                                </div>
+
+                                {/* Description */}
+                                <div>
+                                    <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2 flex items-center gap-1.5">
+                                        <Type size={14} className="text-primary" /> Subtitle / Description Text
+                                    </label>
+                                    <textarea
+                                        rows={3}
+                                        value={getSettingValue('promo_banner_description')}
+                                        onChange={(e) => handleTextChange('promo_banner_description', e.target.value)}
+                                        placeholder="e.g. Get up to 50% off on selected styles. Upgrade your look for the sunny days ahead."
+                                        className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl text-sm font-outfit focus:bg-white focus:border-primary outline-none transition-all resize-none"
+                                    />
+                                </div>
+
+                                {/* Button Config */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2">
+                                            Button Text
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={getSettingValue('promo_banner_btn_text')}
+                                            onChange={(e) => handleTextChange('promo_banner_btn_text', e.target.value)}
+                                            placeholder="e.g. Shop Sale"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl text-sm font-outfit focus:bg-white focus:border-primary outline-none transition-all"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold font-outfit uppercase tracking-wider text-text-main mb-2 flex items-center gap-1.5">
+                                            <LinkIcon size={14} className="text-text-muted" /> Button Link (URL)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={getSettingValue('promo_banner_btn_link')}
+                                            onChange={(e) => handleTextChange('promo_banner_btn_link', e.target.value)}
+                                            placeholder="e.g. /shop or /collections"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-border rounded-xl text-sm font-outfit focus:bg-white focus:border-primary outline-none transition-all"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Live Interactive Preview Box */}
+                            <div className="lg:col-span-6 sticky top-24">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <Eye size={16} className="text-primary" />
+                                    <span className="text-xs font-bold font-outfit uppercase tracking-widest text-text-muted">Live Homepage Preview</span>
+                                </div>
+
+                                <div className="relative rounded-3xl overflow-hidden shadow-xl border border-border/80 min-h-[340px] flex items-center justify-center p-8 text-center group">
+                                    {/* Image */}
+                                    <img
+                                        src={getSettingValue('promo_banner_image') || promoBannerFallback}
+                                        alt="Promo preview"
+                                        className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                                    />
+                                    {/* Overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/70 backdrop-brightness-90"></div>
+
+                                    {/* Foreground Content */}
+                                    <div className="relative z-10 max-w-md text-white">
+                                        {getSettingValue('promo_banner_badge') && (
+                                            <div className="inline-block px-3 py-1 bg-secondary/20 backdrop-blur-md border border-secondary/40 rounded-full mb-3">
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-secondary font-outfit">
+                                                    {getSettingValue('promo_banner_badge')}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        <h3 className="text-2xl sm:text-3xl font-bold font-outfit uppercase tracking-tight text-white mb-2 drop-shadow-md">
+                                            {getSettingValue('promo_banner_title') || 'Summer Sale'}
+                                        </h3>
+
+                                        <p className="text-xs sm:text-sm text-white/90 font-outfit mb-6 line-clamp-3 leading-relaxed drop-shadow">
+                                            {getSettingValue('promo_banner_description') || 'Get up to 50% off on selected styles. Upgrade your look for the sunny days ahead.'}
+                                        </p>
+
+                                        <div className="inline-block">
+                                            <div className="bg-secondary text-primary font-bold font-outfit text-xs uppercase tracking-wider px-6 py-2.5 rounded shadow-lg">
+                                                {getSettingValue('promo_banner_btn_text') || 'Shop Sale'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* SECTION 3: Collection Category Images */}
+                    <div>
+                        <div className="mb-6">
+                            <h2 className="text-xl font-bold text-text-main font-outfit uppercase tracking-tight flex items-center gap-3">
+                                <ShoppingBag className="text-primary" size={20} />
+                                Homepage Collections
+                            </h2>
+                            <p className="text-text-muted font-outfit text-sm">Update the large category cards on your home page.</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <AssetCard
+                                title="Men Collection"
+                                description="Men's category image"
+                                imageUrl={previewAssets.men_collection || siteAssets.men_collection}
+                                isPending={!!previewAssets.men_collection}
+                                onUpload={(e) => handleSiteAssetUpload(e, 'men_collection')}
+                                onSelect={() => {
+                                    setSelectingFor({ type: 'site', key: 'men_collection' });
+                                    setShowLibrary(true);
+                                }}
+                                saving={saving}
+                            />
+
+                            <AssetCard
+                                title="Women Collection"
+                                description="Women's category image"
+                                imageUrl={previewAssets.women_collection || siteAssets.women_collection}
+                                isPending={!!previewAssets.women_collection}
+                                onUpload={(e) => handleSiteAssetUpload(e, 'women_collection')}
+                                onSelect={() => {
+                                    setSelectingFor({ type: 'site', key: 'women_collection' });
+                                    setShowLibrary(true);
+                                }}
+                                saving={saving}
+                            />
+
+                            <AssetCard
+                                title="Unisex Collection"
+                                description="Unisex category image"
+                                imageUrl={previewAssets.unisex_collection || siteAssets.unisex_collection}
+                                isPending={!!previewAssets.unisex_collection}
+                                onUpload={(e) => handleSiteAssetUpload(e, 'unisex_collection')}
+                                onSelect={() => {
+                                    setSelectingFor({ type: 'site', key: 'unisex_collection' });
+                                    setShowLibrary(true);
+                                }}
+                                saving={saving}
+                            />
+                        </div>
+                    </div>
                 </div>
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 pb-32">
