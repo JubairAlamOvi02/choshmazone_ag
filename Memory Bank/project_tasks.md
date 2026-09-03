@@ -422,3 +422,29 @@
   - [x] Implemented dropdown selectors for Button Size (*Medium, Large, Extra Large*).
   - [x] Implemented dropdown selectors for Button Icon (*None, Arrow, Sparkle, Shopping Bag*).
   - [x] Built a real-time Live Homepage Preview sticky panel with instant visual feedback.
+
+## Phase 35: Prescription Lens Engine & Customizer
+- [x] **Lens Selection Modal & Optical Packages (Task Id: 579)**:
+  - [x] Built `LensCustomizerModal.jsx` with optical lens tiers (Frame Only, Single Vision, Blue Cut, Photochromic, Progressive).
+  - [x] Added multi-tab prescription submission flow: Upload Slip with image preview, Manual OD/OS power inputs (SPH, CYL, AXIS, PD), and Send via WhatsApp Later option.
+  - [x] Dynamically integrated lens prices into cart subtotal and checkout calculations across the entire order lifecycle.
+  - [x] Stored prescription file URLs and manual power details in order metadata.
+
+## Phase 36: Admin Optical Lens Packages Management
+- [x] **Lens Packages CRUD Interface (Task Id: 580)**:
+  - [x] Created `/admin/lenses` (`LensPackages.jsx`) admin module with package creation, editing, deletion, and active status toggling.
+  - [x] Added reordering controls (Move Up / Move Down) and "Reset to Defaults" recovery tool.
+  - [x] Connected directly to Supabase `site_settings` table (`lens_packages_settings`) for real-time customer storefront synchronization.
+  - [x] Added "Lens Packages" navigation link with `Glasses` icon to `AdminLayout.jsx`.
+
+## Phase 37: Checkout UX & Order Summary Improvements
+- [x] **Item Removal from Checkout Sidebar (Task Id: 581)**:
+  - [x] Added individual `X` cancel buttons on order summary items in `Checkout.jsx`.
+  - [x] Connected removal handler to `CartContext` (`removeFromCart`) with dynamic recalculation of cart totals and delivery charges.
+
+## Phase 38: Product Details UX & Image Gallery Navigation
+- [x] **Product Details Layout & Image Gallery Refinement (Task Id: 582)**:
+  - [x] Re-architected PDP to ensure full container containment without text overflow (`break-words`, `quill-content` CSS).
+  - [x] Designed sleek, self-contained compact Lens Selector pill badge (`self-start`) with tactile action button.
+  - [x] Restored large square aspect ratio for primary product image and increased thumbnail dimensions (`w-16 h-16 md:w-20 md:h-20`).
+  - [x] Added floating previous and next navigation arrows (`ChevronLeft` / `ChevronRight`) directly on the main product image for effortless multi-image browsing.

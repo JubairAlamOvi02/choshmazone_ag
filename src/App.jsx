@@ -53,6 +53,7 @@ const AdminOrders = lazy(() => import('./pages/admin/Orders'));
 const AdminCustomers = lazy(() => import('./pages/admin/Customers'));
 const AdminMedia = lazy(() => import('./pages/admin/MediaManager'));
 const FacebookCatalog = lazy(() => import('./pages/admin/FacebookCatalog'));
+const AdminLensPackages = lazy(() => import('./pages/admin/LensPackages'));
 
 
 function App() {
@@ -118,6 +119,7 @@ function App() {
                           <Route path="products/edit/:id" element={<ProductForm />} />
                           <Route path="orders" element={<AdminOrders />} />
                           <Route path="customers" element={<AdminCustomers />} />
+                          <Route path="lenses" element={<AdminLensPackages />} />
                           <Route path="media" element={<AdminMedia />} />
                           <Route path="facebook-catalog" element={<FacebookCatalog />} />
                         </Route>

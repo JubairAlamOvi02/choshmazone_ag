@@ -48,12 +48,24 @@
     - Transformed the Collections page header into a visual hero banner with background image support.
     - Made background image, badge tagline, title, and description fully customizable from the Admin Media & Content Manager.
     - Added a real-time live preview module in `MediaManager.jsx` for instant visual validation before publishing.
-- [x] Homepage Hero Banner Full Customization & Button Design Dropdown Controls:
-    - Connected all Hero Banner elements to Supabase `site_settings` (`hero_banner_image`, `hero_banner_badge`, `hero_banner_title`, `hero_banner_highlight`, `hero_banner_description`, `hero_banner_btn_text`, `hero_banner_btn_link`, `hero_banner_btn_style`, `hero_banner_btn_shape`, `hero_banner_btn_size`, `hero_banner_btn_icon`).
-    - Added comprehensive button styling controls via dropdown selectors (Colors/Styles: Dark, Gold, White, Outlines, Glass, Gradient; Corner Shapes: Square, Soft Square, Rounded, Pill; Sizes: Medium, Large, Extra Large; Icons: Arrow, Sparkle, Bag).
-    - Built a responsive real-time Live Homepage Preview sticky card in the Admin Media & Content Manager.
+- [x] Prescription Lens Selection & Upload Flow:
+    - Created `LensCustomizerModal.jsx` for selecting optical lens packages with dynamic pricing.
+    - Implemented 3 prescription submission flows: File Upload (with slip preview), Manual OD/OS power inputs (SPH, CYL, AXIS, PD), and WhatsApp ordering.
+    - Stored prescription specifications and lens package names directly inside Supabase order line items and database records.
+- [x] Admin Optical Lens Packages Management:
+    - Built complete CRUD module at `/admin/lenses` (`LensPackages.jsx`) for managing optical packages, prices, features, and prescription flags.
+    - Synced real-time updates with Supabase `site_settings` table (key: `lens_packages_settings`).
+    - Added "Lens Packages" navigation item with `Glasses` icon in `AdminLayout.jsx`.
+- [x] Checkout Order Summary Item Removal:
+    - Added item-level `X` cancel/remove buttons on each line item card in the `/checkout` Order Summary sidebar.
+    - Automatically updates cart totals, delivery charges, and total amount without navigating away.
+- [x] Product Details Page Layout & Image Gallery Refinements:
+    - Restored natural e-commerce layout flow with description and specifications under Title & Price with full overflow containment (`break-words`, `quill-content`).
+    - Designed compact, self-contained Lens Selector pill badge (`self-start`) with an integrated action button.
+    - Restored large square aspect ratio for primary product image and increased thumbnail sizes.
+    - Added floating previous and next navigation arrows (`ChevronLeft` / `ChevronRight`) on the main product image for multi-image browsing.
 
-**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, Category/Collections management, Collections Hero Header customization, and Homepage Hero Banner customization with button design dropdowns have been implemented and verified.
+**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, Category/Collections management, Collections Hero Header customization, Homepage Hero Banner customization with button design dropdowns, Prescription Lens Selection & Upload Flow, Admin Lens Management, Checkout Item Removal, and PDP Image Navigation have been implemented and verified.
 
 
 ## Next High-Priority Tasks: Admin & Backend

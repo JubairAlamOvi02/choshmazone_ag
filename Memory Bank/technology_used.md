@@ -78,11 +78,19 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **Unified Media Gallery**: Drag-and-drop image reordering system in Admin with automatic primary image selection.
     - **Shopify-Style Variant Table**: Combined option display (Color / Size) for a professional inventory management experience.
 - **Dynamic CMS & Site Settings Engine**:
-    - **Global Site Settings (`site_settings`)**: PostgreSQL key-value persistence layer for promotional banners, brand visual assets, and storefront text.
+    - **Global Site Settings (`site_settings`)**: PostgreSQL key-value persistence layer for promotional banners, brand visual assets, optical lens packages, and storefront text.
     - **Homepage Hero Banner Customizer**: Complete customizer for background imagery, badge text, split title with gold accent highlight, multiline description, and live real-time sticky preview.
     - **Button Design Dropdown Selector Engine**: Selectable styling tokens for CTA buttons (Colors: Dark Luxury, Gold Accent, Crisp White, Outlines, Glassmorphic blur, Gold Gradient; Shapes: Square, Soft Square, Rounded, Pill; Sizes: Medium, Large, Extra Large; Icons: Arrow, Sparkle, Shopping Bag).
     - **Live Content Preview**: Admin module with real-time homepage banner preview as admins edit copy and upload photography.
     - **Category & Collection Architecture**: Dynamic database-driven category collections with instant featured toggling and dual-level Collections page layout (All Collections + Featured Highlights).
     - **Collections Hero Customizer**: Real-time admin customizer for background images, badge, title, and description for the Collections page header.
+- **Optical Prescription & Customization Suite**:
+    - **Interactive Lens Customizer**: Modal (`LensCustomizerModal.jsx`) allowing buyers to select optical lens packages (Single Vision, Anti-Reflective, Blue Cut, Photochromic, Progressive).
+    - **Multi-Method Prescription Submission**: Supports instant prescription slip upload, manual SPH/CYL/AXIS/PD entry, or "Send via WhatsApp Later" ordering flow.
+    - **Admin Lens Package Management (`/admin/lenses`)**: Complete CRUD, pricing, feature list, active toggle, and reordering interface synced to Supabase `site_settings`.
+    - **Dynamic Price Matrix**: Automatic composite calculation of Frame price + Lens package price in real time across PDP, Cart, Checkout, and Order Confirmation.
+- **Checkout & Purchasing UX**:
+    - **Item-Level Order Cancellation**: Individual item removal direct from the Checkout summary sidebar without navigating back to the cart.
+    - **Interactive Image Navigation**: Full-scale product presentation with floating prev/next navigation arrows and high-res thumbnail selection.
 
 

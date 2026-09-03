@@ -105,4 +105,10 @@ CREATE TABLE public.site_settings (
   value text NOT NULL,
   updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
   CONSTRAINT site_settings_pkey PRIMARY KEY (key)
-);
+);
+
+-- Common site_settings keys:
+-- 'lens_packages_settings': JSON array of optical lens packages (id, name, price, subtitle, features, isPrescription, is_active, order)
+-- 'hero_banner_*': Homepage hero configuration (image, badge, title, highlight, description, btn_text, btn_link, btn_style, btn_shape, btn_size, btn_icon)
+-- 'collections_hero_*': Collections page header banner (bg, badge, title, description)
+-- 'promo_banner_*': Promotional highlight banner configuration (image, badge, title, description, button, link)

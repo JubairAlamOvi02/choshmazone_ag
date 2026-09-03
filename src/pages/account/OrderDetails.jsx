@@ -184,7 +184,33 @@ const OrderDetails = () => {
                                         <div className="flex-1">
                                             <h4 className="font-bold text-text-main font-outfit">{item.products?.name || 'Product'}</h4>
                                             {item.style && item.style !== 'Default' && (
-                                                <p className="text-xs text-text-muted mb-1">Variant: {item.style}</p>
+                                                <div className="space-y-1 my-1">
+                                                    <p className="text-xs text-text-muted">
+                                                        {item.style.split('|')[0]?.trim()}
+                                                    </p>
+                                                    {item.style.includes('Lens:') && (
+                                                        <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                                                            <span className="text-[10px] font-bold px-2 py-0.5 bg-primary/10 text-primary rounded-md border border-primary/20 font-outfit">
+                                                                👓 {item.style.match(/Lens:\s*([^|(\[]+)/)?.[1]?.trim() || 'Custom Lens'}
+                                                            </span>
+                                                            {item.style.includes('Prescription Slip Attached') && (
+                                                                <span className="text-[9px] font-bold px-1.5 py-0.5 bg-green-50 text-green-700 rounded border border-green-200">
+                                                                    ✓ Rx Slip Attached
+                                                                </span>
+                                                            )}
+                                                            {item.style.includes('[Rx:') && (
+                                                                <span className="text-[9px] font-bold px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded border border-blue-200">
+                                                                    ✓ Manual Power Provided
+                                                                </span>
+                                                            )}
+                                                            {item.style.includes('WhatsApp Follow-up') && (
+                                                                <span className="text-[9px] font-bold px-1.5 py-0.5 bg-emerald-50 text-emerald-700 rounded border border-emerald-200">
+                                                                    💬 WhatsApp Rx Follow-up
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             )}
                                             <p className="text-sm text-text-muted mb-2">Quantity: {item.quantity}</p>
                                             <p className="font-bold text-primary">৳{(item.unit_price || 0).toLocaleString()}</p>

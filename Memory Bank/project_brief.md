@@ -18,9 +18,10 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 ### Core Features
 - **Homepage**: Hero banner, featured collections, and promotional highlights.
 - **Product Catalog**: Advanced Grid view with "Premium Tag" filtering (Frame Style, Category, Price) and dynamic active filter chips for effortless navigation.
-- **Product Details Page**: High-resolution interactive image gallery with thumbnail support, detailed descriptions, specifications, and "Add to Cart" functionality.
-- **Shopping Cart**: Review selected items, adjust quantities.
-- **Checkout Flow**: Guest/User checkout, shipping information with district-based delivery charges (৳60 for Dhaka, ৳120 for other districts), and payment integration (Support for **bKash** and **Cash on Delivery**).
+- **Product Details Page**: High-resolution interactive image gallery with thumbnail support, floating navigation arrows, detailed rich text descriptions, specifications, custom Prescription Lens selection modal, and "Add to Bag" / "Buy Now" controls.
+- **Optical Prescription Flow**: Dedicated lens package selection (Single Vision, Blue Cut, Photochromic, Progressive) with 3 prescription submission flows (Slip Upload, Manual SPH/CYL/AXIS/PD matrix, WhatsApp Later).
+- **Shopping Cart**: Review selected items, adjust quantities, view lens package details, and dynamic subtotal calculation.
+- **Checkout Flow**: Guest/User checkout, shipping information with district-based delivery charges (৳60 for Dhaka, ৳120 for other districts), item removal directly from order summary, and payment integration (Support for **bKash** and **Cash on Delivery**).
 - **User Portal**:
     - Registration and Login system.
     - View Order History and Profile.
@@ -32,7 +33,8 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
     - **Product Management**: Full CRUD operations + Advanced Multi-Image Upload and **Unified Drag-and-Drop Gallery** management.
     - **Rich Text Editing**: Full HTML description support with professional formatting controls.
     - **Shopify-Style Variants**: Efficient variant management table with combined option views (Color / Size).
-    - **Order Management**: Monitor sales, update statuses, administrative deletion, and Comprehensive Order Details Modal.
+    - **Lens Packages Management**: Full CRUD, pricing, feature list, active toggle, and reordering for optical lens packages at `/admin/lenses`.
+    - **Order Management**: Monitor sales, update statuses, administrative deletion, view attached prescription slips/details, and Comprehensive Order Details Modal.
     - **Real-Time Mobile Alerts**: Instant push notifications with sound directly to the store owner's phone via Telegram Bot on new orders, plus a built-in "Test Phone Alert" feature in the Admin panel.
     - **Media & Content Manager (CMS)**: Manage global assets, customize Homepage Hero Banner (headline typography, gold accent highlight, subtext, background photography, and button design dropdown selectors for color/shape/size/icon) with Live Homepage Preview, edit Promotional Banner copy/imagery, customize Collections hero banner, and configure category collection artwork.
     - **Category & Collection Control**: Manage dynamic store categories with instant "Featured" toggling (★ / ☆) for curated storefront highlights.

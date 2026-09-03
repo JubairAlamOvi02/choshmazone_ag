@@ -441,13 +441,22 @@ const AdminOrders = () => {
                                             <thead className="bg-gray-50/50">
                                                 <tr>
                                                     <th className="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest font-outfit">Product</th>
-                                                    <th className="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest font-outfit">Style</th>
+                                                    <th className="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest font-outfit">Configuration / Lenses</th>
                                                     <th className="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest font-outfit text-center">Qty</th>
                                                     <th className="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest font-outfit text-right">Price</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-border/30">
-                                                {selectedOrder.order_items?.map((item) => (
+                                                {selectedOrder.order_items?.map((item) => {
+                                                    const urlMatch = item.style?.match(/\[URL:\s*([^\]]+)\]/);
+                                                    const rxUrl = urlMatch ? urlMatch[1].trim() : '';
+                                                    const isWhatsApp = item.style?.includes('WhatsApp Follow-up');
+                                                    const rxPowerMatch = item.style?.match(/\[Rx:\s*([^\]]+)\]/);
+                                                    const rxPower = rxPowerMatch ? rxPowerMatch[1].trim() : '';
+                                                    const lensMatch = item.style?.match(/Lens:\s*([^|(\[]+)/);
+                                                    const lensName = lensMatch ? lensMatch[1].trim() : '';
+
+                                                    return (
                                                     <tr key={item.id} className="group hover:bg-gray-50/50 transition-colors">
                                                         <td className="px-6 py-4">
                                                             <div className="flex items-center gap-4">
@@ -456,7 +465,7 @@ const AdminOrders = () => {
                                                                         const imgUrl = getItemImage(item);
                                                                         if (imgUrl) setPreviewImage(imgUrl);
                                                                     }}
-                                                                    className="w-14 h-14 bg-white rounded-xl border border-border/50 flex items-center justify-center p-1.5 shadow-sm hover:scale-110 hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden group/img"
+                                                                    className="w-14 h-14 bg-white rounded-xl border border-border/50 flex items-center justify-center p-1.5 shadow-sm hover:scale-110 hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden group/img shrink-0"
                                                                 >
                                                                     {getItemImage(item) ? (
                                                                         <img
@@ -474,7 +483,46 @@ const AdminOrders = () => {
                                                             </div>
                                                         </td>
                                                         <td className="px-6 py-4">
-                                                            <span className="text-xs text-text-muted font-outfit">{item.style || 'Default'}</span>
+                                                            <div className="space-y-1.5 font-outfit max-w-xs">
+                                                                <div className="text-xs text-text-muted">
+                                                                    {item.style?.split('|')[0]?.trim() || 'Default'}
+                                                                </div>
+
+                                                                {lensName && (
+                                                                    <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                                                                        <span className="text-[10px] font-bold px-2 py-0.5 bg-primary/10 text-primary rounded-md border border-primary/20">
+                                                                            👓 {lensName}
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+
+                                                                {rxUrl && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setPreviewImage(rxUrl)}
+                                                                        className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 px-2 py-1 rounded-lg transition-colors cursor-pointer"
+                                                                    >
+                                                                        <span>🔍 View Doctor Slip</span>
+                                                                    </button>
+                                                                )}
+
+                                                                {rxPower && (
+                                                                    <div className="text-[10px] font-mono bg-gray-100 p-1.5 rounded-md border border-gray-200 text-gray-800 leading-tight">
+                                                                        {rxPower}
+                                                                    </div>
+                                                                )}
+
+                                                                {isWhatsApp && selectedOrder.shipping_address?.phone && (
+                                                                    <a
+                                                                        href={`https://wa.me/88${selectedOrder.shipping_address.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi ${selectedOrder.shipping_address?.first_name || 'there'}, regarding your Choshma Zone order #${selectedOrder.id.slice(0, 8)}, please send your prescription slip photo.`)}`}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="inline-flex items-center gap-1 text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 hover:bg-green-100 px-2 py-1 rounded-lg transition-colors"
+                                                                    >
+                                                                        <span>💬 Chat on WhatsApp for Rx</span>
+                                                                    </a>
+                                                                )}
+                                                            </div>
                                                         </td>
                                                         <td className="px-6 py-4 text-center">
                                                             <span className="text-sm font-bold text-text-main font-outfit">{item.quantity}</span>
@@ -483,7 +531,8 @@ const AdminOrders = () => {
                                                             <span className="text-sm font-bold text-text-main font-outfit">৳{item.unit_price.toLocaleString()}</span>
                                                         </td>
                                                     </tr>
-                                                ))}
+                                                    );
+                                                })}
                                             </tbody>
                                         </table>
 

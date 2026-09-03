@@ -23,9 +23,26 @@ const CartItem = React.memo(({ item }) => {
                     </button>
                 </div>
 
-                <p className="text-xs text-text-muted font-outfit truncate max-w-[150px]">
-                    {item.category} / {item.style}
-                </p>
+                <div className="space-y-1">
+                    <p className="text-xs text-text-muted font-outfit truncate max-w-[200px]">
+                        {item.category} {item.style && item.style !== 'Default' ? `• ${item.style}` : ''}
+                    </p>
+
+                    {item.lensOption && item.lensOption.id !== 'frame_only' && (
+                        <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                            <span className="text-[10px] font-bold px-2 py-0.5 bg-primary/5 text-primary rounded-md border border-primary/15 font-outfit">
+                                👓 {item.lensOption.name}
+                            </span>
+                            {item.lensOption.isPrescription && (
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 bg-green-50 text-green-700 rounded border border-green-200 font-outfit">
+                                    {item.lensOption.method === 'upload' && 'Rx Slip'}
+                                    {item.lensOption.method === 'manual' && 'Manual Rx'}
+                                    {item.lensOption.method === 'whatsapp' && 'WhatsApp'}
+                                </span>
+                            )}
+                        </div>
+                    )}
+                </div>
 
                 <div className="flex justify-between items-center mt-2">
                     <div className="flex items-center gap-1 border border-border rounded p-0.5">

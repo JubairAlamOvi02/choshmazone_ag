@@ -28,6 +28,25 @@ export const orderParams = {
                 }
             }
 
+            if (item.lensOption && item.lensOption.id !== 'frame_only') {
+                let lensDetail = `Lens: ${item.lensOption.name}`;
+                if (item.lensOption.isPrescription) {
+                    if (item.lensOption.method === 'upload') {
+                        const urlInfo = item.uploadedPrescriptionUrl ? ` [URL: ${item.uploadedPrescriptionUrl}]` : '';
+                        lensDetail += ` (Prescription Slip Attached${urlInfo})`;
+                    } else if (item.lensOption.method === 'manual' && item.lensOption.manualPower) {
+                        const p = item.lensOption.manualPower;
+                        lensDetail += ` [Rx: R(Sph:${p.odSph || '0'}, Cyl:${p.odCyl || '0'}, Ax:${p.odAxis || '-'}, Add:${p.odAdd || '-'}) L(Sph:${p.osSph || '0'}, Cyl:${p.osCyl || '0'}, Ax:${p.osAxis || '-'}, Add:${p.osAdd || '-'}) PD:${p.pd || '62'}]`;
+                    } else if (item.lensOption.method === 'whatsapp') {
+                        lensDetail += ' (WhatsApp Follow-up)';
+                    }
+                }
+                if (item.lensOption.notes) {
+                    lensDetail += ` (Note: ${item.lensOption.notes})`;
+                }
+                styleStr = styleStr ? `${styleStr} | ${lensDetail}` : lensDetail;
+            }
+
             return {
                 order_id: order.id,
                 product_id: isUUID ? item.id : null,

@@ -35,10 +35,30 @@ const formatOrderMessage = (order) => {
     let itemsList = '';
     if (items && items.length > 0) {
         itemsList = items.map((item, index) => {
-            const style = item.style && item.style !== 'Default' ? ` (${item.style})` : '';
+            const style = item.style && item.style !== 'Default' ? `\n     <i>Variant: ${item.style}</i>` : '';
+            let lensInfo = '';
+            if (item.lensOption && item.lensOption.id !== 'frame_only') {
+                lensInfo = `\n     👓 <b>Lens:</b> ${item.lensOption.name} (+৳${Number(item.lensOption.price || 0).toLocaleString()})`;
+                if (item.lensOption.isPrescription) {
+                    if (item.lensOption.method === 'upload') {
+                        const slipLink = item.uploadedPrescriptionUrl 
+                            ? ` (<a href="${item.uploadedPrescriptionUrl}">View Slip</a>)` 
+                            : '';
+                        lensInfo += `\n     📋 <b>Prescription:</b> Slip Attached${slipLink}`;
+                    } else if (item.lensOption.method === 'manual' && item.lensOption.manualPower) {
+                        const p = item.lensOption.manualPower;
+                        lensInfo += `\n     📋 <b>Rx Power:</b> OD(R): Sph ${p.odSph || '0'} Cyl ${p.odCyl || '0'} Ax ${p.odAxis || '-'} | OS(L): Sph ${p.osSph || '0'} Cyl ${p.osCyl || '0'} Ax ${p.osAxis || '-'} | PD: ${p.pd || '62'}mm`;
+                    } else if (item.lensOption.method === 'whatsapp') {
+                        lensInfo += `\n     💬 <b>Prescription:</b> Follow-up via WhatsApp`;
+                    }
+                }
+                if (item.lensOption.notes) {
+                    lensInfo += `\n     📝 <b>Note:</b> ${item.lensOption.notes}`;
+                }
+            }
             const price = Number(item.price || 0).toLocaleString();
-            return `  ${index + 1}. <b>${item.title || item.name || 'Product'}</b>${style}\n     Qty: <b>${item.quantity}</b> × ৳${price}`;
-        }).join('\n');
+            return `  ${index + 1}. <b>${item.title || item.name || 'Product'}</b>${style}${lensInfo}\n     Qty: <b>${item.quantity}</b> × ৳${price}`;
+        }).join('\n\n');
     } else {
         itemsList = '  <i>No items listed</i>';
     }

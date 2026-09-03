@@ -284,7 +284,7 @@
   - Transformed the plain Collections header into a visual hero banner with background image support and dark gradient overlay.
   - Connected `collections_hero_bg`, `collections_hero_badge`, `collections_hero_title`, and `collections_hero_description` to `site_settings`.
   - Added dedicated Collections Page Hero Header editor section in Admin Media & Content Manager (`MediaManager.jsx`) with live real-time interactive preview.
-- Task 74 (Hero Banner Full Customization & Button Design Dropdown Controls): Completed
+- Task 74 (Homepage Hero Banner Customization & Button Design Dropdown Controls): Completed
   - Transformed the homepage Hero Banner into a fully dynamic section driven by Supabase `site_settings`.
   - Added full admin customizer for Hero background image (with upload & library picker), tag/badge text, two-line heading with gold accent word (`hero_banner_title` & `hero_banner_highlight`), and multiline description.
   - Built comprehensive Button Design dropdown selectors:
@@ -294,3 +294,29 @@
     - **Button Icon**: None, Right Arrow (→), Sparkle (✨), Shopping Bag (🛍️).
   - Integrated real-time Live Homepage Preview for the Hero section in `MediaManager.jsx`.
   - Updated frontend `Hero.jsx` component to dynamically render all custom settings and styles with robust fallbacks.
+
+- Task 75 (Prescription Lens Selection & Upload Flow): Completed
+  - Created `LensCustomizerModal.jsx` allowing customers to select optical lens packages (Single Vision, Anti-Reflective, Blue Cut / Computer, Photochromic, Progressive).
+  - Added 3 prescription submission methods:
+    1. **Upload Slip**: File picker with image preview and Supabase storage upload.
+    2. **Enter Manually**: Structured power inputs for Right (OD) and Left (OS) Eye (SPH, CYL, AXIS, Pupillary Distance - PD).
+    3. **Send via WhatsApp Later**: Frictionless ordering option with clear post-checkout instructions.
+  - Integrated dynamic price recalculation: Frame price + Lens package price across `ProductDetails.jsx`, `CartContext.jsx`, `CartDrawer.jsx`, `Checkout.jsx`, and `OrderSuccess.jsx`.
+  - Stored prescription specifications and lens package names directly inside Supabase order line items and database records.
+
+- Task 76 (Admin Optical Lens Packages Management): Completed
+  - Created `/admin/lenses` (`src/pages/admin/LensPackages.jsx`) providing complete CRUD capabilities for lens tiers.
+  - Store managers can edit titles, prices, descriptions, feature bullet points, prescription requirements, and active statuses.
+  - Added reordering (Up/Down) and "Reset to Factory Defaults" safety recovery button.
+  - Integrated with live Supabase `site_settings` storage (key: `lens_packages_settings`) with instant real-time synchronization.
+  - Added "Lens Packages" navigation item with `Glasses` icon in `AdminLayout.jsx`.
+
+- Task 77 (Checkout Order Summary Item Removal): Completed
+  - Added item-level `X` cancel/remove buttons directly on each item card within the `/checkout` Order Summary sidebar.
+  - Automatically triggers cart item removal, recalculating subtotal, delivery charges, and total amount without forcing users back to the cart drawer.
+
+- Task 78 (Product Details Page UX & Image Gallery Refinement): Completed
+  - Restored natural e-commerce layout flow with description and specifications directly under the Title & Price.
+  - Enforced strict word-wrapping (`break-words`, `quill-content` CSS rules) ensuring descriptions never overflow the right screen margin.
+  - Refined Lens Selector into a sleek, self-contained pill badge (`self-start`) with an integrated `+ Add Lenses` / `Change` button.
+  - Expanded product image gallery to natural full column dimensions with high-res thumbnails and floating previous/next navigation arrow buttons (`ChevronLeft` / `ChevronRight`).

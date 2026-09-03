@@ -146,7 +146,38 @@ const Checkout = () => {
                 } : {}
             };
 
-            const createdOrder = await orderParams.create(supabaseOrderData, cartItems);
+            // Upload prescription files if any
+            const preparedItems = await Promise.all(cartItems.map(async (item) => {
+                let uploadedPrescriptionUrl = '';
+                if (item.lensOption?.prescriptionFile) {
+                    try {
+                        const file = item.lensOption.prescriptionFile;
+                        const fileExt = file.name ? file.name.split('.').pop() : 'jpg';
+                        const fileName = `rx_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                        const { data: uploadData, error: uploadErr } = await supabase.storage
+                            .from('products')
+                            .upload(`prescriptions/${fileName}`, file, {
+                                cacheControl: '3600',
+                                upsert: false
+                            });
+
+                        if (!uploadErr && uploadData) {
+                            const { data: publicUrlData } = supabase.storage
+                                .from('products')
+                                .getPublicUrl(`prescriptions/${fileName}`);
+                            uploadedPrescriptionUrl = publicUrlData?.publicUrl || '';
+                        }
+                    } catch (e) {
+                        console.warn('Prescription image upload skipped or failed:', e);
+                    }
+                }
+                return {
+                    ...item,
+                    uploadedPrescriptionUrl: uploadedPrescriptionUrl || (typeof item.lensOption?.previewUrl === 'string' && item.lensOption?.previewUrl.startsWith('http') ? item.lensOption.previewUrl : '')
+                };
+            }));
+
+            const createdOrder = await orderParams.create(supabaseOrderData, preparedItems);
 
             const now = new Date();
             const orderDisplayId = createdOrder?.id ? createdOrder.id.slice(0, 8).toUpperCase() : `ORD-${Date.now()}`;
@@ -158,11 +189,12 @@ const Checkout = () => {
                 ...formData,
                 firstName: fName,
                 lastName: lName,
-                items: cartItems.map(item => ({
+                items: preparedItems.map(item => ({
                     title: item.title,
                     quantity: item.quantity,
                     price: item.price,
-                    style: item.style
+                    style: item.style || (item.variant ? [item.variant.color, item.variant.size].filter(Boolean).join(', ') : ''),
+                    lens: item.lensOption ? item.lensOption.name : 'Frame Only'
                 })),
                 deliveryCharge: deliveryCharge.toFixed(2),
                 totalAmount: totalWithDelivery.toFixed(2)
@@ -180,11 +212,13 @@ const Checkout = () => {
                 paymentMethod: formData.paymentMethod,
                 bkashNumber: formData.bkashNumber,
                 bkashTrxId: formData.bkashTrxId,
-                items: cartItems.map(item => ({
+                items: preparedItems.map(item => ({
                     title: item.title,
                     quantity: item.quantity,
                     price: item.price,
-                    style: item.style || (item.variant ? [item.variant.color, item.variant.size].filter(Boolean).join(', ') : '')
+                    style: item.style || (item.variant ? [item.variant.color, item.variant.size].filter(Boolean).join(', ') : ''),
+                    lensOption: item.lensOption,
+                    uploadedPrescriptionUrl: item.uploadedPrescriptionUrl
                 })),
                 deliveryCharge: deliveryCharge,
                 totalAmount: totalWithDelivery,
@@ -493,34 +527,63 @@ const Checkout = () => {
                             </h3>
                             <div className="space-y-4 mb-6 pb-6 border-b border-border max-h-[400px] overflow-y-auto pr-2 scrollbar-thin">
                                 {cartItems.map(item => (
-                                    <div key={item.cartItemId || item.id} className="flex gap-4 items-center">
-                                        <div className="w-16 h-16 bg-white rounded-lg border border-border flex items-center justify-center shrink-0 relative p-1">
+                                    <div key={item.cartItemId || item.id} className="flex gap-4 items-start relative pb-4 border-b border-border/40 last:border-0 last:pb-0">
+                                        <div className="w-16 h-16 bg-white rounded-lg border border-border flex items-center justify-center shrink-0 relative p-1 mt-0.5">
                                             <img src={item.image} alt={item.title} className="w-full h-full object-contain mix-blend-multiply" />
                                         </div>
-                                        <div className="flex-1">
-                                            <p className="text-sm font-bold text-text-main font-outfit leading-tight mb-1">{item.title}</p>
-                                            <p className="text-xs text-text-muted font-outfit opacity-80 mb-2">{item.style}</p>
-                                            <div className="flex items-center gap-2 border border-border rounded-lg px-2 py-1 w-fit bg-white">
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex justify-between items-start gap-2 mb-1">
+                                                <p className="text-sm font-bold text-text-main font-outfit leading-tight">{item.title}</p>
                                                 <button
                                                     type="button"
-                                                    onClick={() => updateQuantity(item.cartItemId || item.id, -1)}
-                                                    className="text-text-muted hover:text-primary transition-colors disabled:opacity-50"
-                                                    disabled={item.quantity <= 1}
+                                                    onClick={() => removeFromCart(item.cartItemId || item.id)}
+                                                    className="text-text-muted hover:text-red-600 hover:bg-red-50 p-1 rounded-md transition-colors shrink-0 -mt-1 -mr-1 cursor-pointer"
+                                                    title="Remove item"
+                                                    aria-label="Remove item"
                                                 >
-                                                    <Minus size={14} />
-                                                </button>
-                                                <span className="text-sm font-bold w-6 text-center font-outfit">{item.quantity}</span>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => updateQuantity(item.cartItemId || item.id, 1)}
-                                                    className="text-text-muted hover:text-primary transition-colors"
-                                                >
-                                                    <Plus size={14} />
+                                                    <X size={15} />
                                                 </button>
                                             </div>
-                                        </div>
-                                        <div className="text-sm font-bold text-text-main font-outfit ml-auto">
-                                            ৳{(item.price * item.quantity).toFixed(2)}
+                                            {item.style && item.style !== 'Default' && (
+                                                <p className="text-xs text-text-muted font-outfit opacity-80 mb-1">{item.style}</p>
+                                            )}
+                                            {item.lensOption && item.lensOption.id !== 'frame_only' && (
+                                                <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                                                    <span className="text-[10px] font-bold px-2 py-0.5 bg-primary/5 text-primary rounded-md border border-primary/15 font-outfit">
+                                                        👓 {item.lensOption.name}
+                                                    </span>
+                                                    {item.lensOption.isPrescription && (
+                                                        <span className="text-[9px] font-bold px-1.5 py-0.5 bg-green-50 text-green-700 rounded border border-green-200 font-outfit">
+                                                            {item.lensOption.method === 'upload' && 'Rx Slip Attached'}
+                                                            {item.lensOption.method === 'manual' && 'Manual Power'}
+                                                            {item.lensOption.method === 'whatsapp' && 'WhatsApp Rx'}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
+                                            <div className="flex items-center justify-between gap-2 mt-2">
+                                                <div className="flex items-center gap-2 border border-border rounded-lg px-2 py-1 w-fit bg-white">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => updateQuantity(item.cartItemId || item.id, -1)}
+                                                        className="text-text-muted hover:text-primary transition-colors disabled:opacity-50"
+                                                        disabled={item.quantity <= 1}
+                                                    >
+                                                        <Minus size={14} />
+                                                    </button>
+                                                    <span className="text-sm font-bold w-6 text-center font-outfit">{item.quantity}</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => updateQuantity(item.cartItemId || item.id, 1)}
+                                                        className="text-text-muted hover:text-primary transition-colors"
+                                                    >
+                                                        <Plus size={14} />
+                                                    </button>
+                                                </div>
+                                                <div className="text-sm font-bold text-text-main font-outfit">
+                                                    ৳{(item.price * item.quantity).toFixed(2)}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
