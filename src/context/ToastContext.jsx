@@ -19,12 +19,16 @@ export const ToastProvider = ({ children }) => {
 
     const showToast = useCallback((message, type = 'success', duration = 3000) => {
         const id = Math.random().toString(36).substring(2, 9);
-        setToasts(prev => [...prev, { id, message, type }]);
+        
+        // Defer toast state update to prevent setState-in-render warnings across providers
+        setTimeout(() => {
+            setToasts(prev => [...prev, { id, message, type }]);
+        }, 0);
 
         if (duration) {
             setTimeout(() => {
                 removeToast(id);
-            }, duration);
+            }, duration + 10);
         }
     }, [removeToast]);
 

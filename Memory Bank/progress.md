@@ -330,3 +330,7 @@
   - Fixed awkward hyphenations by setting `word-break: normal;` and `hyphens: none;` on `.quill-content`, preventing mid-word splitting.
   - Eliminated orphan empty bullet dots (`•`) from rich-text specifications using CSS `:empty` filtering and runtime HTML sanitization (`sanitizeQuillHtml`).
   - Standardized paragraph and list line-heights (`1.65`) and left alignment for professional readability.
+
+- Task 81 (React Context Render-Phase State Update Resolution): Completed
+  - Resolved `Cannot update a component (ToastProvider) while rendering a different component (CartProvider)` by decoupling toast side-effects from the `setCartItems` state updater callback in `CartContext.jsx`.
+  - Hardened `ToastProvider.jsx` with deferred macrotask queueing (`setTimeout(..., 0)`), guaranteeing that notifications never collide with React component rendering phases across any context or hook.

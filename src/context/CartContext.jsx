@@ -38,6 +38,7 @@ export const CartProvider = ({ children }) => {
                 const activeIds = new Set(activeProducts.map(p => p.id));
 
                 // Filter out items that are no longer in the DB
+                let itemsRemoved = false;
                 setCartItems(prev => {
                     const filtered = prev.filter(item => {
                         // Check if it's a valid UUID
@@ -46,13 +47,19 @@ export const CartProvider = ({ children }) => {
                         return activeIds.has(item.id);
                     });
 
-                    // Notify if items were removed
                     if (filtered.length < prev.length) {
-                        showToast('Some items were removed from your cart as they are no longer available.', 'warning', 5000);
+                        itemsRemoved = true;
                     }
 
                     return filtered;
                 });
+
+                // Notify outside of render/updater cycle
+                if (itemsRemoved) {
+                    setTimeout(() => {
+                        showToast('Some items were removed from your cart as they are no longer available.', 'warning', 5000);
+                    }, 0);
+                }
             } catch (err) {
                 console.error("Cart validation failed:", err);
             }
@@ -105,13 +112,15 @@ export const CartProvider = ({ children }) => {
     }, [showToast]);
 
     const removeFromCart = useCallback((id) => {
+        let removedItem = null;
         setCartItems(prevItems => {
-            const itemToRemove = prevItems.find(item => (item.cartItemId || item.id) === id);
-            if (itemToRemove) {
-                showToast(`${itemToRemove.name || itemToRemove.title} removed from bag.`, 'info');
-            }
+            removedItem = prevItems.find(item => (item.cartItemId || item.id) === id);
             return prevItems.filter(item => (item.cartItemId || item.id) !== id);
         });
+
+        if (removedItem) {
+            showToast(`${removedItem.name || removedItem.title} removed from bag.`, 'info');
+        }
     }, [showToast]);
 
     const updateQuantity = useCallback((id, amount) => {

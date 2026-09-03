@@ -460,3 +460,8 @@
   - [x] Resolved mid-word hyphenation breaks by applying `word-break: normal;` and `hyphens: none;` across rich-text elements.
   - [x] Created `sanitizeQuillHtml` helper to eliminate empty bullet points (`<li><br></li>`) and orphan lists.
   - [x] Normalized line-height and paragraph spacing for optimal readability.
+
+## Phase 41: React Context Render-Phase State Update Resolution
+- [x] **Decouple Side-Effects from State Updaters (Task Id: 585)**:
+  - [x] Fixed React warning in `CartContext.jsx` by moving `showToast` notification outside of the synchronous `setCartItems` callback.
+  - [x] Hardened `ToastContext.jsx` with asynchronous micro/macrotask scheduling (`setTimeout(..., 0)`) to ensure clean execution from any component or hook.
