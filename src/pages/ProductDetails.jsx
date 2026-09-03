@@ -36,9 +36,8 @@ const ProductDetails = () => {
     const [selectedSize, setSelectedSize] = useState('');
     const [currentVariant, setCurrentVariant] = useState(null);
 
-    // Lens & Prescription State
-    const [isLensModalOpen, setIsLensModalOpen] = useState(false);
-    const [selectedLens, setSelectedLens] = useState({
+    // Default Frame Only Option (Zero Lens Surcharge)
+    const DEFAULT_FRAME_ONLY = {
         id: 'frame_only',
         name: 'Frame Only / Demo Lens',
         subtitle: 'Zero power factory lenses',
@@ -49,7 +48,17 @@ const ProductDetails = () => {
         previewUrl: '',
         manualPower: null,
         notes: ''
-    });
+    };
+
+    // Lens & Prescription State (Always defaults to Frame Only)
+    const [isLensModalOpen, setIsLensModalOpen] = useState(false);
+    const [selectedLens, setSelectedLens] = useState(DEFAULT_FRAME_ONLY);
+
+    // Reset customizations on product change
+    useEffect(() => {
+        setSelectedLens(DEFAULT_FRAME_ONLY);
+        setQuantity(1);
+    }, [id]);
 
     useEffect(() => {
         const loadDefaultLens = async () => {
@@ -58,16 +67,14 @@ const ProductDetails = () => {
                 if (stored) {
                     const parsed = JSON.parse(stored);
                     if (Array.isArray(parsed) && parsed.length > 0) {
-                        const firstActive = parsed.find(p => p.id === 'frame_only' && p.is_active !== false) || parsed.find(p => p.is_active !== false) || parsed[0];
-                        if (firstActive) {
-                            setSelectedLens(prev => ({
+                        const frameOnlyPkg = parsed.find(p => p.id === 'frame_only');
+                        if (frameOnlyPkg) {
+                            setSelectedLens(prev => (prev.id === 'frame_only' ? {
                                 ...prev,
-                                id: firstActive.id,
-                                name: firstActive.name,
-                                subtitle: firstActive.subtitle,
-                                price: Number(firstActive.price) || 0,
-                                isPrescription: Boolean(firstActive.isPrescription)
-                            }));
+                                name: frameOnlyPkg.name || 'Frame Only / Demo Lens',
+                                subtitle: frameOnlyPkg.subtitle || 'Zero power factory lenses',
+                                price: Number(frameOnlyPkg.price) || 0
+                            } : prev));
                         }
                     }
                 }
