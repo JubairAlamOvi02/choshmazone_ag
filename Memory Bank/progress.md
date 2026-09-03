@@ -325,3 +325,8 @@
   - Prevented background lens settings from automatically pre-selecting paid lens packages (`Zero Power Blue-Cut +৳500`) on initial load.
   - Enforced strict default initialization to `Frame Only / Demo Lens` (৳0 surcharge).
   - Added product ID change listener in `ProductDetails.jsx` to ensure clean state reset when browsing between catalog products.
+
+- Task 80 (Product Details Typography & Bullet Point Sanitization): Completed
+  - Fixed awkward hyphenations by setting `word-break: normal;` and `hyphens: none;` on `.quill-content`, preventing mid-word splitting.
+  - Eliminated orphan empty bullet dots (`•`) from rich-text specifications using CSS `:empty` filtering and runtime HTML sanitization (`sanitizeQuillHtml`).
+  - Standardized paragraph and list line-heights (`1.65`) and left alignment for professional readability.

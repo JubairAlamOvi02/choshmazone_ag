@@ -267,6 +267,16 @@ const ProductDetails = () => {
         setMainImage(product.images[nextIndex]);
     };
 
+    const sanitizeQuillHtml = (html) => {
+        if (!html) return '';
+        return html
+            // Remove empty list items that render orphan bullets
+            .replace(/<li>\s*(<br\s*\/?>|&nbsp;|\s)*<\/li>/gi, '')
+            // Clean empty ul / ol tags
+            .replace(/<ul>\s*<\/ul>/gi, '')
+            .replace(/<ol>\s*<\/ol>/gi, '');
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-white">
@@ -423,12 +433,12 @@ const ProductDetails = () => {
                             </div>
                         </div>
 
-                        {/* Product Description & Overview (Contained within layout) */}
-                        <div className="mb-6 text-text-muted leading-relaxed font-outfit text-sm md:text-base max-w-full break-words overflow-hidden">
+                        {/* Product Description & Overview */}
+                        <div className="mb-6 text-text-muted font-outfit text-sm md:text-base max-w-full overflow-hidden text-left">
                             {product.description ? (
-                                <div className="quill-content space-y-2 break-words max-w-full overflow-hidden" dangerouslySetInnerHTML={{ __html: product.description }} />
+                                <div className="quill-content max-w-full" dangerouslySetInnerHTML={{ __html: sanitizeQuillHtml(product.description) }} />
                             ) : (
-                                <p className="break-words">Experience premium vision with our handcrafted {product.style || 'sunglasses'}. Designed for ultimate comfort and durability, these frames feature high-quality materials and 100% UV protection lenses.</p>
+                                <p>Experience premium vision with our handcrafted {product.style || 'sunglasses'}. Designed for ultimate comfort and durability, these frames feature high-quality materials and 100% UV protection lenses.</p>
                             )}
                         </div>
 

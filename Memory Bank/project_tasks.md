@@ -454,3 +454,9 @@
   - [x] Refactored `ProductDetails.jsx` to prevent background settings loaders from auto-selecting paid optical tiers (`Zero Power Blue-Cut +৳500`).
   - [x] Ensured strict initial selection to `Frame Only / Demo Lens` (৳0).
   - [x] Added product ID change listener to reset lens customization state when switching between products.
+
+## Phase 40: Product Details Typography & Bullet Point Sanitization
+- [x] **Text Wrapping & Bullet Point Polish (Task Id: 584)**:
+  - [x] Resolved mid-word hyphenation breaks by applying `word-break: normal;` and `hyphens: none;` across rich-text elements.
+  - [x] Created `sanitizeQuillHtml` helper to eliminate empty bullet points (`<li><br></li>`) and orphan lists.
+  - [x] Normalized line-height and paragraph spacing for optimal readability.

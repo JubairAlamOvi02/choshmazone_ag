@@ -67,8 +67,11 @@
 - [x] Strict Default Lens State Enforcement:
     - Guaranteed that products open with `Frame Only / Demo Lens` (৳0) by default without auto-selecting paid optical tiers.
     - Added clean reset on product navigation.
+- [x] Product Details Typography & Bullet Point Sanitization:
+    - Fixed mid-word hyphenation splitting by enforcing `word-break: normal;` and `hyphens: none;` on description content.
+    - Sanitized empty list items to prevent orphan bullet dots (`•`) from appearing in specifications.
 
-**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, Category/Collections management, Collections Hero Header customization, Homepage Hero Banner customization with button design dropdowns, Prescription Lens Selection & Upload Flow, Admin Lens Management, Checkout Item Removal, PDP Image Navigation, and Default Lens State have been implemented and verified.
+**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, Category/Collections management, Collections Hero Header customization, Homepage Hero Banner customization with button design dropdowns, Prescription Lens Selection & Upload Flow, Admin Lens Management, Checkout Item Removal, PDP Image Navigation, Default Lens State, and PDP Typography Sanitization have been implemented and verified.
 
 
 ## Next High-Priority Tasks: Admin & Backend
