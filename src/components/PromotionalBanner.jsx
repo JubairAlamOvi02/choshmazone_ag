@@ -5,13 +5,22 @@ import promoBannerFallback from '../assets/promo_banner.jpg';
 import { settingsParams } from '../lib/api/settings';
 
 const PromotionalBanner = () => {
-    const [banner, setBanner] = useState({
-        image: promoBannerFallback,
-        badge: 'Limited Time Offer',
-        title: 'Summer Sale',
-        description: 'Get up to 50% off on selected styles. Upgrade your look for the sunny days ahead.',
-        btnText: 'Shop Sale',
-        btnLink: '/shop'
+    const [banner, setBanner] = useState(() => {
+        const cachedImg = settingsParams.getCached('promo_banner_image');
+        const cachedBadge = settingsParams.getCached('promo_banner_badge');
+        const cachedTitle = settingsParams.getCached('promo_banner_title');
+        const cachedDesc = settingsParams.getCached('promo_banner_description');
+        const cachedBtnText = settingsParams.getCached('promo_banner_btn_text');
+        const cachedBtnLink = settingsParams.getCached('promo_banner_btn_link');
+
+        return {
+            image: cachedImg || promoBannerFallback,
+            badge: cachedBadge !== null && cachedBadge !== undefined ? cachedBadge : 'Limited Time Offer',
+            title: cachedTitle || 'Summer Sale',
+            description: cachedDesc || 'Get up to 50% off on selected styles. Upgrade your look for the sunny days ahead.',
+            btnText: cachedBtnText || 'Shop Sale',
+            btnLink: cachedBtnLink || '/shop'
+        };
     });
 
     useEffect(() => {

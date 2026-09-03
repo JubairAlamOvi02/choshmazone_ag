@@ -1,8 +1,36 @@
 import { supabase } from '../supabaseClient';
 
+const CACHE_STORAGE_KEY = 'cz_site_settings_cache';
+
 let settingsCache = null;
+try {
+    const stored = localStorage.getItem(CACHE_STORAGE_KEY);
+    if (stored) {
+        settingsCache = JSON.parse(stored);
+    }
+} catch {
+    settingsCache = null;
+}
+
+const updateLocalStorage = (data) => {
+    try {
+        if (data) {
+            localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(data));
+        }
+    } catch {
+        // ignore storage errors
+    }
+};
 
 export const settingsParams = {
+    getCachedAll: () => settingsCache || [],
+
+    getCached: (key) => {
+        if (!settingsCache) return null;
+        const found = settingsCache.find(s => s.key === key);
+        return found ? found.value : null;
+    },
+
     fetchAll: async (forceRefresh = false) => {
         if (settingsCache && !forceRefresh) return settingsCache;
 
@@ -18,6 +46,7 @@ export const settingsParams = {
         }
 
         settingsCache = data;
+        updateLocalStorage(data);
         return data;
     },
 
@@ -32,7 +61,7 @@ export const settingsParams = {
             .from('site_settings')
             .select('value')
             .eq('key', key)
-            .maybeSingle(); // Switch to maybeSingle to avoid 406 error
+            .maybeSingle();
 
         if (error) {
             if (error.code === '42P01') return null; // Table missing
@@ -56,6 +85,7 @@ export const settingsParams = {
             } else {
                 settingsCache.push({ key, value });
             }
+            updateLocalStorage(settingsCache);
         }
 
         if (error) throw error;

@@ -28,18 +28,32 @@ export const HERO_BUTTON_SIZES = {
 };
 
 const Hero = () => {
-    const [heroData, setHeroData] = useState({
-        image: heroBannerFallback,
-        badge: 'Elite Vision • Luxury Style',
-        title: 'See the World',
-        highlight: 'Clearly',
-        description: 'Experience premium vision with our handcrafted eyewear collection, designed for those who demand the perfect blend of performance and luxury.',
-        btnText: 'Shop Collection',
-        btnLink: '/shop',
-        btnStyle: 'dark',
-        btnShape: 'rounded-md',
-        btnSize: 'large',
-        btnIcon: 'none'
+    const [heroData, setHeroData] = useState(() => {
+        const cachedImg = settingsParams.getCached('hero_banner_image') || settingsParams.getCached('hero_banner');
+        const cachedBadge = settingsParams.getCached('hero_banner_badge');
+        const cachedTitle = settingsParams.getCached('hero_banner_title');
+        const cachedHighlight = settingsParams.getCached('hero_banner_highlight');
+        const cachedDescription = settingsParams.getCached('hero_banner_description');
+        const cachedBtnText = settingsParams.getCached('hero_banner_btn_text');
+        const cachedBtnLink = settingsParams.getCached('hero_banner_btn_link');
+        const cachedBtnStyle = settingsParams.getCached('hero_banner_btn_style');
+        const cachedBtnShape = settingsParams.getCached('hero_banner_btn_shape');
+        const cachedBtnSize = settingsParams.getCached('hero_banner_btn_size');
+        const cachedBtnIcon = settingsParams.getCached('hero_banner_btn_icon');
+
+        return {
+            image: cachedImg || heroBannerFallback,
+            badge: cachedBadge !== null && cachedBadge !== undefined ? cachedBadge : 'Elite Vision • Luxury Style',
+            title: cachedTitle || 'See the World',
+            highlight: cachedHighlight !== null && cachedHighlight !== undefined ? cachedHighlight : 'Clearly',
+            description: cachedDescription || 'Experience premium vision with our handcrafted eyewear collection, designed for those who demand the perfect blend of performance and luxury.',
+            btnText: cachedBtnText || 'Shop Collection',
+            btnLink: cachedBtnLink || '/shop',
+            btnStyle: cachedBtnStyle || 'dark',
+            btnShape: cachedBtnShape || 'rounded-md',
+            btnSize: cachedBtnSize || 'large',
+            btnIcon: cachedBtnIcon || 'none'
+        };
     });
 
     useEffect(() => {
