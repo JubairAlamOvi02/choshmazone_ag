@@ -320,3 +320,8 @@
   - Enforced strict word-wrapping (`break-words`, `quill-content` CSS rules) ensuring descriptions never overflow the right screen margin.
   - Refined Lens Selector into a sleek, self-contained pill badge (`self-start`) with an integrated `+ Add Lenses` / `Change` button.
   - Expanded product image gallery to natural full column dimensions with high-res thumbnails and floating previous/next navigation arrow buttons (`ChevronLeft` / `ChevronRight`).
+
+- Task 79 (Strict Default Lens State Enforcement): Completed
+  - Prevented background lens settings from automatically pre-selecting paid lens packages (`Zero Power Blue-Cut +৳500`) on initial load.
+  - Enforced strict default initialization to `Frame Only / Demo Lens` (৳0 surcharge).
+  - Added product ID change listener in `ProductDetails.jsx` to ensure clean state reset when browsing between catalog products.

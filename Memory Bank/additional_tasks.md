@@ -64,8 +64,11 @@
     - Designed compact, self-contained Lens Selector pill badge (`self-start`) with an integrated action button.
     - Restored large square aspect ratio for primary product image and increased thumbnail sizes.
     - Added floating previous and next navigation arrows (`ChevronLeft` / `ChevronRight`) on the main product image for multi-image browsing.
+- [x] Strict Default Lens State Enforcement:
+    - Guaranteed that products open with `Frame Only / Demo Lens` (৳0) by default without auto-selecting paid optical tiers.
+    - Added clean reset on product navigation.
 
-**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, Category/Collections management, Collections Hero Header customization, Homepage Hero Banner customization with button design dropdowns, Prescription Lens Selection & Upload Flow, Admin Lens Management, Checkout Item Removal, and PDP Image Navigation have been implemented and verified.
+**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, Category/Collections management, Collections Hero Header customization, Homepage Hero Banner customization with button design dropdowns, Prescription Lens Selection & Upload Flow, Admin Lens Management, Checkout Item Removal, PDP Image Navigation, and Default Lens State have been implemented and verified.
 
 
 ## Next High-Priority Tasks: Admin & Backend

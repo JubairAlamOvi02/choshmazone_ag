@@ -448,3 +448,9 @@
   - [x] Designed sleek, self-contained compact Lens Selector pill badge (`self-start`) with tactile action button.
   - [x] Restored large square aspect ratio for primary product image and increased thumbnail dimensions (`w-16 h-16 md:w-20 md:h-20`).
   - [x] Added floating previous and next navigation arrows (`ChevronLeft` / `ChevronRight`) directly on the main product image for effortless multi-image browsing.
+
+## Phase 39: Strict Default Lens State Enforcement
+- [x] **Zero-Fee Initial State Logic (Task Id: 583)**:
+  - [x] Refactored `ProductDetails.jsx` to prevent background settings loaders from auto-selecting paid optical tiers (`Zero Power Blue-Cut +৳500`).
+  - [x] Ensured strict initial selection to `Frame Only / Demo Lens` (৳0).
+  - [x] Added product ID change listener to reset lens customization state when switching between products.
