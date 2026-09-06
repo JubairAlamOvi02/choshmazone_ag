@@ -506,13 +506,15 @@ const Checkout = () => {
                                                 {fieldSettings.email?.required ? (
                                                     <span className="text-error ml-1">*</span>
                                                 ) : (
-                                                    <span className="text-text-muted/60 text-[10px] font-normal lowercase tracking-normal ml-1">(Optional)</span>
+                                                    <span className="text-red-600 font-bold text-[10px] normal-case tracking-normal ml-1">
+                                                        (Optional - Required for order tracking)
+                                                    </span>
                                                 )}
                                             </label>
                                             <input
                                                 type="email"
                                                 name="email"
-                                                placeholder={fieldSettings.email?.placeholder || 'you@example.com'}
+                                                placeholder={fieldSettings.email?.placeholder || '(Required for order tracking)'}
                                                 value={formData.email}
                                                 onChange={handleChange}
                                                 required={fieldSettings.email?.required}

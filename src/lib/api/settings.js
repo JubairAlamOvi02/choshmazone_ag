@@ -42,7 +42,7 @@ export const DEFAULT_CHECKOUT_FIELD_SETTINGS = {
     email: {
         id: 'email',
         label: 'Email Address',
-        placeholder: 'you@example.com',
+        placeholder: '(Required for order tracking)',
         required: false,
         enabled: true,
         section: 'contact'
