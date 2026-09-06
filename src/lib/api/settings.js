@@ -22,6 +22,81 @@ const updateLocalStorage = (data) => {
     }
 };
 
+export const DEFAULT_CHECKOUT_FIELD_SETTINGS = {
+    name: {
+        id: 'name',
+        label: 'Full Name',
+        placeholder: 'Enter your full name',
+        required: true,
+        enabled: true,
+        section: 'shipping'
+    },
+    phone: {
+        id: 'phone',
+        label: 'Phone Number',
+        placeholder: '01XXXXXXXXX (11 digits)',
+        required: true,
+        enabled: true,
+        section: 'contact'
+    },
+    email: {
+        id: 'email',
+        label: 'Email Address',
+        placeholder: 'you@example.com',
+        required: false,
+        enabled: true,
+        section: 'contact'
+    },
+    address: {
+        id: 'address',
+        label: 'Street Address',
+        placeholder: 'House, road, flat, area...',
+        required: true,
+        enabled: true,
+        section: 'shipping'
+    },
+    district: {
+        id: 'district',
+        label: 'District',
+        placeholder: 'Select District',
+        required: true,
+        enabled: true,
+        section: 'shipping'
+    },
+    thana: {
+        id: 'thana',
+        label: 'Thana / Upazila',
+        placeholder: 'Select Thana',
+        required: false,
+        enabled: true,
+        section: 'shipping'
+    },
+    city: {
+        id: 'city',
+        label: 'City',
+        placeholder: 'Enter city',
+        required: false,
+        enabled: true,
+        section: 'shipping'
+    },
+    zip: {
+        id: 'zip',
+        label: 'Zip / Postal Code',
+        placeholder: 'Enter postal code',
+        required: false,
+        enabled: true,
+        section: 'shipping'
+    },
+    notes: {
+        id: 'notes',
+        label: 'Order Notes / Instructions',
+        placeholder: 'Notes about your order (e.g. special delivery instructions)',
+        required: false,
+        enabled: true,
+        section: 'additional'
+    }
+};
+
 export const settingsParams = {
     getCachedAll: () => settingsCache || [],
 
@@ -72,24 +147,46 @@ export const settingsParams = {
     },
 
     set: async (key, value) => {
+        const strVal = typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value);
         const { data, error } = await supabase
             .from('site_settings')
-            .upsert({ key, value, updated_at: new Date() })
+            .upsert({ key, value: strVal, updated_at: new Date() })
             .select();
 
         // Update cache
         if (!error && settingsCache) {
             const index = settingsCache.findIndex(s => s.key === key);
             if (index > -1) {
-                settingsCache[index] = { ...settingsCache[index], value };
+                settingsCache[index] = { ...settingsCache[index], value: strVal };
             } else {
-                settingsCache.push({ key, value });
+                settingsCache.push({ key, value: strVal });
             }
             updateLocalStorage(settingsCache);
         }
 
         if (error) throw error;
         return data;
+    },
+
+    getCheckoutFieldSettings: async () => {
+        try {
+            const raw = await settingsParams.get('checkout_field_settings');
+            if (!raw) return DEFAULT_CHECKOUT_FIELD_SETTINGS;
+            
+            const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            // Merge with default to guarantee all expected fields exist
+            return {
+                ...DEFAULT_CHECKOUT_FIELD_SETTINGS,
+                ...parsed
+            };
+        } catch (e) {
+            console.warn('[Settings] Failed to parse checkout_field_settings:', e);
+            return DEFAULT_CHECKOUT_FIELD_SETTINGS;
+        }
+    },
+
+    saveCheckoutFieldSettings: async (fieldSettings) => {
+        return await settingsParams.set('checkout_field_settings', fieldSettings);
     },
 
     uploadAsset: async (file, path = 'site-assets') => {

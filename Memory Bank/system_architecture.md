@@ -43,8 +43,10 @@
     *   `Dynamic Category & Collections System`: Database-driven category management with featured status toggling and dual-level Collections page architecture (All Collections + Featured Collections).
     *   `Collections Hero Banner Engine`: Dynamic background image and live real-time editable text customizer (badge, title, subtitle) for `/collections` header powered by `site_settings`.
     *   `Prescription Lens Engine`: Multi-package optical lens customizer modal (`LensCustomizerModal.jsx`) supporting file upload, manual SPH/CYL/AXIS/PD matrix, and WhatsApp submission options with dynamic cart pricing.
-    *   `Admin Lens Packages Module`: Real-time optical lens tier management (`/admin/lenses`) with CRUD operations, reordering, active status toggling, and factory reset synced to `site_settings`.
     *   `Checkout Order Management`: Sidebar item removal direct from checkout with dynamic recalculation of delivery charges and order total.
+    *   `Checkout Form Customizer`: Granular Admin module at `/admin/settings` controlling Required/Optional status, Shown/Hidden visibility, and custom labels/placeholders for all checkout inputs.
+    *   `11-Digit Phone Validation`: Real-time phone number normalization and regex enforcement (`^01[3-9]\d{8}$`) with live digit counters.
+    *   `Admin Orders Interaction Engine`: Clickable table rows and explicit `👁 Details` buttons for frictionless order inspection.
     *   `Interactive PDP Gallery`: Full-scale product image presentation with high-res thumbnails and floating previous/next navigation arrows.
 *   **PWA** (Implemented): Service Worker (`sw.js`) with offline caching for assets/images and Manifest support.
 *   **Performance Optimization**: 

@@ -233,15 +233,19 @@ const Dashboard = () => {
                         <Link to="/admin/orders" className="text-xs font-bold text-primary hover:text-secondary transition-colors uppercase tracking-widest font-outfit border-b border-primary/20 hover:border-secondary">View All</Link>
                     </div>
 
-                    <div className="space-y-6 flex-1">
+                    <div className="space-y-4 flex-1">
                         {orders.slice(0, 5).map(order => (
-                            <div key={order.id} className="flex items-center justify-between group">
+                            <Link 
+                                to="/admin/orders"
+                                key={order.id} 
+                                className="flex items-center justify-between p-2.5 -mx-2.5 rounded-2xl hover:bg-gray-50 transition-colors group"
+                            >
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/5 group-hover:text-primary transition-colors">
+                                    <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                                         <ShoppingBag size={18} />
                                     </div>
                                     <div>
-                                        <p className="text-sm font-bold text-text-main font-outfit">#{order.id.slice(0, 8)}</p>
+                                        <p className="text-sm font-bold text-text-main font-outfit group-hover:text-primary transition-colors">#{order.id.slice(0, 8)}</p>
                                         <p className="text-[10px] text-text-muted font-outfit uppercase tracking-widest">{new Date(order.created_at).toLocaleDateString()}</p>
                                     </div>
                                 </div>
@@ -253,7 +257,7 @@ const Dashboard = () => {
                                         {order.status}
                                     </span>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                         {orders.length === 0 && !loading && (
                             <div className="text-center py-10">

@@ -72,8 +72,21 @@
     - Sanitized empty list items to prevent orphan bullet dots (`•`) from appearing in specifications.
 - [x] React Context Render-Phase State Update Resolution:
     - Fixed `Cannot update a component (ToastProvider) while rendering a different component (CartProvider)` by decoupling toast side-effects from the `setCartItems` state updater callback in `CartContext.jsx`.
+- [x] Dynamic Checkout Field Customization & Admin Management:
+    - Built dedicated Admin Checkout Form Settings page at `/admin/settings` (`src/pages/admin/CheckoutSettings.jsx`).
+    - Added granular switches for toggling **Required** (Mandatory vs Optional) and **Visibility** (Shown vs Hidden) for all checkout fields (`name`, `phone`, `email`, `address`, `district`, `thana`, `city`, `zip`, `notes`).
+    - Enabled custom field labels and placeholders editable directly from admin panel and saved to Supabase `site_settings`.
+    - Integrated dynamic field rendering in `src/pages/Checkout.jsx` with subtle `(Optional)` tags on non-mandatory fields.
+- [x] Strict 11-Digit Bangladesh Phone Number Validation:
+    - Implemented normalization and 11-digit mobile validation (`013`–`019`) in `src/pages/Checkout.jsx`.
+    - Added real-time live digit counter badge (`X/11 digits ✓`) and instant visual error messaging.
+    - Protected checkout submission from malformed or incomplete phone numbers.
+- [x] Admin Order Details Accessibility & UX Overhaul:
+    - Made entire table rows in `src/pages/admin/Orders.jsx` clickable to open the Order Details modal directly without hunting for buttons.
+    - Replaced the ambiguous 3-dot dropdown menu with a prominent, styled `👁 Details` action button.
+    - Added interactive hover highlights, pointer cursors, and protected control cells (checkbox, status dropdown, delete button).
 
-**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, Category/Collections management, Collections Hero Header customization, Homepage Hero Banner customization with button design dropdowns, Prescription Lens Selection & Upload Flow, Admin Lens Management, Checkout Item Removal, PDP Image Navigation, Default Lens State, PDP Typography Sanitization, and Context State Warnings have been implemented and verified.
+**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, Category/Collections management, Collections Hero Header customization, Homepage Hero Banner customization with button design dropdowns, Prescription Lens Selection & Upload Flow, Admin Lens Management, Checkout Item Removal, PDP Image Navigation, Default Lens State, PDP Typography Sanitization, Context State Warnings, Dynamic Checkout Field Customization, 11-Digit Phone Validation, and Admin Orders Details UX have been implemented and verified.
 
 
 ## Next High-Priority Tasks: Admin & Backend

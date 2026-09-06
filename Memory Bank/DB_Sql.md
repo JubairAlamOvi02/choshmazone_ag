@@ -108,6 +108,7 @@ CREATE TABLE public.site_settings (
 );
 
 -- Common site_settings keys:
+-- 'checkout_field_settings': JSON object mapping field IDs ('name', 'phone', 'email', 'address', 'district', 'thana', 'city', 'zip', 'notes') to their required, enabled, label, and placeholder settings.
 -- 'lens_packages_settings': JSON array of optical lens packages (id, name, price, subtitle, features, isPrescription, is_active, order)
 -- 'hero_banner_*': Homepage hero configuration (image, badge, title, highlight, description, btn_text, btn_link, btn_style, btn_shape, btn_size, btn_icon)
 -- 'collections_hero_*': Collections page header banner (bg, badge, title, description)

@@ -66,6 +66,7 @@ const AdminLayout = () => {
                         <AdminNavLink to="/admin/orders" icon={ShoppingCart} label="Orders" isActive={isActive('/admin/orders')} onClick={closeMobileMenu} />
                         <AdminNavLink to="/admin/customers" icon={Users} label="Members" isActive={isActive('/admin/customers')} onClick={closeMobileMenu} />
                         <AdminNavLink to="/admin/facebook-catalog" icon={Facebook} label="FB Catalog" isActive={isActive('/admin/facebook-catalog')} onClick={closeMobileMenu} />
+                        <AdminNavLink to="/admin/settings" icon={Settings} label="Checkout Form" isActive={isActive('/admin/settings')} onClick={closeMobileMenu} />
                     </nav>
 
                     <div className="p-8 border-t border-border">

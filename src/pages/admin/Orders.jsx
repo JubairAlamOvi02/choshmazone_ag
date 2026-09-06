@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { orderParams } from '../../lib/api/orders';
 import { calculateDeliveryCharge } from '../../data/bangladeshLocations';
-import { Trash2, ExternalLink, Filter, Search, MoreVertical, X, Package, User, Mail, Phone, MapPin, CreditCard, ChevronRight, Bell } from 'lucide-react';
+import { Trash2, ExternalLink, Filter, Search, MoreVertical, X, Package, User, Mail, Phone, MapPin, CreditCard, ChevronRight, Bell, Eye } from 'lucide-react';
 import { testTelegramNotification } from '../../lib/telegramNotifier';
 
 const AdminOrders = () => {
@@ -243,8 +243,16 @@ const AdminOrders = () => {
                         </thead>
                         <tbody className="divide-y divide-border/30">
                             {orders.map(order => (
-                                <tr key={order.id} className={`transition-colors group ${selectedOrders.includes(order.id) ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-gray-50/30'}`}>
-                                    <td className="pl-6 py-5">
+                                <tr 
+                                    key={order.id} 
+                                    onClick={() => openOrderDetails(order)}
+                                    className={`transition-all duration-200 cursor-pointer group ${
+                                        selectedOrders.includes(order.id) 
+                                            ? 'bg-primary/5 hover:bg-primary/10' 
+                                            : 'hover:bg-amber-50/40 hover:shadow-xs'
+                                    }`}
+                                >
+                                    <td className="pl-6 py-5" onClick={(e) => e.stopPropagation()}>
                                         <input 
                                             type="checkbox"
                                             className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
@@ -254,28 +262,36 @@ const AdminOrders = () => {
                                     </td>
                                     <td className="px-6 py-5">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-sm font-mono font-bold text-text-main uppercase">#{order.id.slice(0, 8)}</span>
-                                            <ExternalLink size={14} className="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            <span className="text-sm font-mono font-bold text-text-main group-hover:text-primary transition-colors uppercase">
+                                                #{order.id.slice(0, 8)}
+                                            </span>
+                                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Eye size={11} /> View
+                                            </span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-5">
                                         <div className="flex flex-col">
-                                            <span className="text-sm font-bold text-text-main font-outfit">{order.shipping_address?.first_name} {order.shipping_address?.last_name}</span>
-                                            <span className="text-xs text-text-muted font-outfit">{order.shipping_address?.email}</span>
+                                            <span className="text-sm font-bold text-text-main font-outfit group-hover:text-primary transition-colors">
+                                                {order.shipping_address?.first_name} {order.shipping_address?.last_name}
+                                            </span>
+                                            <span className="text-xs text-text-muted font-outfit">
+                                                {order.shipping_address?.phone || order.shipping_address?.email || 'Guest Customer'}
+                                            </span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-5">
                                         <div className="flex flex-col">
-                                            <span className="text-base font-bold text-primary font-outfit">৳{order.total_amount.toLocaleString()}</span>
+                                            <span className="text-base font-bold text-primary font-outfit">৳{Number(order.total_amount || 0).toLocaleString()}</span>
                                             <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest">{order.payment_method}</span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-5">
+                                    <td className="px-6 py-5" onClick={(e) => e.stopPropagation()}>
                                         <select
                                             value={order.status}
                                             onChange={(e) => handleStatusChange(order.id, e.target.value)}
                                             className={`
-                                                text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border-none outline-none cursor-pointer
+                                                text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border-none outline-none cursor-pointer shadow-xs transition-transform hover:scale-105
                                                 ${getStatusStyles(order.status)}
                                             `}
                                         >
@@ -291,21 +307,22 @@ const AdminOrders = () => {
                                             {new Date(order.created_at).toLocaleDateString(undefined, { dateStyle: 'medium' })}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-5 text-right">
+                                    <td className="px-6 py-5 text-right" onClick={(e) => e.stopPropagation()}>
                                         <div className="flex items-center justify-end gap-2">
                                             <button
-                                                onClick={() => handleDelete(order.id)}
-                                                className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                                                title="Delete Order"
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
-                                            <button
                                                 onClick={() => openOrderDetails(order)}
-                                                className="p-2 text-gray-400 hover:text-text-main hover:bg-gray-100 rounded-lg transition-all"
+                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-all shadow-xs group/btn"
                                                 title="View Order Details"
                                             >
-                                                <MoreVertical size={18} />
+                                                <Eye size={14} className="group-hover/btn:scale-110 transition-transform" />
+                                                <span>Details</span>
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(order.id)}
+                                                className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                                                title="Delete Order"
+                                            >
+                                                <Trash2 size={16} />
                                             </button>
                                         </div>
                                     </td>

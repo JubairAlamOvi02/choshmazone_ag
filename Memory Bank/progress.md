@@ -334,3 +334,17 @@
 - Task 81 (React Context Render-Phase State Update Resolution): Completed
   - Resolved `Cannot update a component (ToastProvider) while rendering a different component (CartProvider)` by decoupling toast side-effects from the `setCartItems` state updater callback in `CartContext.jsx`.
   - Hardened `ToastProvider.jsx` with deferred macrotask queueing (`setTimeout(..., 0)`), guaranteeing that notifications never collide with React component rendering phases across any context or hook.
+
+- Task 82 (Dynamic Checkout Fields & 11-Digit Phone Number Validation): Completed
+  - Created `/admin/settings` (`src/pages/admin/CheckoutSettings.jsx`) allowing store owners to dynamically configure which checkout fields (`name`, `phone`, `email`, `address`, `district`, `thana`, `city`, `zip`, `notes`) are Required, Optional, or Hidden.
+  - Enabled custom field labels and placeholders editable directly from admin panel and saved to Supabase `site_settings` under key `checkout_field_settings`.
+  - Implemented strict 11-digit phone number validation in `Checkout.jsx` conforming to Bangladesh mobile numbers (`013`–`019`).
+  - Added real-time live digit counter badge (`X/11 digits ✓`) and interactive validation feedback during input.
+  - Updated customer checkout to display subtle `(Optional)` tags on non-mandatory inputs, removing checkout friction.
+  - Connected optional Order Notes to order storage and Telegram notifications.
+
+- Task 83 (Admin Order Management UX & Direct Details Access): Completed
+  - Made entire order table rows in `src/pages/admin/Orders.jsx` clickable to instantly open the Order Details modal without needing to find a tiny menu icon.
+  - Replaced ambiguous 3-dot dropdown menu with an explicit, styled `👁 Details` action button in the table actions column.
+  - Enhanced interactive row hover highlights, pointer cursors, and protected control cells (checkbox, status select, delete button) from accidental modal opening.
+  - Made recent orders in `Dashboard.jsx` clickable for seamless order navigation.

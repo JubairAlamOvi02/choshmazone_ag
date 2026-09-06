@@ -465,3 +465,22 @@
 - [x] **Decouple Side-Effects from State Updaters (Task Id: 585)**:
   - [x] Fixed React warning in `CartContext.jsx` by moving `showToast` notification outside of the synchronous `setCartItems` callback.
   - [x] Hardened `ToastContext.jsx` with asynchronous micro/macrotask scheduling (`setTimeout(..., 0)`) to ensure clean execution from any component or hook.
+
+## Phase 42: Dynamic Checkout Fields & 11-Digit Phone Number Validation
+- [x] **Admin Checkout Form Settings (Task Id: 586)**:
+  - [x] Created `CheckoutSettings.jsx` at `/admin/settings` with Required/Optional and Shown/Hidden toggles for all fields (`name`, `phone`, `email`, `address`, `district`, `thana`, `city`, `zip`, `notes`).
+  - [x] Added custom label and placeholder editing for every checkout input.
+  - [x] Added "Reset to Defaults" button and integrated with Supabase `site_settings` under key `checkout_field_settings`.
+  - [x] Added "Checkout Form" navigation item in `AdminLayout.jsx`.
+- [x] **Strict 11-Digit Phone Validation & Dynamic Checkout Frontend (Task Id: 587)**:
+  - [x] Implemented phone number normalization and strict 11-digit regex validation (`^01[3-9]\d{8}$`) in `Checkout.jsx`.
+  - [x] Added real-time character count badge (`X/11 digits ✓`) and dynamic inline error feedback.
+  - [x] Integrated dynamic field rendering in `Checkout.jsx` displaying subtle `(Optional)` tags on non-mandatory fields.
+  - [x] Updated order creation and Telegram notifications to capture optional Order Notes.
+
+## Phase 43: Admin Order Management UX & Direct Details Access
+- [x] **Clickable Order Rows & Direct Details Action (Task Id: 588)**:
+  - [x] Made entire order table rows in `Orders.jsx` clickable to instantly open the Order Details modal without extra navigation.
+  - [x] Replaced ambiguous 3-dot dropdown menu with an explicit, styled `👁 Details` action button.
+  - [x] Enhanced interactive hover states, pointer cursors, and protected control cells (checkbox, status dropdown, delete button).
+  - [x] Linked recent orders in `Dashboard.jsx` directly to the orders management module.

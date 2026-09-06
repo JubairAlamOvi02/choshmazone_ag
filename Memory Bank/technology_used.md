@@ -91,6 +91,9 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **Dynamic Price Matrix**: Automatic composite calculation of Frame price + Lens package price in real time across PDP, Cart, Checkout, and Order Confirmation.
 - **Checkout & Purchasing UX**:
     - **Item-Level Order Cancellation**: Individual item removal direct from the Checkout summary sidebar without navigating back to the cart.
+    - **Dynamic Checkout Form Engine**: Admin customizer at `/admin/settings` controlling Required/Optional status and Shown/Hidden visibility for each checkout field (`name`, `phone`, `email`, `address`, `district`, `thana`, `city`, `zip`, `notes`).
+    - **11-Digit Phone Validation Subsystem**: Strict Bangladesh mobile number normalization and regex verification (`^01[3-9]\d{8}$`) with real-time character count badge (`X/11 digits ✓`).
+    - **Admin Orders Interactive UX**: Clickable table rows and explicit `👁 Details` action button in `/admin/orders` for immediate order inspection.
     - **Interactive Image Navigation**: Full-scale product presentation with floating prev/next navigation arrows and high-res thumbnail selection.
 
 

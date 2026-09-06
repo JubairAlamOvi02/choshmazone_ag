@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Minus, Plus, X, AlertCircle } from 'lucide-react';
+import { Minus, Plus, X, AlertCircle, CheckCircle2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
@@ -11,6 +11,24 @@ import { orderParams } from '../lib/api/orders';
 import { supabase } from '../lib/supabaseClient';
 import { getDistricts, getThanas, calculateDeliveryCharge } from '../data/bangladeshLocations';
 import { sendTelegramOrderNotification } from '../lib/telegramNotifier';
+import { settingsParams, DEFAULT_CHECKOUT_FIELD_SETTINGS } from '../lib/api/settings';
+
+// Bangladesh 11-digit phone validation helpers
+export const normalizeBDPhone = (input) => {
+    if (!input) return '';
+    let digits = String(input).replace(/[^\d+]/g, '');
+    if (digits.startsWith('+880')) digits = digits.slice(3);
+    else if (digits.startsWith('+88')) digits = digits.slice(3);
+    else if (digits.startsWith('880')) digits = digits.slice(2);
+    else if (digits.startsWith('88')) digits = digits.slice(2);
+    return digits.replace(/\D/g, '');
+};
+
+export const isValidBDPhone = (phone) => {
+    const cleaned = normalizeBDPhone(phone);
+    // Standard Bangladesh 11-digit mobile format: 013, 014, 015, 016, 017, 018, 019 followed by 8 digits
+    return /^01[3-9]\d{8}$/.test(cleaned);
+};
 
 const Checkout = () => {
     const { cartItems, cartTotal, clearCart, updateQuantity, resetQuantities, removeFromCart } = useCart();
@@ -19,6 +37,21 @@ const Checkout = () => {
 
     const [showStockModal, setShowStockModal] = useState(false);
     const [outOfStockItems, setOutOfStockItems] = useState([]);
+    const [fieldSettings, setFieldSettings] = useState(DEFAULT_CHECKOUT_FIELD_SETTINGS);
+    const [phoneError, setPhoneError] = useState('');
+
+    // Fetch dynamic field settings from Admin Panel
+    useEffect(() => {
+        const loadFields = async () => {
+            try {
+                const settings = await settingsParams.getCheckoutFieldSettings();
+                setFieldSettings(settings);
+            } catch (e) {
+                console.warn('Using default checkout field settings', e);
+            }
+        };
+        loadFields();
+    }, []);
 
     // Reset quantities to 1 when entering the checkout page
     useEffect(() => {
@@ -44,6 +77,7 @@ const Checkout = () => {
         thana: '',
         city: '',
         zip: '',
+        notes: '',
         country: 'Bangladesh',
         paymentMethod: 'cod', // 'bkash' or 'cod'
         bkashNumber: '',
@@ -66,6 +100,26 @@ const Checkout = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
+        if (name === 'phone') {
+            const rawVal = value;
+            const cleaned = normalizeBDPhone(rawVal);
+            if (rawVal.trim() === '') {
+                setPhoneError('');
+            } else if (cleaned.length > 11) {
+                setPhoneError('Phone number must not exceed 11 digits');
+            } else if (cleaned.length === 11) {
+                if (!isValidBDPhone(rawVal)) {
+                    setPhoneError('Invalid prefix. Valid BD mobile starts with 013-019');
+                } else {
+                    setPhoneError('');
+                }
+            } else {
+                setPhoneError('');
+            }
+            setFormData(prev => ({ ...prev, [name]: value }));
+            return;
+        }
+
         // If district changes, reset thana
         if (name === 'district') {
             setFormData(prev => ({ ...prev, [name]: value, thana: '' }));
@@ -76,6 +130,60 @@ const Checkout = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // 1. Phone number validation (11 digits)
+        const isPhoneRequired = fieldSettings.phone?.required !== false && fieldSettings.phone?.enabled !== false;
+        const cleanPhone = normalizeBDPhone(formData.phone);
+
+        if (isPhoneRequired || formData.phone.trim()) {
+            if (!formData.phone.trim()) {
+                setPhoneError('Phone number is required');
+                alert('Please enter your phone number.');
+                return;
+            }
+            if (!isValidBDPhone(formData.phone)) {
+                if (cleanPhone.length !== 11) {
+                    const msg = `Phone number must be exactly 11 digits (currently ${cleanPhone.length} digits). Example: 01712345678`;
+                    setPhoneError(msg);
+                    alert(msg);
+                } else {
+                    const msg = 'Please enter a valid Bangladesh mobile number starting with 01 (e.g. 01712345678)';
+                    setPhoneError(msg);
+                    alert(msg);
+                }
+                return;
+            }
+        }
+
+        // 2. Validate other configured required fields
+        if (fieldSettings.name?.enabled !== false && fieldSettings.name?.required && !formData.name.trim()) {
+            alert('Please enter your full name');
+            return;
+        }
+        if (fieldSettings.address?.enabled !== false && fieldSettings.address?.required && !formData.address.trim()) {
+            alert('Please enter your street address');
+            return;
+        }
+        if (fieldSettings.district?.enabled !== false && fieldSettings.district?.required && !formData.district.trim()) {
+            alert('Please select your delivery district');
+            return;
+        }
+        if (fieldSettings.thana?.enabled !== false && fieldSettings.thana?.required && !formData.thana.trim()) {
+            alert('Please select your Thana / Upazila');
+            return;
+        }
+        if (fieldSettings.email?.enabled !== false && fieldSettings.email?.required && !formData.email.trim()) {
+            alert('Please enter your email address');
+            return;
+        }
+        if (fieldSettings.city?.enabled !== false && fieldSettings.city?.required && !formData.city.trim()) {
+            alert('Please enter your city');
+            return;
+        }
+        if (fieldSettings.zip?.enabled !== false && fieldSettings.zip?.required && !formData.zip.trim()) {
+            alert('Please enter your postal / zip code');
+            return;
+        }
 
         if (formData.paymentMethod === 'bkash') {
             if (!formData.bkashNumber || !formData.bkashTrxId) {
@@ -120,8 +228,8 @@ const Checkout = () => {
             const totalWithDelivery = cartTotal + deliveryCharge;
 
             const nameParts = formData.name.trim().split(' ');
-            const fName = nameParts[0] || '';
-            const lName = nameParts.slice(1).join(' ') || '';
+            const fName = nameParts[0] || (formData.name.trim() || 'Valued');
+            const lName = nameParts.slice(1).join(' ') || (formData.name.trim() ? '' : 'Customer');
 
             const supabaseOrderData = {
                 user_id: user?.id || null,
@@ -131,13 +239,14 @@ const Checkout = () => {
                 shipping_address: {
                     first_name: fName,
                     last_name: lName,
-                    email: formData.email,
-                    phone: formData.phone,
-                    address: formData.address,
-                    district: formData.district,
-                    thana: formData.thana,
-                    city: formData.city,
-                    zip: formData.zip,
+                    email: formData.email || '',
+                    phone: cleanPhone || formData.phone,
+                    address: formData.address || '',
+                    district: formData.district || '',
+                    thana: formData.thana || '',
+                    city: formData.city || '',
+                    zip: formData.zip || '',
+                    notes: formData.notes || '',
                     country: formData.country
                 },
                 payment_details: formData.paymentMethod === 'bkash' ? {
@@ -187,6 +296,7 @@ const Checkout = () => {
                 orderDate: now.toLocaleDateString(),
                 orderTime: now.toLocaleTimeString(),
                 ...formData,
+                phone: cleanPhone || formData.phone,
                 firstName: fName,
                 lastName: lName,
                 items: preparedItems.map(item => ({
@@ -203,12 +313,13 @@ const Checkout = () => {
             // Send real-time order alert to your Telegram Bot (Phone notification)
             sendTelegramOrderNotification({
                 orderId: orderDisplayId,
-                customerName: formData.name.trim(),
-                phone: formData.phone,
+                customerName: formData.name.trim() || 'Valued Customer',
+                phone: cleanPhone || formData.phone,
                 email: formData.email,
                 address: formData.address,
                 district: formData.district,
                 thana: formData.thana,
+                notes: formData.notes || '',
                 paymentMethod: formData.paymentMethod,
                 bkashNumber: formData.bkashNumber,
                 bkashTrxId: formData.bkashTrxId,
@@ -331,107 +442,267 @@ const Checkout = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-12 lg:gap-20">
                     {/* Left Column: Forms */}
                     <form onSubmit={handleSubmit} className="flex flex-col">
-                        <div className="mb-12">
-                            <h2 className="text-xl font-bold mb-6 pb-2 border-b border-border font-outfit uppercase tracking-wider text-text-main">
-                                Contact Information
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <Input
-                                    label="Email Address"
-                                    type="email"
-                                    name="email"
-                                    placeholder="you@example.com"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    required
-                                />
-                                <Input
-                                    label="Phone Number"
-                                    type="tel"
-                                    name="phone"
-                                    placeholder="+8801..."
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                        </div>
+                        {/* Contact Information */}
+                        {(fieldSettings.phone?.enabled !== false || fieldSettings.email?.enabled !== false) && (
+                            <div className="mb-12">
+                                <h2 className="text-xl font-bold mb-6 pb-2 border-b border-border font-outfit uppercase tracking-wider text-text-main">
+                                    Contact Information
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Phone Number Field with 11-digit validation */}
+                                    {fieldSettings.phone?.enabled !== false && (
+                                        <div className="flex flex-col gap-1.5 w-full">
+                                            <div className="flex items-center justify-between ml-1">
+                                                <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit">
+                                                    {fieldSettings.phone?.label || 'Phone Number'}
+                                                    {fieldSettings.phone?.required !== false ? (
+                                                        <span className="text-error ml-1">*</span>
+                                                    ) : (
+                                                        <span className="text-text-muted/60 text-[10px] font-normal lowercase tracking-normal ml-1">(Optional)</span>
+                                                    )}
+                                                </label>
+                                                {formData.phone && (
+                                                    <span className={`text-[10px] font-bold font-outfit tracking-wider px-2 py-0.5 rounded-full transition-all ${
+                                                        isValidBDPhone(formData.phone) 
+                                                            ? 'bg-emerald-100 text-emerald-700' 
+                                                            : normalizeBDPhone(formData.phone).length === 11 
+                                                                ? 'bg-amber-100 text-amber-700'
+                                                                : 'bg-gray-100 text-gray-600'
+                                                    }`}>
+                                                        {normalizeBDPhone(formData.phone).length}/11 digits {isValidBDPhone(formData.phone) && '✓'}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="relative">
+                                                <input
+                                                    type="tel"
+                                                    name="phone"
+                                                    placeholder={fieldSettings.phone?.placeholder || '01XXXXXXXXX (11 digits)'}
+                                                    value={formData.phone}
+                                                    onChange={handleChange}
+                                                    required={fieldSettings.phone?.required !== false}
+                                                    className={`
+                                                        w-full bg-gray-50 border px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm
+                                                        ${phoneError ? 'border-red-500 bg-red-50' : 'border-border/50'}
+                                                    `}
+                                                />
+                                                {isValidBDPhone(formData.phone) && (
+                                                    <CheckCircle2 size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-600 pointer-events-none" />
+                                                )}
+                                            </div>
+                                            {phoneError ? (
+                                                <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider ml-1 font-outfit">{phoneError}</span>
+                                            ) : (
+                                                <span className="text-[11px] text-text-muted font-outfit ml-1">Must be 11 digits (e.g. 01712345678)</span>
+                                            )}
+                                        </div>
+                                    )}
 
+                                    {/* Email Field */}
+                                    {fieldSettings.email?.enabled !== false && (
+                                        <div className="flex flex-col gap-1.5 w-full">
+                                            <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                                {fieldSettings.email?.label || 'Email Address'}
+                                                {fieldSettings.email?.required ? (
+                                                    <span className="text-error ml-1">*</span>
+                                                ) : (
+                                                    <span className="text-text-muted/60 text-[10px] font-normal lowercase tracking-normal ml-1">(Optional)</span>
+                                                )}
+                                            </label>
+                                            <input
+                                                type="email"
+                                                name="email"
+                                                placeholder={fieldSettings.email?.placeholder || 'you@example.com'}
+                                                value={formData.email}
+                                                onChange={handleChange}
+                                                required={fieldSettings.email?.required}
+                                                className="w-full bg-gray-50 border border-border/50 px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Shipping Address */}
                         <div className="mb-12">
                             <h2 className="text-xl font-bold mb-6 pb-2 border-b border-border font-outfit uppercase tracking-wider text-text-main">
                                 Shipping Address
                             </h2>
-                            <div className="mb-6">
-                                <Input
-                                    label="Full Name"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    placeholder="Enter your full name"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-6">
-                                <Input
-                                    label="Address"
-                                    name="address"
-                                    placeholder="Street address, apartment, etc."
-                                    value={formData.address}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-text-main font-outfit">
-                                        District <span className="text-error">*</span>
+
+                            {/* Full Name */}
+                            {fieldSettings.name?.enabled !== false && (
+                                <div className="mb-6 flex flex-col gap-1.5 w-full">
+                                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                        {fieldSettings.name?.label || 'Full Name'}
+                                        {fieldSettings.name?.required !== false ? (
+                                            <span className="text-error ml-1">*</span>
+                                        ) : (
+                                            <span className="text-text-muted/60 text-[10px] font-normal lowercase tracking-normal ml-1">(Optional)</span>
+                                        )}
                                     </label>
-                                    <select
-                                        name="district"
-                                        value={formData.district}
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        placeholder={fieldSettings.name?.placeholder || 'Enter your full name'}
+                                        value={formData.name}
                                         onChange={handleChange}
-                                        required
-                                        className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-outfit bg-white"
-                                    >
-                                        <option value="">Select District</option>
-                                        {getDistricts().map(district => (
-                                            <option key={district} value={district}>{district}</option>
-                                        ))}
-                                    </select>
+                                        required={fieldSettings.name?.required !== false}
+                                        className="w-full bg-gray-50 border border-border/50 px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                    />
                                 </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-sm font-bold text-text-main font-outfit">
-                                        Thana <span className="text-error">*</span>
+                            )}
+
+                            {/* Address */}
+                            {fieldSettings.address?.enabled !== false && (
+                                <div className="mb-6 flex flex-col gap-1.5 w-full">
+                                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                        {fieldSettings.address?.label || 'Address'}
+                                        {fieldSettings.address?.required !== false ? (
+                                            <span className="text-error ml-1">*</span>
+                                        ) : (
+                                            <span className="text-text-muted/60 text-[10px] font-normal lowercase tracking-normal ml-1">(Optional)</span>
+                                        )}
                                     </label>
-                                    <select
-                                        name="thana"
-                                        value={formData.thana}
+                                    <input
+                                        type="text"
+                                        name="address"
+                                        placeholder={fieldSettings.address?.placeholder || 'Street address, apartment, etc.'}
+                                        value={formData.address}
                                         onChange={handleChange}
-                                        required
-                                        disabled={!formData.district}
-                                        className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-outfit bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                    >
-                                        <option value="">Select Thana</option>
-                                        {availableThanas.map(thana => (
-                                            <option key={thana} value={thana}>{thana}</option>
-                                        ))}
-                                    </select>
+                                        required={fieldSettings.address?.required !== false}
+                                        className="w-full bg-gray-50 border border-border/50 px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                    />
                                 </div>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <Input
-                                    label="City"
-                                    name="city"
-                                    value={formData.city}
-                                    onChange={handleChange}
-                                />
-                                <Input
-                                    label="Zip / Postal Code"
-                                    name="zip"
-                                    value={formData.zip}
-                                    onChange={handleChange}
-                                />
-                            </div>
+                            )}
+
+                            {/* District & Thana */}
+                            {(fieldSettings.district?.enabled !== false || fieldSettings.thana?.enabled !== false) && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    {fieldSettings.district?.enabled !== false && (
+                                        <div className="flex flex-col gap-1.5">
+                                            <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                                {fieldSettings.district?.label || 'District'}
+                                                {fieldSettings.district?.required !== false ? (
+                                                    <span className="text-error ml-1">*</span>
+                                                ) : (
+                                                    <span className="text-text-muted/60 text-[10px] font-normal lowercase tracking-normal ml-1">(Optional)</span>
+                                                )}
+                                            </label>
+                                            <select
+                                                name="district"
+                                                value={formData.district}
+                                                onChange={handleChange}
+                                                required={fieldSettings.district?.required !== false}
+                                                className="w-full px-4 py-3 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-outfit bg-gray-50 text-sm"
+                                            >
+                                                <option value="">{fieldSettings.district?.placeholder || 'Select District'}</option>
+                                                {getDistricts().map(district => (
+                                                    <option key={district} value={district}>{district}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
+
+                                    {fieldSettings.thana?.enabled !== false && (
+                                        <div className="flex flex-col gap-1.5">
+                                            <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                                {fieldSettings.thana?.label || 'Thana'}
+                                                {fieldSettings.thana?.required ? (
+                                                    <span className="text-error ml-1">*</span>
+                                                ) : (
+                                                    <span className="text-text-muted/60 text-[10px] font-normal lowercase tracking-normal ml-1">(Optional)</span>
+                                                )}
+                                            </label>
+                                            <select
+                                                name="thana"
+                                                value={formData.thana}
+                                                onChange={handleChange}
+                                                required={fieldSettings.thana?.required}
+                                                disabled={!formData.district}
+                                                className="w-full px-4 py-3 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-outfit bg-gray-50 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                            >
+                                                <option value="">{fieldSettings.thana?.placeholder || 'Select Thana'}</option>
+                                                {availableThanas.map(thana => (
+                                                    <option key={thana} value={thana}>{thana}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* City & Zip */}
+                            {(fieldSettings.city?.enabled !== false || fieldSettings.zip?.enabled !== false) && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    {fieldSettings.city?.enabled !== false && (
+                                        <div className="flex flex-col gap-1.5 w-full">
+                                            <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                                {fieldSettings.city?.label || 'City'}
+                                                {fieldSettings.city?.required ? (
+                                                    <span className="text-error ml-1">*</span>
+                                                ) : (
+                                                    <span className="text-text-muted/60 text-[10px] font-normal lowercase tracking-normal ml-1">(Optional)</span>
+                                                )}
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="city"
+                                                placeholder={fieldSettings.city?.placeholder || 'City / Area'}
+                                                value={formData.city}
+                                                onChange={handleChange}
+                                                required={fieldSettings.city?.required}
+                                                className="w-full bg-gray-50 border border-border/50 px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                            />
+                                        </div>
+                                    )}
+
+                                    {fieldSettings.zip?.enabled !== false && (
+                                        <div className="flex flex-col gap-1.5 w-full">
+                                            <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                                {fieldSettings.zip?.label || 'Zip / Postal Code'}
+                                                {fieldSettings.zip?.required ? (
+                                                    <span className="text-error ml-1">*</span>
+                                                ) : (
+                                                    <span className="text-text-muted/60 text-[10px] font-normal lowercase tracking-normal ml-1">(Optional)</span>
+                                                )}
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="zip"
+                                                placeholder={fieldSettings.zip?.placeholder || 'Postal code'}
+                                                value={formData.zip}
+                                                onChange={handleChange}
+                                                required={fieldSettings.zip?.required}
+                                                className="w-full bg-gray-50 border border-border/50 px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Order Notes */}
+                            {fieldSettings.notes?.enabled !== false && (
+                                <div className="flex flex-col gap-1.5 w-full">
+                                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                        {fieldSettings.notes?.label || 'Order Notes'}
+                                        {fieldSettings.notes?.required ? (
+                                            <span className="text-error ml-1">*</span>
+                                        ) : (
+                                            <span className="text-text-muted/60 text-[10px] font-normal lowercase tracking-normal ml-1">(Optional)</span>
+                                        )}
+                                    </label>
+                                    <textarea
+                                        name="notes"
+                                        rows={2}
+                                        placeholder={fieldSettings.notes?.placeholder || 'Notes about your order (e.g. special delivery instructions)'}
+                                        value={formData.notes || ''}
+                                        onChange={handleChange}
+                                        required={fieldSettings.notes?.required}
+                                        className="w-full bg-gray-50 border border-border/50 px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm resize-none"
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         <div className="mb-8">

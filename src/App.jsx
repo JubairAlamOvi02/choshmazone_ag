@@ -54,6 +54,7 @@ const AdminCustomers = lazy(() => import('./pages/admin/Customers'));
 const AdminMedia = lazy(() => import('./pages/admin/MediaManager'));
 const FacebookCatalog = lazy(() => import('./pages/admin/FacebookCatalog'));
 const AdminLensPackages = lazy(() => import('./pages/admin/LensPackages'));
+const AdminCheckoutSettings = lazy(() => import('./pages/admin/CheckoutSettings'));
 
 
 function App() {
@@ -122,6 +123,7 @@ function App() {
                           <Route path="lenses" element={<AdminLensPackages />} />
                           <Route path="media" element={<AdminMedia />} />
                           <Route path="facebook-catalog" element={<FacebookCatalog />} />
+                          <Route path="settings" element={<AdminCheckoutSettings />} />
                         </Route>
                       </Routes>
                     </Suspense>

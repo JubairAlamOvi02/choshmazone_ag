@@ -18,6 +18,7 @@ const formatOrderMessage = (order) => {
         address = '',
         district = '',
         thana = '',
+        notes = '',
         paymentMethod = 'COD',
         bkashNumber = '',
         bkashTrxId = '',
@@ -80,7 +81,7 @@ const formatOrderMessage = (order) => {
 • <b>Name:</b> ${customerName}
 • <b>Phone:</b> <a href="tel:${phone}">${phone}</a>
 ${email ? `• <b>Email:</b> ${email}\n` : ''}• <b>Delivery Address:</b> ${fullAddress}
-
+${notes ? `• <b>Order Note:</b> <i>${notes}</i>\n` : ''}
 📦 <b>ORDERED ITEMS</b>
 ${itemsList}
 

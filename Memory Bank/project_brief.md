@@ -21,7 +21,7 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 - **Product Details Page**: High-resolution interactive image gallery with thumbnail support, floating navigation arrows, detailed rich text descriptions, specifications, custom Prescription Lens selection modal, and "Add to Bag" / "Buy Now" controls.
 - **Optical Prescription Flow**: Dedicated lens package selection (Single Vision, Blue Cut, Photochromic, Progressive) with 3 prescription submission flows (Slip Upload, Manual SPH/CYL/AXIS/PD matrix, WhatsApp Later).
 - **Shopping Cart**: Review selected items, adjust quantities, view lens package details, and dynamic subtotal calculation.
-- **Checkout Flow**: Guest/User checkout, shipping information with district-based delivery charges (৳60 for Dhaka, ৳120 for other districts), item removal directly from order summary, and payment integration (Support for **bKash** and **Cash on Delivery**).
+- **Checkout Flow**: Dynamic guest/user checkout with configurable required/optional fields, strict 11-digit Bangladesh phone number validation (`013`–`019`) with live character counter, shipping information with district-based delivery charges (৳60 for Dhaka, ৳120 for other districts), item removal directly from order summary, optional Order Notes, and payment integration (Support for **bKash** and **Cash on Delivery**).
 - **User Portal**:
     - Registration and Login system.
     - View Order History and Profile.
@@ -34,7 +34,8 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
     - **Rich Text Editing**: Full HTML description support with professional formatting controls.
     - **Shopify-Style Variants**: Efficient variant management table with combined option views (Color / Size).
     - **Lens Packages Management**: Full CRUD, pricing, feature list, active toggle, and reordering for optical lens packages at `/admin/lenses`.
-    - **Order Management**: Monitor sales, update statuses, administrative deletion, view attached prescription slips/details, and Comprehensive Order Details Modal.
+    - **Checkout Form Settings**: Full control at `/admin/settings` to toggle Required vs Optional and Shown vs Hidden for every checkout field (`name`, `phone`, `email`, `address`, `district`, `thana`, `city`, `zip`, `notes`), plus custom label/placeholder management.
+    - **Order Management**: Monitor sales, update statuses, administrative deletion, view attached prescription slips/details, clickable rows for direct detail viewing, and Comprehensive Order Details Modal.
     - **Real-Time Mobile Alerts**: Instant push notifications with sound directly to the store owner's phone via Telegram Bot on new orders, plus a built-in "Test Phone Alert" feature in the Admin panel.
     - **Media & Content Manager (CMS)**: Manage global assets, customize Homepage Hero Banner (headline typography, gold accent highlight, subtext, background photography, and button design dropdown selectors for color/shape/size/icon) with Live Homepage Preview, edit Promotional Banner copy/imagery, customize Collections hero banner, and configure category collection artwork.
     - **Category & Collection Control**: Manage dynamic store categories with instant "Featured" toggling (★ / ☆) for curated storefront highlights.
