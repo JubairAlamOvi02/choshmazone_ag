@@ -85,8 +85,12 @@
     - Made entire table rows in `src/pages/admin/Orders.jsx` clickable to open the Order Details modal directly without hunting for buttons.
     - Replaced the ambiguous 3-dot dropdown menu with a prominent, styled `👁 Details` action button.
     - Added interactive hover highlights, pointer cursors, and protected control cells (checkbox, status dropdown, delete button).
+- [x] Track Order Default +880 Prefix & Multi-Format Search:
+    - Integrated a default `🇧🇩 +880` country code badge into the phone input on `src/pages/TrackOrder.jsx`.
+    - Automatically cleans pasted numbers (`+880...`, `880...`, or `01...`) to fit the 10-digit mobile field (`17XXXXXXXX`).
+    - Added multi-format lookup in Supabase so orders stored as `017...`, `+88017...`, or `88017...` are all retrieved reliably.
 
-**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, Category/Collections management, Collections Hero Header customization, Homepage Hero Banner customization with button design dropdowns, Prescription Lens Selection & Upload Flow, Admin Lens Management, Checkout Item Removal, PDP Image Navigation, Default Lens State, PDP Typography Sanitization, Context State Warnings, Dynamic Checkout Field Customization, 11-Digit Phone Validation, and Admin Orders Details UX have been implemented and verified.
+**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, Category/Collections management, Collections Hero Header customization, Homepage Hero Banner customization with button design dropdowns, Prescription Lens Selection & Upload Flow, Admin Lens Management, Checkout Item Removal, PDP Image Navigation, Default Lens State, PDP Typography Sanitization, Context State Warnings, Dynamic Checkout Field Customization, 11-Digit Phone Validation, Admin Orders Details UX, and Track Order +880 Default Prefix have been implemented and verified.
 
 
 ## Next High-Priority Tasks: Admin & Backend

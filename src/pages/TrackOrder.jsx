@@ -17,20 +17,37 @@ const TrackOrder = () => {
     const [expandedOrder, setExpandedOrder] = useState(null);
     const { showToast } = useToast();
 
+    const handlePhoneChange = (e) => {
+        let val = e.target.value.replace(/[^\d+]/g, '');
+        // Handle user pasting with +880, 880, +88, or starting with 0
+        if (val.startsWith('+880')) val = val.slice(4);
+        else if (val.startsWith('880')) val = val.slice(3);
+        else if (val.startsWith('+88')) val = val.slice(3);
+        else if (val.startsWith('0')) val = val.slice(1);
+
+        // Limit to 10 digits (e.g. 17XXXXXXXX)
+        if (val.length <= 10) {
+            setPhone(val);
+        }
+    };
+
     const handlePhoneSubmit = async (e) => {
         e.preventDefault();
 
-        // Basic phone validation for Bangladesh (11 digits)
-        if (!/^[0-9]{11}$/.test(phone)) {
-            if (!/^\+880[0-9]{10}$/.test(phone)) {
-                showToast("Please enter a valid 11-digit phone number", "error");
-                return;
-            }
+        const cleanDigits = phone.replace(/\D/g, '');
+        if (cleanDigits.length !== 10) {
+            showToast("Please enter a valid 10-digit mobile number after +880 (e.g. 1712345678)", "error");
+            return;
         }
+
+        const local11 = '0' + cleanDigits; // 017XXXXXXXX
+        const intlFormat = '+880' + cleanDigits; // +88017XXXXXXXX
+        const digits13 = '880' + cleanDigits; // 88017XXXXXXXX
+        const tenDigits = cleanDigits; // 17XXXXXXXX
 
         setLoading(true);
         try {
-            // Search for orders linked to this phone number in the shipping_address JSONB column
+            // Search for orders linked to this phone number in any common format in the shipping_address JSONB column
             const { data, error } = await supabase
                 .from('orders')
                 .select(`
@@ -40,7 +57,7 @@ const TrackOrder = () => {
                         products (*)
                     )
                 `)
-                .filter('shipping_address->>phone', 'eq', phone)
+                .or(`shipping_address->>phone.eq.${local11},shipping_address->>phone.eq.${intlFormat},shipping_address->>phone.eq.${digits13},shipping_address->>phone.eq.${tenDigits}`)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -56,7 +73,7 @@ const TrackOrder = () => {
             const customerEmail = latestOrder.shipping_address?.email;
 
             if (!customerEmail) {
-                showToast("Order found but no email associated.", "error");
+                showToast("Order found but no email associated with this order.", "error");
                 setLoading(false);
                 return;
             }
@@ -68,16 +85,16 @@ const TrackOrder = () => {
             const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
             setGeneratedOtp(newOtp);
 
-            // SIMULATION: Calling the Google Apps Script to send a real email
+            // Trigger email script
             try {
                 fetch(import.meta.env.VITE_GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Apps Script requires no-cors for simple POST
+                    mode: 'no-cors',
                     body: JSON.stringify({
                         action: "sendOTP",
                         email: customerEmail,
                         otp: newOtp,
-                        phone: phone
+                        phone: intlFormat
                     })
                 });
             } catch (err) {
@@ -93,7 +110,7 @@ const TrackOrder = () => {
             setStep(2);
         } catch (error) {
             console.error('Track Order Error:', error);
-            showToast("Something went wrong.", "error");
+            showToast("Something went wrong while searching for orders.", "error");
         } finally {
             setLoading(false);
         }
@@ -142,14 +159,31 @@ const TrackOrder = () => {
                                     <label className="block text-xs font-bold text-text-main uppercase tracking-[0.2em] font-outfit px-1">
                                         Phone Number
                                     </label>
-                                    <input
-                                        type="tel"
-                                        value={phone}
-                                        onChange={(e) => setPhone(e.target.value)}
-                                        placeholder="017XXXXXXXX"
-                                        required
-                                        className="w-full px-5 py-4 rounded-xl border border-border focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none transition-all font-outfit text-lg shadow-sm"
-                                    />
+                                    <div className="relative flex items-center">
+                                        <div className="absolute left-0 top-0 bottom-0 flex items-center px-4 pointer-events-none border-r border-border bg-gray-50 rounded-l-xl text-text-main font-bold font-outfit text-base select-none">
+                                            <span className="flex items-center gap-1.5">
+                                                <span className="text-base">🇧🇩</span>
+                                                <span>+880</span>
+                                            </span>
+                                        </div>
+                                        <input
+                                            type="tel"
+                                            value={phone}
+                                            onChange={handlePhoneChange}
+                                            placeholder="17XXXXXXXX"
+                                            maxLength={10}
+                                            required
+                                            className="w-full pl-28 pr-5 py-4 rounded-xl border border-border focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none transition-all font-outfit text-lg shadow-sm font-medium tracking-wide"
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-between text-[11px] text-text-muted font-outfit px-1">
+                                        <span>Enter the remaining 10 digits (e.g. 17XXXXXXXX)</span>
+                                        {phone && (
+                                            <span className={`font-bold font-mono ${phone.length === 10 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                                +880{phone} ({phone.length}/10)
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                                 <Button type="submit" variant="primary" size="large" className="w-full shadow-xl shadow-primary/20 transition-all active:scale-[0.98]" disabled={loading}>
                                     {loading ? 'Searching...' : 'Continue'}
