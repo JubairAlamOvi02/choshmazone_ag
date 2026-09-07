@@ -54,8 +54,11 @@ const FeaturedCollections = ({ showAll = false, title = "Featured Collections" }
                     { id: '5', name: 'Women' }
                 ];
 
-                // Filter by featured if not showAll
+                // Filter by active status and featured if not showAll
                 const filtered = baseCategories.filter(cat => {
+                    // Exclude inactive categories
+                    if (cat.is_active === false) return false;
+                    
                     if (showAll) return true;
                     if (Array.isArray(featuredList) && featuredList.length > 0) {
                         return featuredList.includes(cat.name) || featuredList.includes(cat.id);

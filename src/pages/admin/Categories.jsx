@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Star, Image as ImageIcon, Upload, Check, Sparkles } from 'lucide-react';
+import { Plus, Trash2, Star, Upload, Sparkles, Eye, EyeOff, Power, CheckCircle2, Filter } from 'lucide-react';
 import { categoryParams } from '../../lib/api/categories';
 import { settingsParams } from '../../lib/api/settings';
 import { useToast } from '../../context/ToastContext';
@@ -9,11 +9,14 @@ const Categories = () => {
     const [categories, setCategories] = useState([]);
     const [newCategoryName, setNewCategoryName] = useState('');
     const [newCategoryFeatured, setNewCategoryFeatured] = useState(true);
+    const [newCategoryActive, setNewCategoryActive] = useState(true);
     const [featuredCategories, setFeaturedCategories] = useState([]);
     const [categoryImages, setCategoryImages] = useState({});
     const [loading, setLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [uploadingFor, setUploadingFor] = useState(null);
+    const [togglingActive, setTogglingActive] = useState(null);
+    const [filterTab, setFilterTab] = useState('all'); // 'all' | 'active' | 'inactive'
     const { showToast } = useToast();
 
     useEffect(() => {
@@ -75,7 +78,10 @@ const Categories = () => {
 
         try {
             setIsSubmitting(true);
-            const newCat = await categoryParams.create({ name: trimmed });
+            const newCat = await categoryParams.create({ 
+                name: trimmed,
+                is_active: newCategoryActive 
+            });
             
             // Update featured list if requested
             if (newCategoryFeatured) {
@@ -86,13 +92,38 @@ const Categories = () => {
 
             setNewCategoryName('');
             setNewCategoryFeatured(true);
-            showToast('Category created successfully', 'success');
+            setNewCategoryActive(true);
+            showToast(`Category "${trimmed}" created successfully`, 'success');
             loadData();
         } catch (error) {
             console.error('Failed to add category:', error);
             showToast(error.message || 'Failed to add category', 'error');
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const handleToggleActive = async (category) => {
+        const currentActive = category.is_active !== false;
+        const newStatus = !currentActive;
+
+        try {
+            setTogglingActive(category.id);
+            await categoryParams.update(category.id, { is_active: newStatus });
+            
+            // Update local state immediately
+            setCategories(prev => prev.map(c => c.id === category.id ? { ...c, is_active: newStatus } : c));
+
+            if (newStatus) {
+                showToast(`Category "${category.name}" is now Active and visible in store`, 'success');
+            } else {
+                showToast(`Category "${category.name}" deactivated (hidden from store)`, 'info');
+            }
+        } catch (err) {
+            console.error('Failed to toggle category active status:', err);
+            showToast('Failed to update category status. Ensure database migration has run.', 'error');
+        } finally {
+            setTogglingActive(null);
         }
     };
 
@@ -145,7 +176,7 @@ const Categories = () => {
     };
 
     const handleDeleteCategory = async (id, name) => {
-        if (!window.confirm(`Are you sure you want to delete the category "${name}"?`)) {
+        if (!window.confirm(`Are you sure you want to permanently delete the category "${name}"?\n\nTip: If you might need this category in the future, you can deactivate it instead of deleting.`)) {
             return;
         }
 
@@ -163,12 +194,22 @@ const Categories = () => {
         }
     };
 
+    // Filter categories based on active tab
+    const activeCount = categories.filter(c => c.is_active !== false).length;
+    const inactiveCount = categories.filter(c => c.is_active === false).length;
+
+    const displayedCategories = categories.filter(cat => {
+        if (filterTab === 'active') return cat.is_active !== false;
+        if (filterTab === 'inactive') return cat.is_active === false;
+        return true;
+    });
+
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-text-main font-outfit uppercase tracking-tight">Categories & Collections</h1>
-                    <p className="text-text-muted font-outfit">Manage store categories, images, and choose which ones appear in Featured Collections.</p>
+                    <p className="text-text-muted font-outfit">Manage store categories, activate/deactivate temporary items, update images, and select Featured Collections.</p>
                 </div>
             </div>
 
@@ -193,6 +234,26 @@ const Categories = () => {
                                 />
                             </div>
 
+                            {/* Active Status Checkbox */}
+                            <div className="p-3 bg-gray-50 rounded-xl border border-border/60">
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={newCategoryActive}
+                                        onChange={(e) => setNewCategoryActive(e.target.checked)}
+                                        className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-border"
+                                    />
+                                    <div className="text-xs font-outfit">
+                                        <span className="font-bold text-text-main flex items-center gap-1.5">
+                                            <span className={`w-2 h-2 rounded-full ${newCategoryActive ? 'bg-emerald-500' : 'bg-gray-400'}`}></span>
+                                            Active Status
+                                        </span>
+                                        <span className="text-text-muted">Visible in navigation, collections & shop filters</span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            {/* Featured Checkbox */}
                             <div className="p-3 bg-gray-50 rounded-xl border border-border/60">
                                 <label className="flex items-center gap-3 cursor-pointer">
                                     <input
@@ -223,42 +284,100 @@ const Categories = () => {
                 {/* Categories List */}
                 <div className="lg:col-span-8">
                     <div className="bg-white rounded-3xl border border-border shadow-sm overflow-hidden">
+                        {/* Header & Stats */}
                         <div className="p-6 border-b border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <div>
                                 <h2 className="text-lg font-bold text-text-main font-outfit uppercase tracking-tight">Existing Categories</h2>
-                                <p className="text-xs text-text-muted font-outfit">Upload custom images or click the star to toggle Featured status.</p>
+                                <p className="text-xs text-text-muted font-outfit">Deactivate temporary categories to hide them from store without deleting.</p>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-wrap items-center gap-2">
                                 <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full font-outfit uppercase">
                                     {categories.length} Total
                                 </span>
+                                <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full font-outfit uppercase flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    {activeCount} Active
+                                </span>
+                                {inactiveCount > 0 && (
+                                    <span className="text-xs font-bold text-gray-700 bg-gray-200 px-3 py-1.5 rounded-full font-outfit uppercase">
+                                        {inactiveCount} Inactive
+                                    </span>
+                                )}
                                 <span className="text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full font-outfit uppercase flex items-center gap-1">
                                     <Star size={12} className="fill-amber-500 text-amber-500" />
                                     {featuredCategories.length} Featured
                                 </span>
                             </div>
                         </div>
+
+                        {/* Filter Tabs */}
+                        <div className="px-6 py-3 bg-gray-50/70 border-b border-border flex items-center gap-2">
+                            <span className="text-xs font-bold text-text-muted font-outfit uppercase tracking-wider flex items-center gap-1 mr-2">
+                                <Filter size={12} /> View:
+                            </span>
+                            <button
+                                onClick={() => setFilterTab('all')}
+                                className={`px-3 py-1 text-xs font-bold font-outfit uppercase tracking-wider rounded-lg transition-all ${
+                                    filterTab === 'all'
+                                        ? 'bg-primary text-white shadow-sm'
+                                        : 'bg-white text-text-muted hover:text-text-main border border-border'
+                                }`}
+                            >
+                                All ({categories.length})
+                            </button>
+                            <button
+                                onClick={() => setFilterTab('active')}
+                                className={`px-3 py-1 text-xs font-bold font-outfit uppercase tracking-wider rounded-lg transition-all ${
+                                    filterTab === 'active'
+                                        ? 'bg-emerald-600 text-white shadow-sm'
+                                        : 'bg-white text-text-muted hover:text-text-main border border-border'
+                                }`}
+                            >
+                                Active ({activeCount})
+                            </button>
+                            <button
+                                onClick={() => setFilterTab('inactive')}
+                                className={`px-3 py-1 text-xs font-bold font-outfit uppercase tracking-wider rounded-lg transition-all ${
+                                    filterTab === 'inactive'
+                                        ? 'bg-gray-700 text-white shadow-sm'
+                                        : 'bg-white text-text-muted hover:text-text-main border border-border'
+                                }`}
+                            >
+                                Inactive ({inactiveCount})
+                            </button>
+                        </div>
                         
                         {loading ? (
                             <div className="p-12 flex justify-center">
                                 <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
                             </div>
-                        ) : categories.length === 0 ? (
+                        ) : displayedCategories.length === 0 ? (
                             <div className="p-12 text-center text-text-muted font-outfit">
-                                No categories found. Add your first category using the form on the left.
+                                {filterTab === 'inactive'
+                                    ? 'No inactive categories. All categories are currently active.'
+                                    : filterTab === 'active'
+                                    ? 'No active categories found.'
+                                    : 'No categories found. Add your first category using the form on the left.'}
                             </div>
                         ) : (
                             <div className="divide-y divide-border">
-                                {categories.map(category => {
+                                {displayedCategories.map(category => {
                                     const isFeatured = featuredCategories.includes(category.name);
+                                    const isActive = category.is_active !== false;
                                     const isUploading = uploadingFor === category.name;
+                                    const isToggling = togglingActive === category.id;
                                     const currentImg = categoryImages[category.name] || getCategoryFallbackImage(category.name);
 
                                     return (
-                                        <div key={category.id} className="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors">
+                                        <div 
+                                            key={category.id} 
+                                            className={`p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all ${
+                                                isActive ? 'hover:bg-gray-50/50' : 'bg-gray-50/40 opacity-75 hover:opacity-100 hover:bg-gray-50'
+                                            }`}
+                                        >
                                             <div className="flex items-center gap-4">
                                                 {/* Image Thumbnail with Upload Trigger */}
-                                                <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-gray-100 border border-border flex-shrink-0 group/thumb">
+                                                <div className={`relative w-16 h-16 rounded-2xl overflow-hidden bg-gray-100 border border-border flex-shrink-0 group/thumb ${!isActive ? 'grayscale' : ''}`}>
                                                     <img
                                                         src={currentImg}
                                                         alt={category.name}
@@ -282,14 +401,31 @@ const Categories = () => {
                                                 </div>
 
                                                 <div className="flex flex-col">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-bold text-text-main font-outfit text-base">{category.name}</span>
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <span className={`font-bold font-outfit text-base ${isActive ? 'text-text-main' : 'text-text-muted line-through decoration-text-muted/40'}`}>
+                                                            {category.name}
+                                                        </span>
+                                                        
+                                                        {/* Active / Inactive Badge */}
+                                                        {isActive ? (
+                                                            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                                Active
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-600 bg-gray-200 border border-gray-300 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                                                <EyeOff size={10} />
+                                                                Inactive
+                                                            </span>
+                                                        )}
+
                                                         {isFeatured && (
-                                                            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                                            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1">
                                                                 <Star size={10} className="fill-amber-500 text-amber-500" /> Featured
                                                             </span>
                                                         )}
                                                     </div>
+
                                                     <label className="text-xs text-primary hover:underline cursor-pointer inline-flex items-center gap-1 mt-1 font-outfit font-medium">
                                                         <Upload size={12} />
                                                         Change Photo
@@ -305,24 +441,45 @@ const Categories = () => {
                                             </div>
 
                                             {/* Action Buttons */}
-                                            <div className="flex items-center gap-3 self-end sm:self-center">
+                                            <div className="flex flex-wrap items-center gap-2.5 self-end sm:self-center">
+                                                {/* Active / Deactivate Toggle Button */}
+                                                <button
+                                                    onClick={() => handleToggleActive(category)}
+                                                    disabled={isToggling}
+                                                    className={`px-3.5 py-2 rounded-xl text-xs font-bold font-outfit uppercase tracking-wider flex items-center gap-1.5 transition-all border ${
+                                                        isActive
+                                                            ? 'bg-emerald-50 text-emerald-700 hover:bg-red-50 hover:text-red-700 hover:border-red-200 border-emerald-200'
+                                                            : 'bg-gray-100 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 border-gray-300'
+                                                    }`}
+                                                    title={isActive ? 'Click to deactivate (hide from store)' : 'Click to activate (make visible in store)'}
+                                                >
+                                                    {isToggling ? (
+                                                        <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                                    ) : (
+                                                        <Power size={13} className={isActive ? 'text-emerald-600' : 'text-gray-400'} />
+                                                    )}
+                                                    <span>{isActive ? 'Active' : 'Deactivated'}</span>
+                                                </button>
+
+                                                {/* Featured Button */}
                                                 <button
                                                     onClick={() => handleToggleFeatured(category.name)}
-                                                    className={`px-4 py-2 rounded-xl text-xs font-bold font-outfit uppercase tracking-wider flex items-center gap-1.5 transition-all ${
+                                                    className={`px-3.5 py-2 rounded-xl text-xs font-bold font-outfit uppercase tracking-wider flex items-center gap-1.5 transition-all ${
                                                         isFeatured
                                                             ? 'bg-amber-100 text-amber-800 hover:bg-amber-200 border border-amber-300'
                                                             : 'bg-gray-100 text-text-muted hover:bg-gray-200 hover:text-text-main border border-border'
                                                     }`}
                                                     title={isFeatured ? 'Click to unfeature' : 'Click to feature in collections'}
                                                 >
-                                                    <Star size={14} className={isFeatured ? 'fill-amber-500 text-amber-500' : 'text-gray-400'} />
+                                                    <Star size={13} className={isFeatured ? 'fill-amber-500 text-amber-500' : 'text-gray-400'} />
                                                     {isFeatured ? 'Featured' : 'Make Featured'}
                                                 </button>
 
+                                                {/* Delete Button */}
                                                 <button
                                                     onClick={() => handleDeleteCategory(category.id, category.name)}
-                                                    className="p-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-colors border border-transparent hover:border-red-200"
-                                                    title="Delete category"
+                                                    className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-colors border border-transparent hover:border-red-200"
+                                                    title="Delete permanently"
                                                 >
                                                     <Trash2 size={16} />
                                                 </button>
@@ -340,4 +497,3 @@ const Categories = () => {
 };
 
 export default Categories;
-

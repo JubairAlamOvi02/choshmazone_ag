@@ -40,7 +40,7 @@
     *   `Telegram Notifier`: Real-time instant phone push alerts for orders via Telegram Bot API with interactive test suite in Admin Orders.
     *   `Promotional Content Engine`: Dynamic background image and live editable text for homepage banners via `site_settings`.
     *   `Hero Banner Dynamic Engine`: Database-driven Hero section on homepage with customizable photography, tag/badge, two-part heading with accent gold word, multiline description, and button styling token selector engine (Color/Style, Shape, Size, Icon) with Live Homepage Preview.
-    *   `Dynamic Category & Collections System`: Database-driven category management with featured status toggling and dual-level Collections page architecture (All Collections + Featured Collections).
+    *   `Dynamic Category & Collections System`: Database-driven category management with activation/deactivation toggles (`is_active`), featured status management, live tab filters, and dual-level Collections page architecture (All Collections + Featured Collections).
     *   `Collections Hero Banner Engine`: Dynamic background image and live real-time editable text customizer (badge, title, subtitle) for `/collections` header powered by `site_settings`.
     *   `Prescription Lens Engine`: Multi-package optical lens customizer modal (`LensCustomizerModal.jsx`) supporting file upload, manual SPH/CYL/AXIS/PD matrix, and WhatsApp submission options with dynamic cart pricing.
     *   `Checkout Order Management`: Sidebar item removal direct from checkout with dynamic recalculation of delivery charges and order total.
@@ -123,6 +123,7 @@
 *Dynamic category definitions and collections.*
 *   `id` (UUID, Primary Key)
 *   `name` (Text, Unique)
+*   `is_active` (Boolean, Default: true) - Controls storefront visibility without deletion
 *   `created_at` (Timestamp)
 
 #### 7. `site_settings`

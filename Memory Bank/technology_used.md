@@ -82,7 +82,7 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **Homepage Hero Banner Customizer**: Complete customizer for background imagery, badge text, split title with gold accent highlight, multiline description, and live real-time sticky preview.
     - **Button Design Dropdown Selector Engine**: Selectable styling tokens for CTA buttons (Colors: Dark Luxury, Gold Accent, Crisp White, Outlines, Glassmorphic blur, Gold Gradient; Shapes: Square, Soft Square, Rounded, Pill; Sizes: Medium, Large, Extra Large; Icons: Arrow, Sparkle, Shopping Bag).
     - **Live Content Preview**: Admin module with real-time homepage banner preview as admins edit copy and upload photography.
-    - **Category & Collection Architecture**: Dynamic database-driven category collections with instant featured toggling and dual-level Collections page layout (All Collections + Featured Highlights).
+    - **Category & Collection Architecture**: Dynamic database-driven category collections with active/deactivation state toggles (`is_active`), instant featured toggling, live status filtering, and dual-level Collections page layout (All Collections + Featured Highlights).
     - **Collections Hero Customizer**: Real-time admin customizer for background images, badge, title, and description for the Collections page header.
 - **Optical Prescription & Customization Suite**:
     - **Interactive Lens Customizer**: Modal (`LensCustomizerModal.jsx`) allowing buyers to select optical lens packages (Single Vision, Anti-Reflective, Blue Cut, Photochromic, Progressive).

@@ -89,8 +89,16 @@
     - Integrated a default `🇧🇩 +880` country code badge into the phone input on `src/pages/TrackOrder.jsx`.
     - Automatically cleans pasted numbers (`+880...`, `880...`, or `01...`) to fit the 10-digit mobile field (`17XXXXXXXX`).
     - Added multi-format lookup in Supabase so orders stored as `017...`, `+88017...`, or `88017...` are all retrieved reliably.
+- [x] Category Activation & Deactivation System:
+    - Enabled temporary category deactivation in `src/pages/admin/Categories.jsx` so unneeded categories can be hidden without deleting.
+    - Added one-click `Active` / `Deactivated` toggle button with instant toast confirmation.
+    - Added visual status badges (`● Active` vs `Inactive`), tab filters (`All`, `Active`, `Inactive`), and header statistics.
+    - Added "Active Status" checkbox in the "Add New Category" form.
+    - Filtered out inactive categories in `FeaturedCollections.jsx`, `Collections.jsx`, and `FilterSidebar.jsx`.
+    - Added `(Inactive)` label in admin `ProductForm.jsx` category selector.
+    - Provided SQL migration script `add_is_active_to_categories.sql`.
 
-**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, Category/Collections management, Collections Hero Header customization, Homepage Hero Banner customization with button design dropdowns, Prescription Lens Selection & Upload Flow, Admin Lens Management, Checkout Item Removal, PDP Image Navigation, Default Lens State, PDP Typography Sanitization, Context State Warnings, Dynamic Checkout Field Customization, 11-Digit Phone Validation, Admin Orders Details UX, and Track Order +880 Default Prefix have been implemented and verified.
+**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, Category/Collections management, Category Activation/Deactivation, Collections Hero Header customization, Homepage Hero Banner customization with button design dropdowns, Prescription Lens Selection & Upload Flow, Admin Lens Management, Checkout Item Removal, PDP Image Navigation, Default Lens State, PDP Typography Sanitization, Context State Warnings, Dynamic Checkout Field Customization, 11-Digit Phone Validation, Admin Orders Details UX, and Track Order +880 Default Prefix have been implemented and verified.
 
 
 ## Next High-Priority Tasks: Admin & Backend

@@ -484,3 +484,14 @@
   - [x] Replaced ambiguous 3-dot dropdown menu with an explicit, styled `👁 Details` action button.
   - [x] Enhanced interactive hover states, pointer cursors, and protected control cells (checkbox, status dropdown, delete button).
   - [x] Linked recent orders in `Dashboard.jsx` directly to the orders management module.
+
+## Phase 44: Category Activation & Deactivation System
+- [x] **Admin Category Active Status Controls (Task Id: 589)**:
+  - [x] Built category activation/deactivation support in `Categories.jsx` allowing store owners to hide temporary categories without deleting.
+  - [x] Added one-click toggle button (`Active` / `Deactivated`) with real-time feedback and toast notifications.
+  - [x] Implemented status badges (`● Active` vs `Inactive`), tab filters (`All`, `Active`, `Inactive`), and live category count stats.
+  - [x] Added "Active Status" checkbox in the "Add New Category" form (default: active).
+  - [x] Filtered out inactive categories across customer-facing pages (`FeaturedCollections.jsx`, `Collections.jsx`, and `FilterSidebar.jsx`).
+  - [x] Added `(Inactive)` label in admin `ProductForm.jsx` category select dropdown.
+  - [x] Created database migration script `add_is_active_to_categories.sql`.
+

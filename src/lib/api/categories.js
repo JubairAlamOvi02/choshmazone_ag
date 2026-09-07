@@ -12,10 +12,19 @@ export const categoryParams = {
         return data || [];
     },
 
+    fetchActive: async () => {
+        const categories = await categoryParams.fetchAll();
+        return categories.filter(c => c.is_active !== false);
+    },
+
     create: async (categoryData) => {
+        const payload = {
+            ...categoryData,
+            is_active: categoryData.is_active !== undefined ? categoryData.is_active : true
+        };
         const { data, error } = await supabase
             .from('categories')
-            .insert([categoryData])
+            .insert([payload])
             .select()
             .single();
             
@@ -33,8 +42,14 @@ export const categoryParams = {
 
         if (error) {
             console.warn('[Categories] Table update warning:', error.message);
+            throw error;
         }
         return data;
+    },
+
+    toggleActive: async (id, currentStatus) => {
+        const newStatus = currentStatus === false ? true : false;
+        return await categoryParams.update(id, { is_active: newStatus });
     },
 
     delete: async (id) => {

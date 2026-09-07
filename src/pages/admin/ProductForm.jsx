@@ -346,7 +346,9 @@ const ProductForm = () => {
                                     >
                                         <option value="">Select Category</option>
                                         {categoriesList.map(cat => (
-                                            <option key={cat.id} value={cat.name}>{cat.name}</option>
+                                            <option key={cat.id} value={cat.name}>
+                                                {cat.name}{cat.is_active === false ? ' (Inactive)' : ''}
+                                            </option>
                                         ))}
                                     </select>
                                 </div>

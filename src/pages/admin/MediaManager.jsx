@@ -1007,7 +1007,7 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                                     <div key={cat.id} className="relative">
                                         <AssetCard
                                             title={`${cat.name} Collection`}
-                                            description={`${isFeatured ? '★ Featured Collection' : 'Standard Category'}`}
+                                            description={`${cat.is_active === false ? '● Inactive • ' : '● Active • '}${isFeatured ? '★ Featured Collection' : 'Standard Category'}`}
                                             imageUrl={currentImg}
                                             isPending={!!previewAssets[normalizedKey] || !!previewAssets[`${cat.name.toLowerCase()}_collection`]}
                                             onUpload={(e) => handleSiteAssetUpload(e, normalizedKey)}

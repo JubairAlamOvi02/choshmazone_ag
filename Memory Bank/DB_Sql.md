@@ -4,14 +4,18 @@
 CREATE TABLE public.categories (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
   name text NOT NULL,
-  slug text NOT NULL,
+  slug text,
   description text,
   image_url text,
   is_active boolean DEFAULT true,
   created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
   CONSTRAINT categories_pkey PRIMARY KEY (id),
-  CONSTRAINT categories_slug_key UNIQUE (slug)
+  CONSTRAINT categories_name_key UNIQUE (name)
 );
+
+-- Migration for is_active column:
+-- alter table public.categories add column if not exists is_active boolean default true;
+-- update public.categories set is_active = true where is_active is null;
 
 CREATE TABLE public.order_items (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),

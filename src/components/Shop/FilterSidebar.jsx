@@ -7,7 +7,7 @@ const FilterSidebar = ({ filters, setFilters }) => {
     useEffect(() => {
         const loadCategories = async () => {
             try {
-                const data = await categoryParams.fetchAll();
+                const data = await categoryParams.fetchActive();
                 setCategoriesList(data.map(c => c.name));
             } catch (err) {
                 console.error('Failed to load categories:', err);

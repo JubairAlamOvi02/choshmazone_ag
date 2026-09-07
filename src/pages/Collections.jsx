@@ -37,14 +37,14 @@ const Collections = () => {
                     description: getSetting('collections_hero_description') || 'Explore our complete range of handcrafted eyewear designed for every style, gender, and occasion.'
                 });
 
-                // Base fallback categories if empty
-                const list = categoriesData.length > 0 ? categoriesData : [
+                // Base fallback categories if empty, filtered by active status
+                const list = (categoriesData.length > 0 ? categoriesData : [
                     { id: '1', name: 'Eye Glasses' },
                     { id: '2', name: 'Kids' },
                     { id: '3', name: 'Men' },
                     { id: '4', name: 'Unisex' },
                     { id: '5', name: 'Women' }
-                ];
+                ]).filter(cat => cat.is_active !== false);
 
                 const mapped = list.map(cat => {
                     const normalizedKey = `category_img_${cat.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;

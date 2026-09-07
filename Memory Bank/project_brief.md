@@ -38,7 +38,7 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
     - **Order Management**: Monitor sales, update statuses, administrative deletion, view attached prescription slips/details, clickable rows for direct detail viewing, and Comprehensive Order Details Modal.
     - **Real-Time Mobile Alerts**: Instant push notifications with sound directly to the store owner's phone via Telegram Bot on new orders, plus a built-in "Test Phone Alert" feature in the Admin panel.
     - **Media & Content Manager (CMS)**: Manage global assets, customize Homepage Hero Banner (headline typography, gold accent highlight, subtext, background photography, and button design dropdown selectors for color/shape/size/icon) with Live Homepage Preview, edit Promotional Banner copy/imagery, customize Collections hero banner, and configure category collection artwork.
-    - **Category & Collection Control**: Manage dynamic store categories with instant "Featured" toggling (★ / ☆) for curated storefront highlights.
+    - **Category & Collection Control**: Manage dynamic store categories with active/deactivation state toggles (`Active` vs `Deactivated`) to temporarily hide categories without deleting, instant "Featured" toggling (★ / ☆), and live category status tab filters.
     - **Customer Management**: View registered user list and roles.
     - **Inventory Control**: Manage stock levels and dynamic "Active/Inactive" visibility toggle.
     - **Database Visibility**: Access to schemas and tables for debugging.
