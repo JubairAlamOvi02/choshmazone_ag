@@ -12,6 +12,7 @@ import { supabase } from '../lib/supabaseClient';
 import { getDistricts, getThanas, calculateDeliveryCharge } from '../data/bangladeshLocations';
 import { sendTelegramOrderNotification } from '../lib/telegramNotifier';
 import { settingsParams, DEFAULT_CHECKOUT_FIELD_SETTINGS } from '../lib/api/settings';
+import { trackEvent } from '../lib/tracker';
 
 // Bangladesh 11-digit phone validation helpers
 export const normalizeBDPhone = (input) => {
@@ -58,11 +59,25 @@ const Checkout = () => {
         resetQuantities();
 
         // Track Initiate Checkout
-        if (typeof window !== 'undefined' && window.fbq && cartItems.length > 0) {
-            window.fbq('track', 'InitiateCheckout', {
-                value: cartTotal,
-                currency: 'BDT',
-                num_items: cartItems.length
+        if (cartItems.length > 0) {
+            if (typeof window !== 'undefined' && window.fbq) {
+                window.fbq('track', 'InitiateCheckout', {
+                    value: cartTotal,
+                    currency: 'BDT',
+                    num_items: cartItems.length
+                });
+            }
+
+            // Web Log Analytics Initiate Checkout
+            trackEvent('initiate_checkout', {
+                cart_count: cartItems.length,
+                total_value: cartTotal,
+                items: cartItems.map(item => ({
+                    id: item.id,
+                    title: item.title || item.name,
+                    price: item.price,
+                    quantity: item.quantity
+                }))
             });
         }
     }, [resetQuantities]);
@@ -356,6 +371,25 @@ const Checkout = () => {
                     num_items: cartItems.reduce((acc, item) => acc + item.quantity, 0)
                 });
             }
+
+            // Web Log Analytics Purchase event
+            trackEvent('purchase', {
+                order_id: createdOrder?.id || orderDisplayId,
+                total_amount: Number(totalWithDelivery.toFixed(2)),
+                delivery_charge: deliveryCharge,
+                payment_method: formData.paymentMethod,
+                customer_name: formData.name,
+                customer_phone: cleanPhone || formData.phone,
+                customer_district: formData.district,
+                num_items: preparedItems.reduce((acc, item) => acc + item.quantity, 0),
+                items: preparedItems.map(item => ({
+                    id: item.id,
+                    title: item.title,
+                    price: item.price,
+                    quantity: item.quantity,
+                    style: item.style
+                }))
+            });
 
             clearCart();
             navigate('/order-success');

@@ -358,3 +358,17 @@
   - Updated storefront components (`FeaturedCollections.jsx`, `Collections.jsx`, and `FilterSidebar.jsx`) to filter out inactive categories from navigation, shop filters, and catalog grids.
   - Added `(Inactive)` badge in the admin `ProductForm.jsx` category dropdown so admins have complete visibility when assigning categories.
   - Provided database migration script `add_is_active_to_categories.sql`.
+
+- Task 85 (Web Log & Conversion Funnel Analytics System): Completed
+  - Created `visitor_sessions` and `web_events` database schema with RLS and high-performance indexes in `create_web_logs_schema.sql`.
+  - Built client-side non-blocking tracker engine in `src/lib/tracker.js` managing persistent `visitor_id`, `session_id`, device and browser detection, and async dispatching.
+  - Automated tracking hooks for `page_view` (`PageMonitor.jsx`), `view_product` (`ProductDetails.jsx`), `add_to_cart` / `remove_from_cart` (`CartContext.jsx`), and `initiate_checkout` / `purchase` (`Checkout.jsx`).
+  - Built comprehensive Admin Web Logs & Analytics page (`src/pages/admin/WebLogs.jsx`) featuring:
+    - 6 KPI scorecards (Unique Visitors, Page Views, Add to Cart rate, Checkout rate, Purchase rate, Tracked revenue)
+    - Step-by-step interactive conversion funnel with drop-off analytics
+    - Recharts Area Chart for daily/hourly traffic & conversion timeline
+    - Hardware & device distribution breakdown (Mobile vs Desktop vs Tablet)
+    - Most added-to-cart high-demand products
+    - Real-time live event stream table with search, event filters, time-ago format, and raw JSON metadata inspector modal.
+  - Added "Web Logs & Funnel" with `Activity` icon in `AdminLayout.jsx` and registered `/admin/web-logs` route in `App.jsx`.
+

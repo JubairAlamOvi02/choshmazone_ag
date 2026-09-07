@@ -495,3 +495,12 @@
   - [x] Added `(Inactive)` label in admin `ProductForm.jsx` category select dropdown.
   - [x] Created database migration script `add_is_active_to_categories.sql`.
 
+## Phase 45: Web Log & Conversion Funnel Analytics System
+- [x] **Web Log & Funnel Analytics Suite (Task Id: 590)**:
+  - [x] Created `visitor_sessions` and `web_events` database tables with RLS and high-speed indexes in `create_web_logs_schema.sql`.
+  - [x] Built client-side non-blocking tracker library in `src/lib/tracker.js` managing persistent `visitor_id`, `session_id`, device/OS/browser detection, and async dispatching.
+  - [x] Automated event tracking for `page_view` (`PageMonitor.jsx`), `view_product` (`ProductDetails.jsx`), `add_to_cart` / `remove_from_cart` (`CartContext.jsx`), and `initiate_checkout` / `purchase` (`Checkout.jsx`).
+  - [x] Built comprehensive Admin Web Logs & Funnel Analytics Dashboard (`src/pages/admin/WebLogs.jsx`) with 6 KPI scorecards, interactive conversion funnel with drop-off metrics, Recharts area trend charts, hardware breakdown, high-demand cart items, and live event log table with JSON metadata inspector.
+  - [x] Added "Web Logs & Funnel" navigation link in `AdminLayout.jsx` and registered `/admin/web-logs` route in `App.jsx`.
+
+

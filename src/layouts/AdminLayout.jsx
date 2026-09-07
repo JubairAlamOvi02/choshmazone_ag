@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, LayoutDashboard, Box, ShoppingCart, Users, LogOut, Bell, Search, Settings, Glasses, Image as ImageIcon, Facebook, Tags } from 'lucide-react';
+import { Menu, X, LayoutDashboard, Box, ShoppingCart, Users, LogOut, Bell, Search, Settings, Glasses, Image as ImageIcon, Facebook, Tags, Activity } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 
@@ -59,6 +59,7 @@ const AdminLayout = () => {
 
                     <nav className="flex-1 space-y-2">
                         <AdminNavLink to="/admin/dashboard" icon={LayoutDashboard} label="Dashboard" isActive={isActive('/admin/dashboard')} onClick={closeMobileMenu} />
+                        <AdminNavLink to="/admin/web-logs" icon={Activity} label="Web Logs & Funnel" isActive={isActive('/admin/web-logs')} onClick={closeMobileMenu} />
                         <AdminNavLink to="/admin/products" icon={Box} label="Inventory" isActive={isActive('/admin/products')} onClick={closeMobileMenu} />
                         <AdminNavLink to="/admin/categories" icon={Tags} label="Categories" isActive={isActive('/admin/categories')} onClick={closeMobileMenu} />
                         <AdminNavLink to="/admin/lenses" icon={Glasses} label="Lens Packages" isActive={isActive('/admin/lenses')} onClick={closeMobileMenu} />

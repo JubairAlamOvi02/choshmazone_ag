@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, startTransition, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useToast } from './ToastContext';
+import { trackEvent } from '../lib/tracker';
 
 const CartContext = createContext();
 
@@ -103,6 +104,18 @@ export const CartProvider = ({ children }) => {
             });
         }
 
+        // Web Log Analytics AddToCart event
+        trackEvent('add_to_cart', {
+            product_id: product.id,
+            product_name: product.name || product.title,
+            price: Number(product.price || 0),
+            quantity: quantityToAdd,
+            total_value: Number(product.price || 0) * quantityToAdd,
+            category: product.category || 'General',
+            variant: product.variant || null,
+            lens: product.lensOption?.name || 'Frame Only'
+        });
+
         // Wrap UI state update in transition to improve INP/responsiveness
         if (shouldOpenCart) {
             startTransition(() => {
@@ -120,6 +133,14 @@ export const CartProvider = ({ children }) => {
 
         if (removedItem) {
             showToast(`${removedItem.name || removedItem.title} removed from bag.`, 'info');
+
+            // Web Log Analytics RemoveFromCart event
+            trackEvent('remove_from_cart', {
+                product_id: removedItem.id,
+                product_name: removedItem.name || removedItem.title,
+                price: Number(removedItem.price || 0),
+                quantity: removedItem.quantity || 1
+            });
         }
     }, [showToast]);
 

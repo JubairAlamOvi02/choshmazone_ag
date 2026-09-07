@@ -14,6 +14,7 @@ import ProductCard from '../components/ProductCard';
 import ReviewSection from '../components/ReviewSection';
 import LensCustomizerModal from '../components/Prescription/LensCustomizerModal';
 import { settingsParams } from '../lib/api/settings';
+import { trackEvent } from '../lib/tracker';
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -124,6 +125,15 @@ const ProductDetails = () => {
                         currency: 'BDT'
                     });
                 }
+
+                // Web Log Analytics View Product event
+                trackEvent('view_product', {
+                    product_id: formattedProduct.id,
+                    product_name: formattedProduct.title,
+                    price: Number(formattedProduct.price || 0),
+                    category: data.category || 'General',
+                    image_url: formattedProduct.image
+                });
 
                 // Fetch related products - only if category exists
                 if (data.category) {

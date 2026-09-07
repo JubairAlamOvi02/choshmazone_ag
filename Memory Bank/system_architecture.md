@@ -48,6 +48,7 @@
     *   `11-Digit Phone Validation`: Real-time phone number normalization and regex enforcement (`^01[3-9]\d{8}$`) with live digit counters.
     *   `Admin Orders Interaction Engine`: Clickable table rows and explicit `👁 Details` buttons for frictionless order inspection.
     *   `Interactive PDP Gallery`: Full-scale product image presentation with high-res thumbnails and floating previous/next navigation arrows.
+    *   `Web Log & Funnel Analytics Engine`: Real-time visitor activity stream, persistent visitor/session tracking (`src/lib/tracker.js`), non-blocking event logging (`page_view`, `view_product`, `add_to_cart`, `remove_from_cart`, `initiate_checkout`, `purchase`), and comprehensive admin analytics dashboard (`WebLogs.jsx`) with step-by-step conversion funnel visualization, drop-off metrics, Recharts area trends, device breakdown, and JSON metadata inspector.
 *   **PWA** (Implemented): Service Worker (`sw.js`) with offline caching for assets/images and Manifest support.
 *   **Performance Optimization**: 
     - **Code Splitting**: Route-level granularity via `React.lazy` and `Suspense`.
@@ -132,10 +133,34 @@
 *   `value` (Text)
 *   `updated_at` (Timestamp)
 
+#### 8. `visitor_sessions`
+*Tracks unique visitor sessions and conversion milestones.*
+*   `id` (Text, Primary Key) - Session UUID (sessionStorage)
+*   `visitor_id` (Text) - Persistent client ID (localStorage)
+*   `user_id` (UUID, References `profiles.id`, Nullable)
+*   `first_page` (Text), `last_page` (Text), `referrer` (Text)
+*   `device_type` (Text), `browser` (Text), `operating_system` (Text)
+*   `page_views_count` (Integer, Default: 1)
+*   `has_viewed_product` (Boolean), `has_added_to_cart` (Boolean), `has_initiated_checkout` (Boolean), `has_purchased` (Boolean)
+*   `total_purchased_amount` (Numeric, Default: 0), `order_id` (UUID)
+*   `started_at` (Timestamp), `last_active_at` (Timestamp)
+
+#### 9. `web_events`
+*Real-time granular event stream for all visitor actions.*
+*   `id` (UUID, Primary Key)
+*   `session_id` (Text), `visitor_id` (Text)
+*   `user_id` (UUID, References `profiles.id`, Nullable)
+*   `event_type` (Text) - 'page_view', 'view_product', 'add_to_cart', 'remove_from_cart', 'initiate_checkout', 'purchase', 'wishlist_add'
+*   `path` (Text), `page_title` (Text)
+*   `metadata` (JSONB) - Event specific details (product info, price, cart value, order summary)
+*   `device_type` (Text)
+*   `created_at` (Timestamp)
+
 ### B. Relationships
 *   `profiles` 1:N `orders`
 *   `orders` 1:N `order_items`
 *   `products` 1:N `order_items`
+*   `visitor_sessions` 1:N `web_events` (via session_id)
 
 
 ---

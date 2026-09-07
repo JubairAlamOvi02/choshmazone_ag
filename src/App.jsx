@@ -55,6 +55,7 @@ const AdminMedia = lazy(() => import('./pages/admin/MediaManager'));
 const FacebookCatalog = lazy(() => import('./pages/admin/FacebookCatalog'));
 const AdminLensPackages = lazy(() => import('./pages/admin/LensPackages'));
 const AdminCheckoutSettings = lazy(() => import('./pages/admin/CheckoutSettings'));
+const AdminWebLogs = lazy(() => import('./pages/admin/WebLogs'));
 
 
 function App() {
@@ -114,6 +115,7 @@ function App() {
                         }>
                           <Route index element={<Navigate to="dashboard" replace />} />
                           <Route path="dashboard" element={<AdminDashboard />} />
+                          <Route path="web-logs" element={<AdminWebLogs />} />
                           <Route path="categories" element={<AdminCategories />} />
                           <Route path="products" element={<AdminProducts />} />
                           <Route path="products/new" element={<AdminProductNew />} />

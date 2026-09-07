@@ -95,5 +95,10 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **11-Digit Phone Validation Subsystem**: Strict Bangladesh mobile number normalization and regex verification (`^01[3-9]\d{8}$`) with real-time character count badge (`X/11 digits ✓`).
     - **Admin Orders Interactive UX**: Clickable table rows and explicit `👁 Details` action button in `/admin/orders` for immediate order inspection.
     - **Interactive Image Navigation**: Full-scale product presentation with floating prev/next navigation arrows and high-res thumbnail selection.
+- **Web Log & Conversion Funnel Analytics Engine**:
+    - **Real-Time Client Tracker (`src/lib/tracker.js`)**: Non-blocking visitor session management (`visitor_id` in localStorage, `session_id` in sessionStorage), device/browser detection, and milestone updating (`has_viewed_product`, `has_added_to_cart`, `has_initiated_checkout`, `has_purchased`).
+    - **Automated Event Hooks**: Route-level tracking on Page Views (`PageMonitor.jsx`), Product Views (`ProductDetails.jsx`), Cart Changes (`CartContext.jsx`), and Checkout/Purchase conversions (`Checkout.jsx`).
+    - **Admin Analytics Dashboard (`/admin/web-logs`)**: 6 KPI cards, interactive step-by-step conversion funnel with drop-off analytics, Recharts Area Charts for traffic and sales trends, hardware breakdown (Mobile vs Desktop vs Tablet), high-demand cart items, and a searchable live activity log with JSON metadata inspection.
+
 
 

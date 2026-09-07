@@ -97,8 +97,14 @@
     - Filtered out inactive categories in `FeaturedCollections.jsx`, `Collections.jsx`, and `FilterSidebar.jsx`.
     - Added `(Inactive)` label in admin `ProductForm.jsx` category selector.
     - Provided SQL migration script `add_is_active_to_categories.sql`.
+- [x] Web Log & Conversion Funnel Analytics Suite:
+    - Created database tables (`visitor_sessions`, `web_events`) with high-performance indexes and RLS policies in `create_web_logs_schema.sql`.
+    - Built client-side non-blocking tracker library in `src/lib/tracker.js` managing persistent `visitor_id`, `session_id`, device/browser detection, and async dispatching.
+    - Automated event tracking across the entire customer journey: `page_view` (`PageMonitor.jsx`), `view_product` (`ProductDetails.jsx`), `add_to_cart` / `remove_from_cart` (`CartContext.jsx`), and `initiate_checkout` / `purchase` (`Checkout.jsx`).
+    - Built comprehensive Admin Web Logs & Funnel Analytics Dashboard (`src/pages/admin/WebLogs.jsx`) featuring 6 KPI scorecards, interactive conversion funnel with drop-off analytics, Recharts area trend charts, hardware breakdown, high-demand cart items, and a searchable live activity log with JSON metadata inspection.
+    - Added "Web Logs & Funnel" navigation link in `AdminLayout.jsx` and registered `/admin/web-logs` route in `App.jsx`.
 
-**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, Category/Collections management, Category Activation/Deactivation, Collections Hero Header customization, Homepage Hero Banner customization with button design dropdowns, Prescription Lens Selection & Upload Flow, Admin Lens Management, Checkout Item Removal, PDP Image Navigation, Default Lens State, PDP Typography Sanitization, Context State Warnings, Dynamic Checkout Field Customization, 11-Digit Phone Validation, Admin Orders Details UX, and Track Order +880 Default Prefix have been implemented and verified.
+**Status**: All additional tasks requested by the user involving Currency, Google Sheets customizations, Social Media branding, Telegram Order Alerts, Homepage Promotional Banners, Category/Collections management, Category Activation/Deactivation, Collections Hero Header customization, Homepage Hero Banner customization with button design dropdowns, Prescription Lens Selection & Upload Flow, Admin Lens Management, Checkout Item Removal, PDP Image Navigation, Default Lens State, PDP Typography Sanitization, Context State Warnings, Dynamic Checkout Field Customization, 11-Digit Phone Validation, Admin Orders Details UX, Track Order +880 Default Prefix, and Web Log & Conversion Funnel Analytics Suite have been implemented and verified.
 
 
 ## Next High-Priority Tasks: Admin & Backend

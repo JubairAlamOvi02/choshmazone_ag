@@ -40,6 +40,7 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
     - **Media & Content Manager (CMS)**: Manage global assets, customize Homepage Hero Banner (headline typography, gold accent highlight, subtext, background photography, and button design dropdown selectors for color/shape/size/icon) with Live Homepage Preview, edit Promotional Banner copy/imagery, customize Collections hero banner, and configure category collection artwork.
     - **Category & Collection Control**: Manage dynamic store categories with active/deactivation state toggles (`Active` vs `Deactivated`) to temporarily hide categories without deleting, instant "Featured" toggling (★ / ☆), and live category status tab filters.
     - **Customer Management**: View registered user list and roles.
+    - **Web Log & Funnel Analytics**: Dedicated real-time dashboard at `/admin/web-logs` tracking unique visitors, page views, conversion funnel milestones (Product View $\rightarrow$ Add to Cart $\rightarrow$ Checkout $\rightarrow$ Purchase) with drop-off percentages, Recharts area trends, device breakdown, high-demand cart items, and live event log table with JSON metadata inspector.
     - **Inventory Control**: Manage stock levels and dynamic "Active/Inactive" visibility toggle.
     - **Database Visibility**: Access to schemas and tables for debugging.
 
