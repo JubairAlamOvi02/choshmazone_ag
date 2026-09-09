@@ -334,3 +334,21 @@
     - [x] Added `color` column to the `products` table schema for default variant mapping.
     - [x] Added a "Default Color" field to the Pricing & Inventory section of `ProductForm.jsx`.
     - [x] Updated `ProductDetails.jsx` to dynamically merge the default `product.color` with the `variants` array and correctly update the UI.
+
+## Phase 30: Web Log & Conversion Funnel Tracking
+- [x] **Visitor Tracking Engine & Admin Logs**:
+    - [x] Implemented `visitor_sessions` and `web_events` logging schema with indexing.
+    - [x] Created client-side tracker (`src/lib/tracker.js`) with non-blocking async event dispatching.
+    - [x] Built comprehensive Admin Funnel Dashboard (`WebLogs.jsx`) with KPIs, conversion steps, and event inspection.
+
+## Phase 31: Phone-Based Public Order Tracking
+- [x] **Customer Order Tracking & OTP Verification**:
+    - [x] Built phone-based order lookup system in `/track-order` (`TrackOrder.jsx`).
+    - [x] Added mock OTP verification security gate allowing account-less order status tracking.
+    - [x] Rendered visual fulfillment timeline with dynamic status badges.
+
+## Phase 32: Recharts Stabilization & SEO Branding
+- [x] **Chart Hydration & Dimension Hardening**:
+    - [x] Solved Recharts `-1` width/height evaluation warnings with `isMounted`, `min-w-0`, and `debounce={50}`.
+- [x] **Google Search Branding**:
+    - [x] Updated `index.html` with official Google search favicons and high-res web app icons.

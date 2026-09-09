@@ -4,7 +4,7 @@ import {
     Activity, Users, Eye, ShoppingCart, CreditCard, ShoppingBag,
     TrendingUp, RefreshCw, Smartphone, Monitor, Tablet, Search,
     Filter, ArrowDown, ExternalLink, Clock, ShieldCheck, ChevronRight,
-    AlertCircle, Sparkles, X, CheckCircle2, ChevronDown
+    AlertCircle, Sparkles, X, CheckCircle2, ChevronDown, Radio, Globe, Package
 } from 'lucide-react';
 import {
     ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
@@ -58,6 +58,8 @@ const WebLogs = () => {
     const [selectedEventModal, setSelectedEventModal] = useState(null);
     const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'events' | 'products'
     const [isMounted, setIsMounted] = useState(false);
+    const [liveViewers, setLiveViewers] = useState([]);
+    const [liveExpanded, setLiveExpanded] = useState(true);
 
     useEffect(() => {
         setIsMounted(true);
@@ -130,6 +132,60 @@ const WebLogs = () => {
         }, 20000);
         return () => clearInterval(interval);
     }, [autoRefresh, fetchData]);
+
+    // ---------- LIVE VIEWERS ----------
+    const LIVE_THRESHOLD_MS = 2 * 60 * 1000; // 2 minutes = considered "live"
+
+    const fetchLiveViewers = useCallback(async () => {
+        try {
+            const cutoff = new Date(Date.now() - LIVE_THRESHOLD_MS).toISOString();
+            const { data } = await supabase
+                .from('visitor_sessions')
+                .select('id, visitor_id, last_page, device_type, browser, last_active_at')
+                .gte('last_active_at', cutoff)
+                .order('last_active_at', { ascending: false });
+            if (data) setLiveViewers(data);
+        } catch {
+            // non-critical
+        }
+    }, []);
+
+    // Fetch live viewers on mount and every 15s
+    useEffect(() => {
+        fetchLiveViewers();
+        const interval = setInterval(fetchLiveViewers, 15000);
+        return () => clearInterval(interval);
+    }, [fetchLiveViewers]);
+
+    // Derived live viewer analytics
+    const liveStats = useMemo(() => {
+        const total = liveViewers.length;
+        const uniqueVisitors = new Set(liveViewers.map(v => v.visitor_id)).size;
+
+        // Group by page
+        const pageMap = {};
+        liveViewers.forEach(v => {
+            const page = v.last_page || '/';
+            if (!pageMap[page]) pageMap[page] = { path: page, count: 0, viewers: [] };
+            pageMap[page].count += 1;
+            pageMap[page].viewers.push(v);
+        });
+        const pages = Object.values(pageMap).sort((a, b) => b.count - a.count);
+
+        // Product viewers (paths like /product/xxx or /products/xxx)
+        const productViewers = pages.filter(p => /^\/(product|products)\//i.test(p.path));
+        const browsingCount = total - productViewers.reduce((s, p) => s + p.count, 0);
+
+        // Device breakdown
+        const devices = { mobile: 0, desktop: 0, tablet: 0 };
+        liveViewers.forEach(v => {
+            const d = v.device_type || 'desktop';
+            if (devices[d] !== undefined) devices[d] += 1;
+            else devices.desktop += 1;
+        });
+
+        return { total, uniqueVisitors, pages, productViewers, browsingCount, devices };
+    }, [liveViewers]);
 
     // Realtime subscription for incoming events
     useEffect(() => {
@@ -433,6 +489,177 @@ const WebLogs = () => {
                     icon={TrendingUp}
                     color="bg-rose-50 text-rose-600"
                 />
+            </div>
+
+            {/* ============ LIVE NOW PANEL ============ */}
+            <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-2xl border border-gray-700 shadow-lg overflow-hidden">
+                {/* Header */}
+                <button
+                    onClick={() => setLiveExpanded(!liveExpanded)}
+                    className="w-full flex items-center justify-between p-5 sm:p-6 text-left hover:bg-white/[0.02] transition-colors"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="relative">
+                            <div className="p-2.5 bg-emerald-500/20 rounded-xl">
+                                <Radio size={22} className="text-emerald-400" />
+                            </div>
+                            {liveStats.total > 0 && (
+                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full animate-ping" />
+                            )}
+                            {liveStats.total > 0 && (
+                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full" />
+                            )}
+                        </div>
+                        <div>
+                            <h3 className="text-base font-black text-white font-outfit flex items-center gap-2">
+                                Live Now
+                                <span className="text-2xl font-black text-emerald-400 tabular-nums">
+                                    {liveStats.total}
+                                </span>
+                                <span className="text-xs font-bold text-gray-400 font-outfit">
+                                    {liveStats.total === 1 ? 'viewer' : 'viewers'} on site
+                                </span>
+                            </h3>
+                            <p className="text-[11px] text-gray-500 font-outfit mt-0.5">
+                                Users active within the last 2 minutes • Auto-refreshes every 15s
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        {/* Quick device counts */}
+                        <div className="hidden sm:flex items-center gap-3 text-gray-400">
+                            <span className="flex items-center gap-1 text-[11px] font-bold font-outfit">
+                                <Smartphone size={13} /> {liveStats.devices.mobile}
+                            </span>
+                            <span className="flex items-center gap-1 text-[11px] font-bold font-outfit">
+                                <Monitor size={13} /> {liveStats.devices.desktop}
+                            </span>
+                            <span className="flex items-center gap-1 text-[11px] font-bold font-outfit">
+                                <Tablet size={13} /> {liveStats.devices.tablet}
+                            </span>
+                        </div>
+                        <ChevronDown
+                            size={18}
+                            className={`text-gray-500 transition-transform duration-300 ${liveExpanded ? 'rotate-180' : ''}`}
+                        />
+                    </div>
+                </button>
+
+                {/* Collapsible Body */}
+                {liveExpanded && (
+                    <div className="px-5 sm:px-6 pb-5 sm:pb-6 border-t border-gray-700/60">
+                        {liveStats.total === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-10 text-center">
+                                <div className="p-4 bg-gray-800 rounded-2xl mb-3">
+                                    <Globe size={28} className="text-gray-600" />
+                                </div>
+                                <p className="text-sm font-bold text-gray-500 font-outfit">No active viewers right now</p>
+                                <p className="text-[11px] text-gray-600 font-outfit mt-1">Visitors will appear here as they browse your store</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-4">
+                                {/* Left: Summary Stats */}
+                                <div className="space-y-3">
+                                    <div className="bg-gray-800/60 rounded-xl p-4 border border-gray-700/50">
+                                        <h4 className="text-[11px] font-bold text-gray-500 font-outfit uppercase tracking-wider mb-3">Live Summary</h4>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <p className="text-2xl font-black text-white font-outfit tabular-nums">{liveStats.uniqueVisitors}</p>
+                                                <p className="text-[11px] text-gray-500 font-outfit">Unique visitors</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-2xl font-black text-white font-outfit tabular-nums">{liveStats.total}</p>
+                                                <p className="text-[11px] text-gray-500 font-outfit">Active sessions</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-2xl font-black text-emerald-400 font-outfit tabular-nums">{liveStats.productViewers.length}</p>
+                                                <p className="text-[11px] text-gray-500 font-outfit">Viewing products</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-2xl font-black text-blue-400 font-outfit tabular-nums">{liveStats.browsingCount}</p>
+                                                <p className="text-[11px] text-gray-500 font-outfit">Browsing site</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Device breakdown mini */}
+                                    <div className="bg-gray-800/60 rounded-xl p-4 border border-gray-700/50">
+                                        <h4 className="text-[11px] font-bold text-gray-500 font-outfit uppercase tracking-wider mb-3">Devices</h4>
+                                        <div className="space-y-2">
+                                            {[
+                                                { label: 'Mobile', count: liveStats.devices.mobile, icon: Smartphone, color: 'bg-blue-500' },
+                                                { label: 'Desktop', count: liveStats.devices.desktop, icon: Monitor, color: 'bg-purple-500' },
+                                                { label: 'Tablet', count: liveStats.devices.tablet, icon: Tablet, color: 'bg-amber-500' }
+                                            ].map(d => (
+                                                <div key={d.label} className="flex items-center gap-2">
+                                                    <d.icon size={14} className="text-gray-500" />
+                                                    <span className="text-xs font-bold text-gray-300 font-outfit w-14">{d.label}</span>
+                                                    <div className="flex-1 bg-gray-700 h-1.5 rounded-full overflow-hidden">
+                                                        <div
+                                                            className={`h-full ${d.color} rounded-full transition-all duration-500`}
+                                                            style={{ width: liveStats.total > 0 ? `${(d.count / liveStats.total) * 100}%` : '0%' }}
+                                                        />
+                                                    </div>
+                                                    <span className="text-xs font-black text-gray-400 font-outfit w-6 text-right tabular-nums">{d.count}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Center & Right: Active Pages List */}
+                                <div className="lg:col-span-2 bg-gray-800/60 rounded-xl border border-gray-700/50 overflow-hidden">
+                                    <div className="px-4 py-3 border-b border-gray-700/50 flex items-center justify-between">
+                                        <h4 className="text-[11px] font-bold text-gray-500 font-outfit uppercase tracking-wider">Active Pages</h4>
+                                        <span className="text-[11px] font-bold text-gray-600 font-outfit">{liveStats.pages.length} pages</span>
+                                    </div>
+                                    <div className="max-h-[240px] overflow-y-auto scrollbar-thin">
+                                        {liveStats.pages.map((page, idx) => {
+                                            const isProduct = /^\/(product|products)\//i.test(page.path);
+                                            const pathSegments = page.path.split('/').filter(Boolean);
+                                            const displayName = isProduct
+                                                ? decodeURIComponent(pathSegments[pathSegments.length - 1] || '').replace(/-/g, ' ')
+                                                : page.path === '/' ? 'Homepage' : page.path;
+                                            return (
+                                                <div
+                                                    key={idx}
+                                                    className="flex items-center justify-between px-4 py-2.5 border-b border-gray-700/30 hover:bg-gray-700/30 transition-colors last:border-b-0"
+                                                >
+                                                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                                        <div className={`p-1.5 rounded-lg ${isProduct ? 'bg-emerald-500/15' : 'bg-blue-500/15'}`}>
+                                                            {isProduct ? (
+                                                                <Package size={14} className="text-emerald-400" />
+                                                            ) : (
+                                                                <Globe size={14} className="text-blue-400" />
+                                                            )}
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <p className={`text-xs font-bold font-outfit truncate ${
+                                                                isProduct ? 'text-emerald-300' : 'text-gray-300'
+                                                            }`}>
+                                                                {isProduct ? '🔍 ' : ''}{displayName}
+                                                            </p>
+                                                            <p className="text-[10px] text-gray-600 font-outfit truncate">{page.path}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 flex-shrink-0 ml-3">
+                                                        <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                                                        <span className="text-sm font-black text-white font-outfit tabular-nums">
+                                                            {page.count}
+                                                        </span>
+                                                        <span className="text-[10px] text-gray-500 font-outfit">
+                                                            {page.count === 1 ? 'viewer' : 'viewers'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Conversion Funnel Section */}

@@ -99,6 +99,13 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **Real-Time Client Tracker (`src/lib/tracker.js`)**: Non-blocking visitor session management (`visitor_id` in localStorage, `session_id` in sessionStorage), device/browser detection, and milestone updating (`has_viewed_product`, `has_added_to_cart`, `has_initiated_checkout`, `has_purchased`).
     - **Automated Event Hooks**: Route-level tracking on Page Views (`PageMonitor.jsx`), Product Views (`ProductDetails.jsx`), Cart Changes (`CartContext.jsx`), and Checkout/Purchase conversions (`Checkout.jsx`).
     - **Admin Analytics Dashboard (`/admin/web-logs`)**: 6 KPI cards, interactive step-by-step conversion funnel with drop-off analytics, Recharts Area Charts for traffic and sales trends, hardware breakdown (Mobile vs Desktop vs Tablet), high-demand cart items, and a searchable live activity log with JSON metadata inspection.
+- **Public Phone-Based Order Tracking & Verification**:
+    - **Frictionless Tracking (`/track-order`)**: Phone-number discovery system coupled with mock OTP SMS verification simulation, providing customers immediate access to fulfillment updates, item lists, and delivery addresses without account login.
+    - **Visual Order Timeline**: Milestone stepper highlighting active order stage (Placed → Processing → Shipped → Delivered).
+- **Search Engine Branding & Metadata**:
+    - **Google Search Favicons**: Configured dedicated high-resolution favicon links and manifest icons for optimal search engine display and home screen shortcuts.
+- **Data Visualization & Chart Resilience**:
+    - **Recharts Container Hardening**: Client-side hydration tracking (`isMounted`), flex/grid `min-w-0` layout safeguards, and `<ResponsiveContainer>` debouncing preventing `-1` dimension calculation warnings.
 
 
 

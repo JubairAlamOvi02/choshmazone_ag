@@ -372,3 +372,19 @@
     - Real-time live event stream table with search, event filters, time-ago format, and raw JSON metadata inspector modal.
   - Added "Web Logs & Funnel" with `Activity` icon in `AdminLayout.jsx` and registered `/admin/web-logs` route in `App.jsx`.
 
+- Task 86 (Phone-Based Order Tracking with OTP Verification & Security): Completed
+  - Created public customer order tracking page at `/track-order` (`src/pages/TrackOrder.jsx`).
+  - Implemented phone number lookup coupled with secure mock OTP verification, allowing customers to track order status, payment methods, delivery addresses, and shipment stages without requiring login.
+  - Added visual progress stepper (Pending → Processing → Shipped → Delivered) with live timestamps and itemized breakdowns.
+  - Linked order tracking in the main navbar and footer for quick buyer access.
+
+- Task 87 (Google Search Favicon & Branding Metadata Optimization): Completed
+  - Added standardized Google Search and mobile browser favicons and app icons in `index.html`.
+  - Configured crisp logo link tags and Open Graph / Twitter metadata for high-resolution search results and social link previews.
+
+- Task 88 (Recharts -1 Dimensions Warning Resolution & Container Hardening): Completed
+  - Resolved `The width(-1) and height(-1) of chart should be greater than 0` warning across Recharts components in `WebLogs.jsx` and `Dashboard.jsx`.
+  - Implemented `isMounted` DOM lifecycle validation, ensuring charts render only after client layout computes.
+  - Added `min-w-0` and explicit minimum height bounds (`min-h-[16rem]`) on parent flex/grid containers.
+  - Configured `minWidth={0}`, `minHeight={0}`, and `debounce={50}` on `<ResponsiveContainer>`.
+

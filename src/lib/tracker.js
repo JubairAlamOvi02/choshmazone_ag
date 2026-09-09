@@ -210,3 +210,23 @@ export const trackEvent = async (eventType, metadata = {}, extra = {}) => {
         console.debug('[Tracker] Event dispatch notice:', err?.message || err);
     }
 };
+
+/**
+ * Send a lightweight heartbeat to keep session active and update current page location
+ * @param {string} path - Current route pathname
+ */
+export const touchSession = async (path = '/') => {
+    try {
+        const sessionId = getSessionId();
+        await supabase
+            .from('visitor_sessions')
+            .update({
+                last_page: path,
+                last_active_at: new Date().toISOString()
+            })
+            .eq('id', sessionId);
+    } catch {
+        // Heartbeat failure is non-critical
+    }
+};
+

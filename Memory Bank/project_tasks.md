@@ -503,4 +503,23 @@
   - [x] Built comprehensive Admin Web Logs & Funnel Analytics Dashboard (`src/pages/admin/WebLogs.jsx`) with 6 KPI scorecards, interactive conversion funnel with drop-off metrics, Recharts area trend charts, hardware breakdown, high-demand cart items, and live event log table with JSON metadata inspector.
   - [x] Added "Web Logs & Funnel" navigation link in `AdminLayout.jsx` and registered `/admin/web-logs` route in `App.jsx`.
 
+## Phase 46: Public Phone-Based Order Tracking & Verification Flow
+- [x] **Phone Order Tracking & Verification (Task Id: 591)**:
+  - [x] Implemented dedicated `/track-order` lookup page (`src/pages/TrackOrder.jsx`).
+  - [x] Integrated phone-number querying with mock SMS OTP verification simulation for safe, frictionless access without requiring customer accounts.
+  - [x] Rendered interactive order timeline with detailed status flags, items overview, payment methods, and shipping summaries.
+  - [x] Added navigation entry points in header and footer.
+
+## Phase 47: Google Search SEO Favicon & Metadata Enhancements
+- [x] **Google Search Branding Assets (Task Id: 592)**:
+  - [x] Added standard Google search favicons and high-resolution web app icons in `index.html`.
+  - [x] Configured structured Open Graph and Twitter card image headers for search result crawlers and social link sharing.
+
+## Phase 48: Recharts Container Hardening & Layout Dimension Fix
+- [x] **Recharts -1 Dimensions Warning Resolution (Task Id: 593)**:
+  - [x] Resolved console warnings (`width(-1) and height(-1) of chart should be greater than 0`) in `WebLogs.jsx` and `Dashboard.jsx`.
+  - [x] Added client-side mounting guard (`isMounted`) to prevent pre-layout render attempts.
+  - [x] Configured `min-w-0` and explicit container height styles (`min-h-[16rem]`) on chart wrappers.
+  - [x] Passed `minWidth={0}`, `minHeight={0}`, and `debounce={50}` to `<ResponsiveContainer>`.
+
 
