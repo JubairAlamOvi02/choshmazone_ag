@@ -57,6 +57,11 @@ const WebLogs = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedEventModal, setSelectedEventModal] = useState(null);
     const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'events' | 'products'
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     // Compute start date based on selected time range
     const getStartDate = useCallback(() => {
@@ -479,7 +484,7 @@ const WebLogs = () => {
             {/* Charts & Breakdown Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Traffic & Funnel Timeline Area Chart */}
-                <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-border shadow-xs">
+                <div className="lg:col-span-2 min-w-0 bg-white p-6 rounded-2xl border border-border shadow-xs">
                     <div className="flex items-center justify-between mb-4">
                         <div>
                             <h3 className="text-base font-black text-text-main font-outfit">Visitor & Purchase Trends</h3>
@@ -487,9 +492,9 @@ const WebLogs = () => {
                         </div>
                     </div>
 
-                    <div className="h-64 w-full">
-                        {timelineData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-64 min-h-[16rem] w-full min-w-0">
+                        {isMounted && timelineData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
                                 <AreaChart data={timelineData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="colorVisitors" x1="0" y1="0" x2="0" y2="1">
@@ -516,7 +521,7 @@ const WebLogs = () => {
                                             boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                                             fontFamily: 'Outfit, sans-serif',
                                             fontSize: '12px'
-                                        }}
+                                         }}
                                     />
                                     <Area type="monotone" dataKey="visitors" name="Visitors" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorVisitors)" />
                                     <Area type="monotone" dataKey="cartAdds" name="Add to Cart" stroke="#f59e0b" strokeWidth={2} fillOpacity={1} fill="url(#colorCart)" />
@@ -525,7 +530,7 @@ const WebLogs = () => {
                             </ResponsiveContainer>
                         ) : (
                             <div className="h-full flex items-center justify-center text-text-muted text-xs font-outfit">
-                                No visitor data recorded in this period yet.
+                                {!isMounted ? 'Loading chart...' : 'No visitor data recorded in this period yet.'}
                             </div>
                         )}
                     </div>
