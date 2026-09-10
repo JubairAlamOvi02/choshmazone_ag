@@ -522,4 +522,37 @@
   - [x] Configured `min-w-0` and explicit container height styles (`min-h-[16rem]`) on chart wrappers.
   - [x] Passed `minWidth={0}`, `minHeight={0}`, and `debounce={50}` to `<ResponsiveContainer>`.
 
+## Phase 49: Admin Product Duplication Feature
+- [x] **One-Click Product Duplication Engine (Task Id: 594)**:
+  - [x] Added Copy button in the Actions column of the Inventory table in `Products.jsx` linking to `/admin/products/duplicate/:id`.
+  - [x] Registered `/admin/products/duplicate/:id` route in `App.jsx` reusing `ProductForm.jsx`.
+  - [x] Implemented `isDuplicateMode` detection and `loadProductForDuplication(id)` in `ProductForm.jsx`.
+  - [x] Cloned all existing product data (name, description, price, stock, category, style, color, shipping info, and image media gallery).
+  - [x] Appended `(Copy)` suffix to product name for clear differentiation.
+  - [x] Stripped original database IDs and timestamp properties to ensure insertion of a clean new record.
+  - [x] Regenerated unique IDs for all variants to eliminate key collision issues.
+  - [x] Displayed tailored "Duplicate Product" header and persisted as a newly created product on submit.
+
+## Phase 50: Service Worker Resiliency & Dev-Mode Isolation
+- [x] **Service Worker Hardening & Dev Cleanup (Task Id: 595)**:
+  - [x] Resolved `Uncaught (in promise) TypeError: Failed to fetch at sw.js:37:32` by wrapping resource fetches with safe `.catch()` returning synthetic 408 responses.
+  - [x] Added non-`GET` HTTP method bypass (`POST`, `PUT`, `DELETE`).
+  - [x] Filtered out Vite dev server requests (`/@vite/`, `/@fs/`, `/__vite_ping`, `node_modules`, `hot-update`, WebSockets).
+  - [x] Added `self.skipWaiting()` and `self.clients.claim()` with cache version bump (`choshmazone-v2`) in `public/sw.js`.
+  - [x] Restricted service worker registration to production builds (`import.meta.env.PROD`) in `src/main.jsx`.
+  - [x] Added automatic service worker deregistration and cache purging in development mode (`import.meta.env.DEV`).
+
+## Phase 51: Resource & Image Request Guarding
+- [x] **Image Source Validation & Fallback Handling (Task Id: 596)**:
+  - [x] Added `hasValidSrc` validation in `OptimizedImage.jsx` to prevent empty or undefined `src` attributes from generating requests to the current page path (`/shop`).
+  - [x] Added `onError` fallback handling so failed image loads do not hang the component state.
+  - [x] Added missing-image fallback handling in `CartItem.jsx`.
+
+## Phase 52: Meta Pixel HTML Syntax & Tag Validation
+- [x] **HTML5 Markup & Script Tag Rectification (Task Id: 597)**:
+  - [x] Moved Meta Pixel `<noscript>` block from `<head>` into `<body>` in `index.html` to comply with HTML5 specifications and avoid Vite parse errors.
+  - [x] Fixed missing closing `</script>` tag for Meta Pixel code, eliminating `Uncaught SyntaxError: Unexpected token '<'`.
+  - [x] Validated production build (`npm run build`) completing with code 0.
+
+
 

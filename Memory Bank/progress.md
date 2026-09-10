@@ -388,3 +388,35 @@
   - Added `min-w-0` and explicit minimum height bounds (`min-h-[16rem]`) on parent flex/grid containers.
   - Configured `minWidth={0}`, `minHeight={0}`, and `debounce={50}` on `<ResponsiveContainer>`.
 
+- Task 89 (Duplicate Product Feature): Completed
+  - Implemented a one-click product duplication feature in the Admin Inventory catalog (`src/pages/admin/Products.jsx`).
+  - Added a dedicated Copy button (`Copy` icon from `lucide-react`) in the table Actions column linking to `/admin/products/duplicate/:id`.
+  - Registered route `products/duplicate/:id` in `src/App.jsx`.
+  - Enhanced `src/pages/admin/ProductForm.jsx` with `isDuplicateMode` and `loadProductForDuplication(id)`:
+    - Fetches the source product and clones all attributes (title, price, category, style, color, stock, description, shipping info, and image media items).
+    - Automatically appends `(Copy)` to the product title.
+    - Strips existing primary ID (`id`) and timestamp fields (`created_at`, `updated_at`).
+    - Regenerates unique variant IDs to eliminate collision issues.
+    - Reuses existing image URLs seamlessly without requiring manual re-upload.
+    - Displays "Duplicate Product" header and saves as a newly inserted record on submit.
+
+- Task 90 (Service Worker Resiliency & Dev Mode Isolation): Completed
+  - Hardened `public/sw.js` to eliminate unhandled promise rejections and network errors (`TypeError: Failed to fetch` on line 37):
+    - Added error catching (`.catch()`) on all fetch attempts, returning synthetic 408 responses instead of letting promises reject inside `event.respondWith()`.
+    - Added bypass guards for non-`GET` HTTP methods (`POST`, `PUT`, `DELETE`).
+    - Added bypass filters for Vite development requests (`/@vite/`, `/@fs/`, `/__vite_ping`, `node_modules`, `hot-update`, WebSockets `ws:`/`wss:`).
+    - Added `self.skipWaiting()` on install and `self.clients.claim()` on activate with cache version bump (`choshmazone-v2`).
+  - Updated `src/main.jsx` to only register Service Worker in production (`import.meta.env.PROD`).
+  - Implemented automatic cleanup in development mode (`import.meta.env.DEV` on `http://localhost:5173`) that unregisters any active service worker and purges local caches, preventing stale dev caches and HMR interference.
+
+- Task 91 (Resource & Image Request Guarding): Completed
+  - Updated `src/components/ui/OptimizedImage.jsx` to validate `src` (`hasValidSrc = Boolean(src && typeof src === 'string' && src.trim() !== '')`).
+  - Prevented browsers from making unintended GET requests to the current route (e.g., `http://localhost:5173/shop`) when `src` is empty, null, or undefined.
+  - Added `onError` fallback handling so images fail gracefully without breaking the layout.
+  - Safeguarded `src/components/Cart/CartItem.jsx` to render a clean fallback placeholder when item image is missing.
+
+- Task 92 (Meta Pixel & HTML5 Markup Specification Fix): Completed
+  - Moved Meta Pixel `<noscript><img ...></noscript>` fallback inside `<body>` in `index.html`, eliminating Vite/Rollup `disallowed-content-in-noscript-in-head` parse errors.
+  - Ensured correct closing `</script>` tag syntax for Meta Pixel tracking snippet, resolving `Uncaught SyntaxError: Unexpected token '<'`.
+
+

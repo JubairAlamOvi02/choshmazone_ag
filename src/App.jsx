@@ -120,6 +120,7 @@ function App() {
                           <Route path="products" element={<AdminProducts />} />
                           <Route path="products/new" element={<AdminProductNew />} />
                           <Route path="products/edit/:id" element={<ProductForm />} />
+                          <Route path="products/duplicate/:id" element={<ProductForm />} />
                           <Route path="orders" element={<AdminOrders />} />
                           <Route path="customers" element={<AdminCustomers />} />
                           <Route path="lenses" element={<AdminLensPackages />} />

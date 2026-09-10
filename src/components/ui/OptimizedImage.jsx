@@ -10,6 +10,7 @@ const OptimizedImage = ({
     const [isLoaded, setIsLoaded] = useState(false);
     const [isInView, setIsInView] = useState(priority);
     const imgRef = useRef(null);
+    const hasValidSrc = Boolean(src && typeof src === 'string' && src.trim() !== '');
 
     useEffect(() => {
         if (priority) return;
@@ -61,11 +62,12 @@ const OptimizedImage = ({
                 }}
             />
 
-            {isInView && (
+            {isInView && hasValidSrc && (
                 <img
                     src={src}
                     alt={alt}
                     onLoad={handleLoad}
+                    onError={handleLoad}
                     className={`block w-full h-full object-cover transition-opacity duration-500 ease-in-out ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
                     style={{ position: 'relative', zIndex: 10 }}
                 />

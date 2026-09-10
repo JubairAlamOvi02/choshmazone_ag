@@ -50,7 +50,7 @@ The application utilizes a **Mobile-First Responsive Strategy**:
 - **Enhanced Product Details**: Premium PDP featuring breadcrumbs, quantity selectors, star ratings, collapsible information sections, trust badges, and interactive image galleries with zoom indicators.
 - **Premium CTAs**: Redesigned action buttons with icons, shadow effects, and smooth hover transitions for improved conversion rates.
 - **Smart Delivery System**: District-based delivery charge calculation with dependent location dropdowns (District → Thana) for accurate shipping costs across Bangladesh.
-- **Progressive Web App (PWA)**: Full manifest support (`manifest.json`) and service worker (`sw.js`) caching for offline-ready performance and installability.
+- **Progressive Web App (PWA) & Resilient Service Worker**: Full manifest support (`manifest.json`) and hardened service worker (`public/sw.js`, version `choshmazone-v2`) with safe error handling on fetch events, non-GET bypassing, dev-server filtering, and environment-aware registration (production-only with automatic dev unregistration and cache purging).
 - **Client-Side Caching**: Custom `cacheManager` utilizing LocalStorage with TTL for optimized API performance.
 - **Advanced UX System**: Global toast notification system and real-time product search with debounced filtering.
 - **Elite Performance & Analytics**: 
@@ -75,6 +75,7 @@ The application utilizes a **Mobile-First Responsive Strategy**:
 - **Rich Text Management**:
     - **React Quill New**: Integrated `react-quill-new` for full HTML product descriptions, ensuring compatibility with React 19's `findDOMNode` deprecation.
 - **Advanced Inventory Management**:
+    - **Product Duplication System**: Instant one-click cloning from the admin inventory list with auto `(Copy)` naming, ID sanitization, variant ID regeneration, and asset reuse.
     - **Unified Media Gallery**: Drag-and-drop image reordering system in Admin with automatic primary image selection.
     - **Shopify-Style Variant Table**: Combined option display (Color / Size) for a professional inventory management experience.
 - **Dynamic CMS & Site Settings Engine**:

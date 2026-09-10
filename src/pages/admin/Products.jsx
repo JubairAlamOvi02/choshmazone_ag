@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { productParams } from '../../lib/api/products';
-import { Plus, Edit3, Trash2, Power, PowerOff, Glasses, Search, Filter } from 'lucide-react';
+import { Plus, Edit3, Trash2, Copy, Power, PowerOff, Glasses, Search, Filter } from 'lucide-react';
 
 const AdminProducts = () => {
     const [products, setProducts] = useState([]);
@@ -290,6 +290,13 @@ const AdminProducts = () => {
                                         </td>
                                         <td className="px-6 py-5 text-right">
                                             <div className="flex items-center justify-end gap-2">
+                                                <Link
+                                                    to={`/admin/products/duplicate/${product.id}`}
+                                                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                                    title="Duplicate Product"
+                                                >
+                                                    <Copy size={18} />
+                                                </Link>
                                                 <Link
                                                     to={`/admin/products/edit/${product.id}`}
                                                     className="p-2 text-gray-400 hover:text-text-main hover:bg-gray-100 rounded-lg transition-all"

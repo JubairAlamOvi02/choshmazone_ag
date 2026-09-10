@@ -352,3 +352,15 @@
     - [x] Solved Recharts `-1` width/height evaluation warnings with `isMounted`, `min-w-0`, and `debounce={50}`.
 - [x] **Google Search Branding**:
     - [x] Updated `index.html` with official Google search favicons and high-res web app icons.
+
+## Phase 33: Product Duplication & Service Worker Resiliency
+- [x] **Product Duplication System**:
+    - [x] Added duplicate action button in `Products.jsx` routing to `/admin/products/duplicate/:id`.
+    - [x] Handled duplicate mode in `ProductForm.jsx` with automatic `(Copy)` naming, ID sanitization, variant ID regeneration, and image reuse.
+- [x] **Service Worker Hardening & Dev Isolation**:
+    - [x] Fixed `TypeError: Failed to fetch` in `sw.js` with comprehensive rejection handling and non-GET / Vite endpoint bypassing.
+    - [x] Restricted SW registration to production only; auto-unregistered active workers and purged caches in dev mode.
+- [x] **Resource & Image Guarding**:
+    - [x] Validated `src` attribute in `OptimizedImage.jsx` to prevent unintentional requests to `/shop`.
+    - [x] Fixed Meta Pixel HTML markup in `index.html`, moving `<noscript>` into `<body>` and closing `<script>` tag.
+

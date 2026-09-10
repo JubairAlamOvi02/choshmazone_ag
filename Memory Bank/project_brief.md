@@ -30,7 +30,7 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 - **Admin Panel (WordPress-like)**:
     - Secure Login for Admins.
     - **Dashboard**: Overview of orders, customers, and system status with **Live Sales Analytics (Recharts)**.
-    - **Product Management**: Full CRUD operations + Advanced Multi-Image Upload and **Unified Drag-and-Drop Gallery** management.
+    - **Product Management**: Full CRUD operations + One-Click Product Duplication, Advanced Multi-Image Upload, and **Unified Drag-and-Drop Gallery** management.
     - **Rich Text Editing**: Full HTML description support with professional formatting controls.
     - **Shopify-Style Variants**: Efficient variant management table with combined option views (Color / Size).
     - **Lens Packages Management**: Full CRUD, pricing, feature list, active toggle, and reordering for optical lens packages at `/admin/lenses`.

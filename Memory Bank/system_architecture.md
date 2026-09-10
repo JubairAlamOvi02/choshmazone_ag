@@ -49,7 +49,13 @@
     *   `Admin Orders Interaction Engine`: Clickable table rows and explicit `👁 Details` buttons for frictionless order inspection.
     *   `Interactive PDP Gallery`: Full-scale product image presentation with high-res thumbnails and floating previous/next navigation arrows.
     *   `Web Log & Funnel Analytics Engine`: Real-time visitor activity stream, persistent visitor/session tracking (`src/lib/tracker.js`), non-blocking event logging (`page_view`, `view_product`, `add_to_cart`, `remove_from_cart`, `initiate_checkout`, `purchase`), and comprehensive admin analytics dashboard (`WebLogs.jsx`) with step-by-step conversion funnel visualization, drop-off metrics, Recharts area trends, device breakdown, and JSON metadata inspector.
-*   **PWA** (Implemented): Service Worker (`sw.js`) with offline caching for assets/images and Manifest support.
+    *   `Product Duplication Engine`: Administrative cloning pipeline (`Products.jsx` + `ProductForm.jsx`) supporting instant product duplication with auto `(Copy)` naming, ID sanitization, variant regeneration, image re-referencing, and direct new-product persistence.
+    *   `Guarded Image Rendering`: Explicit `hasValidSrc` validation in `OptimizedImage.jsx` and `CartItem.jsx` to prevent empty/undefined image sources from generating invalid client requests.
+*   **PWA & Service Worker Resiliency**:
+    - **Offline Caching**: Service Worker (`public/sw.js`) with cache versioning (`choshmazone-v2`) and pre-caching for core static assets (`/`, `/index.html`, `/manifest.json`).
+    - **Safe Rejection Handling**: Network fetches inside `event.respondWith` are wrapped with `.catch()` returning synthetic 408 responses, preventing `TypeError: Failed to fetch` unhandled promise rejections.
+    - **Dev Environment Isolation**: Service worker is registered strictly in production (`import.meta.env.PROD`). In development (`import.meta.env.DEV`), active registrations on `localhost:5173` are automatically unregistered and local caches purged to prevent interference with Vite HMR and dev server modules.
+    - **Bypass Filters**: Non-`GET` requests, API calls, WebSocket protocols, and Vite dev server paths (`/@vite/`, `/@fs/`, `/__vite_ping`, `node_modules`, `hot-update`) bypass service worker interception completely.
 *   **Performance Optimization**: 
     - **Code Splitting**: Route-level granularity via `React.lazy` and `Suspense`.
     - **Asset Priority**: `fetchpriority="high"` for critical path Above-The-Fold (ATF) images.

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { productParams } from '../../lib/api/products';
 import { categoryParams } from '../../lib/api/categories';
 import ReactQuill from 'react-quill-new';
@@ -9,7 +9,9 @@ import { ChevronLeft, Upload, X, Plus, Package, DollarSign, Layers, Tag, Eye } f
 const ProductForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const isEditMode = !!id;
+    const location = useLocation();
+    const isDuplicateMode = location.pathname.includes('/duplicate/');
+    const isEditMode = !!id && !isDuplicateMode;
 
     const [formData, setFormData] = useState({
         name: '',
@@ -35,6 +37,8 @@ const ProductForm = () => {
         loadCategories();
         if (isEditMode) {
             loadProduct(id);
+        } else if (isDuplicateMode && id) {
+            loadProductForDuplication(id);
         }
     }, [id]);
 
@@ -71,6 +75,41 @@ const ProductForm = () => {
             setMediaItems(loadedMedia);
         } catch (err) {
             setError('Failed to load product details');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const loadProductForDuplication = async (productId) => {
+        try {
+            setLoading(true);
+            const data = await productParams.fetchById(productId);
+            // Strip out the id and timestamps so it creates a new product
+            const { id: _id, created_at, updated_at, ...productData } = data;
+            setFormData({
+                ...productData,
+                name: `${productData.name} (Copy)`,
+                images: productData.images || [],
+                variants: (productData.variants || []).map(v => ({
+                    ...v,
+                    id: Date.now().toString() + Math.random().toString(36).substring(2, 6)
+                }))
+            });
+            
+            const loadedMedia = [];
+            if (productData.image_url) {
+                loadedMedia.push({ type: 'url', data: productData.image_url, id: Math.random().toString() });
+            }
+            if (productData.images) {
+                productData.images.forEach(url => {
+                    if (url !== productData.image_url) {
+                        loadedMedia.push({ type: 'url', data: url, id: Math.random().toString() });
+                    }
+                });
+            }
+            setMediaItems(loadedMedia);
+        } catch (err) {
+            setError('Failed to load product for duplication');
         } finally {
             setLoading(false);
         }
@@ -226,7 +265,7 @@ const ProductForm = () => {
         }
     };
 
-    if (loading && isEditMode && !formData.name) {
+    if (loading && (isEditMode || isDuplicateMode) && !formData.name) {
         return (
             <div className="flex items-center justify-center min-vh-[400px]">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
@@ -246,9 +285,11 @@ const ProductForm = () => {
                     </button>
                     <div>
                         <h1 className="text-3xl font-bold text-text-main font-outfit uppercase tracking-tight">
-                            {isEditMode ? 'Modify Product' : 'Add New Style'}
+                            {isEditMode ? 'Modify Product' : isDuplicateMode ? 'Duplicate Product' : 'Add New Style'}
                         </h1>
-                        <p className="text-text-muted font-outfit">Detailed information about your inventory item.</p>
+                        <p className="text-text-muted font-outfit">
+                            {isDuplicateMode ? 'Review and save the duplicated product.' : 'Detailed information about your inventory item.'}
+                        </p>
                     </div>
                 </div>
             </div>

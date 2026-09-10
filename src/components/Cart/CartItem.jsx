@@ -8,7 +8,11 @@ const CartItem = React.memo(({ item }) => {
     return (
         <div className="flex gap-4 py-4 border-b border-border last:border-0">
             <div className="w-20 h-20 bg-background-alt rounded-sm flex items-center justify-center shrink-0 overflow-hidden">
-                <img src={item.image} alt={item.title} className="w-full h-full object-contain" />
+                {item.image ? (
+                    <img src={item.image} alt={item.title} className="w-full h-full object-contain" />
+                ) : (
+                    <div className="w-full h-full bg-gray-100 flex items-center justify-center text-text-muted text-xs font-outfit">No Image</div>
+                )}
             </div>
 
             <div className="flex-1 flex flex-col justify-between">
