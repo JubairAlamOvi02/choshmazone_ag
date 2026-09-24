@@ -836,7 +836,7 @@ const WebLogs = () => {
 
                     <div className="h-64 min-h-[16rem] w-full min-w-0">
                         {isMounted && timelineData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
+                            <ResponsiveContainer width="100%" height={260} minWidth={0} minHeight={0} debounce={50}>
                                 <AreaChart data={timelineData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="colorVisitors" x1="0" y1="0" x2="0" y2="1">

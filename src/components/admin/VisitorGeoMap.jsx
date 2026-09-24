@@ -132,16 +132,23 @@ const VisitorGeoMap = ({ events = [], onSelectCity }) => {
             attributionControl: false
         });
 
-        // Add custom clean CartoDB Positron / OSM tiles
+        // Use fast, globally accessible Esri tile services (zero DNS issues or blocks)
         const tileUrl =
             mapStyle === 'streets'
-                ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-                : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+                ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
+                : 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
 
         L.tileLayer(tileUrl, {
             maxZoom: 18,
-            subdomains: 'abcd'
+            attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
         }).addTo(map);
+
+        // Invalidate size to ensure clean rendering on initial paint
+        setTimeout(() => {
+            if (mapInstanceRef.current) {
+                mapInstanceRef.current.invalidateSize();
+            }
+        }, 200);
 
         // Zoom control in top right
         L.control.zoom({ position: 'topright' }).addTo(map);
@@ -173,12 +180,12 @@ const VisitorGeoMap = ({ events = [], onSelectCity }) => {
 
         const tileUrl =
             mapStyle === 'streets'
-                ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-                : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+                ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
+                : 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
 
         L.tileLayer(tileUrl, {
             maxZoom: 18,
-            subdomains: 'abcd'
+            attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
         }).addTo(map);
     }, [mapStyle]);
 
