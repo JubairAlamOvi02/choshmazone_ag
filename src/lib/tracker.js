@@ -4,6 +4,63 @@ import { supabase } from './supabaseClient';
 const VISITOR_KEY = 'cz_visitor_id';
 const SESSION_KEY = 'cz_session_id';
 const SESSION_INIT_KEY = 'cz_session_init_ts';
+const GEO_CACHE_KEY = 'cz_geo_cache';
+
+// Detect and cache Geo-Location, City, and ISP info
+let inFlightGeoPromise = null;
+export const getGeoInfo = async () => {
+    if (typeof window === 'undefined') return null;
+
+    try {
+        const cached = sessionStorage.getItem(GEO_CACHE_KEY);
+        if (cached) {
+            return JSON.parse(cached);
+        }
+    } catch {
+        // sessionStorage restricted or disabled
+    }
+
+    if (inFlightGeoPromise) return inFlightGeoPromise;
+
+    inFlightGeoPromise = (async () => {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+            const res = await fetch('https://ipwho.is/', {
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
+            if (!res.ok) throw new Error('Geo fetch failed');
+            const data = await res.json();
+
+            if (data && data.success !== false) {
+                const geo = {
+                    ip: data.ip || '',
+                    city: data.city || 'Unknown City',
+                    region: data.region || '',
+                    country: data.country || 'Unknown Country',
+                    countryCode: data.country_code || '',
+                    latitude: data.latitude || null,
+                    longitude: data.longitude || null,
+                    flag: data.flag?.emoji || '🌐',
+                    isp: data.connection?.isp || data.connection?.org || 'Unknown ISP',
+                    asn: data.connection?.asn || null
+                };
+                try {
+                    sessionStorage.setItem(GEO_CACHE_KEY, JSON.stringify(geo));
+                } catch {}
+                return geo;
+            }
+        } catch {
+            // Silently fallback without disrupting application performance
+        }
+        return null;
+    })();
+
+    return inFlightGeoPromise;
+};
 
 // Helper to generate a random UUID-like string
 const generateId = () => {
@@ -157,8 +214,19 @@ export const trackEvent = async (eventType, metadata = {}, extra = {}) => {
         // Ensure session exists
         ensureSession(path);
 
+        // Fetch geo info (instant cache hit after initial fetch)
+        const geo = await getGeoInfo().catch(() => null);
+
         // Fetch auth user ID if exists
         const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
+
+        // Merge event payload with geo information
+        const enrichedMetadata = {
+            ...(metadata || {})
+        };
+        if (geo) {
+            enrichedMetadata.geo = geo;
+        }
 
         // 1. Record event
         const eventPromise = supabase
@@ -170,7 +238,7 @@ export const trackEvent = async (eventType, metadata = {}, extra = {}) => {
                 event_type: eventType,
                 path: path,
                 page_title: pageTitle,
-                metadata: metadata || {},
+                metadata: enrichedMetadata,
                 device_type: deviceType,
                 created_at: new Date().toISOString()
             });

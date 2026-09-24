@@ -4,12 +4,14 @@ import {
     Activity, Users, Eye, ShoppingCart, CreditCard, ShoppingBag,
     TrendingUp, RefreshCw, Smartphone, Monitor, Tablet, Search,
     Filter, ArrowDown, ExternalLink, Clock, ShieldCheck, ChevronRight,
-    AlertCircle, Sparkles, X, CheckCircle2, ChevronDown, Radio, Globe, Package
+    AlertCircle, Sparkles, X, CheckCircle2, ChevronDown, Radio, Globe, Package,
+    ChevronLeft, Download, Shield, MapPin, Wifi, Map
 } from 'lucide-react';
 import {
     ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
     CartesianGrid, Tooltip as RechartsTooltip, BarChart, Bar
 } from 'recharts';
+import VisitorGeoMap from '../../components/admin/VisitorGeoMap';
 
 const TIME_RANGES = [
     { label: 'Today', value: 'today' },
@@ -60,6 +62,10 @@ const WebLogs = () => {
     const [isMounted, setIsMounted] = useState(false);
     const [liveViewers, setLiveViewers] = useState([]);
     const [liveExpanded, setLiveExpanded] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [excludeAdmin, setExcludeAdmin] = useState(true);
+    const [showMap, setShowMap] = useState(true);
 
     useEffect(() => {
         setIsMounted(true);
@@ -353,8 +359,10 @@ const WebLogs = () => {
     }, [events]);
 
     // Filtered Events Feed
+    // Filtered Events Feed
     const filteredEvents = useMemo(() => {
         return events.filter((e) => {
+            if (excludeAdmin && e.path && e.path.startsWith('/admin')) return false;
             if (eventFilter !== 'all' && e.event_type !== eventFilter) return false;
             if (searchQuery.trim() !== '') {
                 const query = searchQuery.toLowerCase();
@@ -363,11 +371,104 @@ const WebLogs = () => {
                 const productMatch = e.metadata?.product_name?.toLowerCase().includes(query);
                 const nameMatch = e.metadata?.customer_name?.toLowerCase().includes(query);
                 const phoneMatch = e.metadata?.customer_phone?.toLowerCase().includes(query);
-                return pathMatch || visitorMatch || productMatch || nameMatch || phoneMatch;
+                const cityMatch = e.metadata?.geo?.city?.toLowerCase().includes(query);
+                const countryMatch = e.metadata?.geo?.country?.toLowerCase().includes(query);
+                const ispMatch = e.metadata?.geo?.isp?.toLowerCase().includes(query);
+                const ipMatch = e.metadata?.geo?.ip?.toLowerCase().includes(query);
+                return pathMatch || visitorMatch || productMatch || nameMatch || phoneMatch || cityMatch || countryMatch || ispMatch || ipMatch;
             }
             return true;
         });
-    }, [events, eventFilter, searchQuery]);
+    }, [events, eventFilter, searchQuery, excludeAdmin]);
+
+    // Geo & ISP Intelligence from events
+    const geoStats = useMemo(() => {
+        const cityMap = {};
+        const ispMap = {};
+        let totalGeo = 0;
+
+        events.forEach((e) => {
+            const geo = e.metadata?.geo;
+            if (geo && geo.city && geo.city !== 'Unknown City') {
+                totalGeo += 1;
+                const cityLabel = geo.city;
+                if (!cityMap[cityLabel]) {
+                    cityMap[cityLabel] = {
+                        name: cityLabel,
+                        fullLocation: `${geo.city}, ${geo.countryCode || 'BD'}`,
+                        flag: geo.flag || '🇧🇩',
+                        count: 0
+                    };
+                }
+                cityMap[cityLabel].count += 1;
+
+                if (geo.isp && geo.isp !== 'Unknown ISP') {
+                    const cleanIsp = geo.isp.replace(/Limited|Ltd\.?|Internet/gi, '').trim();
+                    if (!ispMap[cleanIsp]) {
+                        ispMap[cleanIsp] = { name: cleanIsp, fullName: geo.isp, count: 0 };
+                    }
+                    ispMap[cleanIsp].count += 1;
+                }
+            }
+        });
+
+        const topCities = Object.values(cityMap)
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5)
+            .map((c) => ({
+                ...c,
+                pct: totalGeo > 0 ? Math.round((c.count / totalGeo) * 100) : 0
+            }));
+
+        const topISPs = Object.values(ispMap)
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5)
+            .map((i) => ({
+                ...i,
+                pct: totalGeo > 0 ? Math.round((i.count / totalGeo) * 100) : 0
+            }));
+
+        return { topCities, topISPs, totalGeo };
+    }, [events]);
+
+    const totalPages = Math.max(1, Math.ceil(filteredEvents.length / pageSize));
+    const paginatedEvents = useMemo(() => {
+        const start = (currentPage - 1) * pageSize;
+        return filteredEvents.slice(start, start + pageSize);
+    }, [filteredEvents, currentPage, pageSize]);
+
+    useEffect(() => {
+        if (currentPage > totalPages) {
+            setCurrentPage(1);
+        }
+    }, [totalPages, currentPage]);
+
+    const exportToCSV = () => {
+        if (filteredEvents.length === 0) return;
+        const headers = ['Timestamp', 'Event Type', 'Path', 'City', 'Country', 'ISP', 'IP', 'Device', 'Visitor ID', 'Metadata'];
+        const rows = filteredEvents.map((e) => [
+            new Date(e.created_at).toISOString(),
+            e.event_type,
+            e.path || '',
+            e.metadata?.geo?.city || '',
+            e.metadata?.geo?.country || '',
+            e.metadata?.geo?.isp || '',
+            e.metadata?.geo?.ip || '',
+            e.device_type || 'Desktop',
+            e.visitor_id || '',
+            JSON.stringify(e.metadata || {})
+        ]);
+        const csvContent =
+            'data:text/csv;charset=utf-8,' +
+            [headers.join(','), ...rows.map((r) => r.map((f) => `"${String(f).replace(/"/g, '""')}"`).join(','))].join('\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', `activity_logs_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     const formatTimeAgo = (dateString) => {
         const date = new Date(dateString);
@@ -430,6 +531,20 @@ const WebLogs = () => {
                     >
                         <span className={`w-2 h-2 rounded-full ${autoRefresh ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`} />
                         Live Stream
+                    </button>
+
+                    {/* Map View Toggle */}
+                    <button
+                        onClick={() => setShowMap(!showMap)}
+                        className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold font-outfit rounded-xl border transition-all ${
+                            showMap
+                                ? 'bg-primary/10 text-primary border-primary/20 shadow-xs'
+                                : 'bg-gray-50 text-text-muted border-border hover:bg-gray-100'
+                        }`}
+                        title="Toggle Regional Visitor Map"
+                    >
+                        <Map size={14} />
+                        {showMap ? 'Hide Map' : 'Map View'}
                     </button>
 
                     {/* Manual Refresh */}
@@ -836,45 +951,156 @@ const WebLogs = () => {
                 </div>
             )}
 
+            {/* Regional Visitor Map View */}
+            {showMap && (
+                <VisitorGeoMap
+                    events={events}
+                    onSelectCity={(city) => {
+                        setSearchQuery(city);
+                        setCurrentPage(1);
+                    }}
+                />
+            )}
+
+            {/* Geo-Location & ISP Breakdown Card */}
+            {geoStats.totalGeo > 0 && (
+                <div className="bg-white p-5 rounded-2xl border border-border shadow-xs">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                            <div className="p-2 bg-blue-50 text-primary rounded-xl">
+                                <MapPin size={18} />
+                            </div>
+                            <div>
+                                <h3 className="text-base font-black text-text-main font-outfit">Visitor Geo & ISP Intelligence</h3>
+                                <p className="text-xs text-text-muted font-outfit">Real-time geographic locations and internet providers across Bangladesh</p>
+                            </div>
+                        </div>
+                        <span className="text-xs font-bold text-text-muted bg-gray-50 border border-border px-2.5 py-1 rounded-lg">
+                            {geoStats.totalGeo} Geo Records
+                        </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Top Cities */}
+                        <div className="space-y-3">
+                            <h4 className="text-xs font-black text-text-main font-outfit uppercase tracking-wider flex items-center gap-1.5">
+                                <Globe size={13} className="text-primary" /> Top Cities & Regions
+                            </h4>
+                            <div className="space-y-2">
+                                {geoStats.topCities.map((city, idx) => (
+                                    <div key={idx} className="space-y-1">
+                                        <div className="flex items-center justify-between text-xs font-outfit">
+                                            <button
+                                                onClick={() => { setSearchQuery(city.name); setCurrentPage(1); }}
+                                                className="font-bold text-text-main hover:text-primary transition-colors flex items-center gap-1.5"
+                                            >
+                                                <span>{city.flag}</span>
+                                                <span>{city.name}</span>
+                                            </button>
+                                            <span className="text-text-muted font-mono text-[11px]">
+                                                {city.count} ({city.pct}%)
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                                            <div className="bg-primary h-full rounded-full transition-all duration-500" style={{ width: `${city.pct}%` }} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Top ISPs */}
+                        <div className="space-y-3">
+                            <h4 className="text-xs font-black text-text-main font-outfit uppercase tracking-wider flex items-center gap-1.5">
+                                <Wifi size={13} className="text-emerald-500" /> Top Internet Providers (ISP)
+                            </h4>
+                            <div className="space-y-2">
+                                {geoStats.topISPs.map((isp, idx) => (
+                                    <div key={idx} className="space-y-1">
+                                        <div className="flex items-center justify-between text-xs font-outfit">
+                                            <button
+                                                onClick={() => { setSearchQuery(isp.name); setCurrentPage(1); }}
+                                                className="font-bold text-text-main hover:text-primary transition-colors truncate max-w-[200px]"
+                                                title={isp.fullName}
+                                            >
+                                                {isp.name}
+                                            </button>
+                                            <span className="text-text-muted font-mono text-[11px]">
+                                                {isp.count} ({isp.pct}%)
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                                            <div className="bg-emerald-500 h-full rounded-full transition-all duration-500" style={{ width: `${isp.pct}%` }} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Detailed Real-Time Web Event Logs Table */}
             <div className="bg-white rounded-2xl border border-border shadow-xs overflow-hidden">
-                {/* Table Controls */}
-                <div className="p-6 border-b border-border flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div>
+                {/* Compact Table Header Controls */}
+                <div className="p-4 sm:px-5 border-b border-border flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2.5">
                         <div className="flex items-center gap-2">
-                            <h3 className="text-lg font-black text-text-main font-outfit">Live Activity & Event Stream</h3>
-                            <span className="px-2.5 py-0.5 bg-primary/10 text-primary text-xs font-black rounded-full font-outfit">
+                            <h3 className="text-base font-black text-text-main font-outfit">Live Activity & Event Stream</h3>
+                            <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs font-black rounded-full font-outfit">
                                 {filteredEvents.length} Events
                             </span>
                         </div>
-                        <p className="text-xs text-text-muted font-outfit mt-0.5">
-                            Chronological web log of every visitor action across the website
-                        </p>
+                        <div className="flex items-center gap-2">
+                            {/* Exclude Admin Toggle */}
+                            <button
+                                onClick={() => { setExcludeAdmin(!excludeAdmin); setCurrentPage(1); }}
+                                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold font-outfit border transition-colors ${
+                                    excludeAdmin
+                                        ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                        : 'bg-gray-50 text-text-muted border-border hover:bg-gray-100'
+                                }`}
+                                title="Hide internal admin navigation events (/admin)"
+                            >
+                                <Shield size={13} />
+                                {excludeAdmin ? 'Admin Hidden' : 'Admin Included'}
+                            </button>
+
+                            {/* Export CSV */}
+                            <button
+                                onClick={exportToCSV}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 hover:bg-gray-100 border border-border text-text-muted hover:text-text-main rounded-lg text-xs font-bold font-outfit transition-colors"
+                                title="Download logs as CSV"
+                            >
+                                <Download size={13} />
+                                CSV
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
-                        {/* Search */}
-                        <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-border rounded-xl text-xs font-outfit w-full sm:w-64">
-                            <Search size={16} className="text-text-muted shrink-0" />
+                    <div className="flex flex-wrap items-center gap-2.5">
+                        {/* Compact Search */}
+                        <div className="flex items-center gap-2 px-2.5 py-1.5 bg-gray-50 border border-border rounded-xl text-xs font-outfit w-full sm:w-64">
+                            <Search size={14} className="text-text-muted shrink-0" />
                             <input
                                 type="text"
-                                placeholder="Search URL, product, or visitor ID..."
+                                placeholder="Search city, ISP, URL, or visitor..."
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="bg-transparent border-none outline-none w-full text-text-main"
+                                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                                className="bg-transparent border-none outline-none w-full text-text-main placeholder:text-text-muted/70 text-xs"
                             />
                             {searchQuery && (
-                                <button onClick={() => setSearchQuery('')} className="text-text-muted hover:text-text-main">
-                                    <X size={14} />
+                                <button onClick={() => { setSearchQuery(''); setCurrentPage(1); }} className="text-text-muted hover:text-text-main">
+                                    <X size={12} />
                                 </button>
                             )}
                         </div>
 
-                        {/* Event Filter */}
+                        {/* Event Filter Pills */}
                         <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-border overflow-x-auto text-xs font-bold font-outfit">
                             <button
-                                onClick={() => setEventFilter('all')}
-                                className={`px-2.5 py-1.5 rounded-lg transition-all ${
+                                onClick={() => { setEventFilter('all'); setCurrentPage(1); }}
+                                className={`px-2 py-1 rounded-lg transition-all text-xs ${
                                     eventFilter === 'all' ? 'bg-white text-primary shadow-xs' : 'text-text-muted hover:text-text-main'
                                 }`}
                             >
@@ -883,8 +1109,8 @@ const WebLogs = () => {
                             {Object.entries(EVENT_TYPE_CONFIG).map(([key, cfg]) => (
                                 <button
                                     key={key}
-                                    onClick={() => setEventFilter(key)}
-                                    className={`px-2.5 py-1.5 rounded-lg whitespace-nowrap transition-all ${
+                                    onClick={() => { setEventFilter(key); setCurrentPage(1); }}
+                                    className={`px-2 py-1 rounded-lg whitespace-nowrap transition-all text-xs ${
                                         eventFilter === key ? 'bg-white text-primary shadow-xs' : 'text-text-muted hover:text-text-main'
                                     }`}
                                 >
@@ -895,23 +1121,24 @@ const WebLogs = () => {
                     </div>
                 </div>
 
-                {/* Table */}
+                {/* Compact Table */}
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-gray-50/80 text-[11px] font-bold text-text-muted uppercase tracking-wider font-outfit border-b border-border">
-                                <th className="py-3.5 px-6">Time</th>
-                                <th className="py-3.5 px-6">Event Type</th>
-                                <th className="py-3.5 px-6">Activity Details</th>
-                                <th className="py-3.5 px-6">Page Path</th>
-                                <th className="py-3.5 px-6">Device</th>
-                                <th className="py-3.5 px-6">Visitor ID</th>
-                                <th className="py-3.5 px-6 text-right">Inspect</th>
+                                <th className="py-2.5 px-4">Time</th>
+                                <th className="py-2.5 px-4">Event Type</th>
+                                <th className="py-2.5 px-4">Activity Details</th>
+                                <th className="py-2.5 px-4">Location & ISP</th>
+                                <th className="py-2.5 px-4">Page Path</th>
+                                <th className="py-2.5 px-4">Device</th>
+                                <th className="py-2.5 px-4">Visitor ID</th>
+                                <th className="py-2.5 px-4 text-right">Inspect</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border text-xs font-outfit">
-                            {filteredEvents.length > 0 ? (
-                                filteredEvents.map((evt) => {
+                            {paginatedEvents.length > 0 ? (
+                                paginatedEvents.map((evt) => {
                                     const cfg = EVENT_TYPE_CONFIG[evt.event_type] || {
                                         label: evt.event_type,
                                         color: 'bg-gray-100 text-gray-700 border-gray-200',
@@ -936,37 +1163,77 @@ const WebLogs = () => {
                                     }
 
                                     return (
-                                        <tr key={evt.id} className="hover:bg-gray-50/70 transition-colors">
-                                            <td className="py-3.5 px-6 whitespace-nowrap text-text-muted">
-                                                <div className="font-bold text-text-main">{formatTimeAgo(evt.created_at)}</div>
+                                        <tr key={evt.id} className="hover:bg-gray-50/80 transition-colors">
+                                            <td className="py-2 px-4 whitespace-nowrap text-text-muted">
+                                                <div className="font-bold text-text-main text-xs">{formatTimeAgo(evt.created_at)}</div>
                                                 <div className="text-[10px] text-text-muted font-mono">
                                                     {new Date(evt.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                                                 </div>
                                             </td>
-                                            <td className="py-3.5 px-6 whitespace-nowrap">
-                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${cfg.color}`}>
-                                                    <Icon size={13} />
+                                            <td className="py-2 px-4 whitespace-nowrap">
+                                                <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold border ${cfg.color}`}>
+                                                    <Icon size={12} />
                                                     {cfg.label}
                                                 </span>
                                             </td>
-                                            <td className="py-3.5 px-6 font-bold text-text-main max-w-xs truncate">
-                                                {detailText}
+                                            <td className="py-2 px-4 font-bold text-text-main max-w-xs truncate text-xs">
+                                                {detailText !== '-' ? (
+                                                    detailText
+                                                ) : (
+                                                    <span className="text-text-muted font-normal text-[11px] italic">Visited page</span>
+                                                )}
                                             </td>
-                                            <td className="py-3.5 px-6 text-text-muted font-mono max-w-xs truncate">
+                                            <td className="py-2 px-4 whitespace-nowrap">
+                                                {evt.metadata?.geo?.city ? (
+                                                    <div className="flex flex-col">
+                                                        <span
+                                                            className="font-bold text-text-main text-xs flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors"
+                                                            title={`${evt.metadata.geo.city}, ${evt.metadata.geo.region || ''} ${evt.metadata.geo.country} (Click to filter)`}
+                                                            onClick={() => { setSearchQuery(evt.metadata.geo.city); setCurrentPage(1); }}
+                                                        >
+                                                            <span>{evt.metadata.geo.flag || '🌐'}</span>
+                                                            <span>{evt.metadata.geo.city}</span>
+                                                            <span className="text-[10px] text-text-muted font-normal uppercase">({evt.metadata.geo.countryCode || 'BD'})</span>
+                                                        </span>
+                                                        <span
+                                                            className="text-[10px] text-text-muted flex items-center gap-1 max-w-[130px] truncate cursor-pointer hover:text-primary transition-colors"
+                                                            title={`ISP: ${evt.metadata.geo.isp} | IP: ${evt.metadata.geo.ip} (Click to filter)`}
+                                                            onClick={() => { setSearchQuery(evt.metadata.geo.isp); setCurrentPage(1); }}
+                                                        >
+                                                            <Wifi size={10} className="shrink-0 text-emerald-500" />
+                                                            <span className="truncate">{evt.metadata.geo.isp || 'Broadband'}</span>
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-text-muted text-[11px] flex items-center gap-1">
+                                                        <MapPin size={11} className="text-text-muted/60" />
+                                                        <span className="italic">Web / Local</span>
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="py-2 px-4 text-text-muted font-mono text-[11px] max-w-xs truncate">
                                                 {evt.path}
                                             </td>
-                                            <td className="py-3.5 px-6 whitespace-nowrap">
-                                                <span className="capitalize px-2 py-0.5 bg-gray-100 text-gray-700 rounded-md font-bold text-[11px]">
+                                            <td className="py-2 px-4 whitespace-nowrap">
+                                                <span className="capitalize px-1.5 py-0.5 bg-gray-100 text-gray-700 rounded font-bold text-[10px]">
                                                     {evt.device_type || 'Desktop'}
                                                 </span>
                                             </td>
-                                            <td className="py-3.5 px-6 font-mono text-[11px] text-text-muted truncate max-w-[120px]" title={evt.visitor_id}>
-                                                {evt.visitor_id ? evt.visitor_id.slice(0, 8) + '...' : 'Unknown'}
+                                            <td className="py-2 px-4 font-mono text-[11px] text-text-muted truncate max-w-[110px]">
+                                                {evt.visitor_id ? (
+                                                    <button
+                                                        onClick={() => { setSearchQuery(evt.visitor_id); setCurrentPage(1); }}
+                                                        className="hover:text-primary hover:underline transition-colors"
+                                                        title={`Click to filter by visitor: ${evt.visitor_id}`}
+                                                    >
+                                                        {evt.visitor_id.slice(0, 8)}...
+                                                    </button>
+                                                ) : 'Unknown'}
                                             </td>
-                                            <td className="py-3.5 px-6 text-right whitespace-nowrap">
+                                            <td className="py-2 px-4 text-right whitespace-nowrap">
                                                 <button
                                                     onClick={() => setSelectedEventModal(evt)}
-                                                    className="px-2.5 py-1 bg-gray-100 hover:bg-primary/10 hover:text-primary rounded-lg text-xs font-bold transition-colors"
+                                                    className="px-2 py-0.5 bg-gray-100 hover:bg-primary/10 hover:text-primary rounded text-[11px] font-bold transition-colors"
                                                 >
                                                     View JSON
                                                 </button>
@@ -976,16 +1243,68 @@ const WebLogs = () => {
                                 })
                             ) : (
                                 <tr>
-                                    <td colSpan={7} className="py-12 text-center text-text-muted">
-                                        <Activity size={32} className="mx-auto mb-2 text-text-muted/50" />
-                                        <p className="font-bold text-sm">No web events matching the filter found.</p>
-                                        <p className="text-xs mt-1">Events will appear here automatically as visitors navigate your site.</p>
+                                    <td colSpan={8} className="py-8 text-center text-text-muted">
+                                        <Activity size={24} className="mx-auto mb-1.5 text-text-muted/40" />
+                                        <p className="font-bold text-xs">No web events matching the filter found.</p>
+                                        <p className="text-[11px] mt-0.5">Events will appear here automatically as visitors navigate your site.</p>
                                     </td>
                                 </tr>
                             )}
                         </tbody>
                     </table>
                 </div>
+
+                {/* Compact Pagination Footer */}
+                {filteredEvents.length > 0 && (
+                    <div className="p-3 sm:px-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-outfit bg-gray-50/50">
+                        <div className="flex items-center gap-3 text-text-muted">
+                            <span>
+                                Showing <strong className="text-text-main font-bold">{Math.min((currentPage - 1) * pageSize + 1, filteredEvents.length)}</strong>–<strong className="text-text-main font-bold">{Math.min(currentPage * pageSize, filteredEvents.length)}</strong> of <strong className="text-text-main font-bold">{filteredEvents.length}</strong> events
+                            </span>
+
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-[11px]">Show:</span>
+                                {[10, 25, 50].map((size) => (
+                                    <button
+                                        key={size}
+                                        onClick={() => { setPageSize(size); setCurrentPage(1); }}
+                                        className={`px-2 py-0.5 rounded text-[11px] font-bold transition-colors ${
+                                            pageSize === size
+                                                ? 'bg-primary text-white'
+                                                : 'bg-white border border-border text-text-muted hover:text-text-main'
+                                        }`}
+                                    >
+                                        {size}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-text-muted text-[11px] mr-1">
+                                Page <strong className="text-text-main">{currentPage}</strong> of <strong className="text-text-main">{totalPages}</strong>
+                            </span>
+
+                            <button
+                                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                                className="p-1.5 rounded-lg border border-border bg-white text-text-muted hover:text-text-main disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                title="Previous page"
+                            >
+                                <ChevronLeft size={14} />
+                            </button>
+
+                            <button
+                                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages}
+                                className="p-1.5 rounded-lg border border-border bg-white text-text-muted hover:text-text-main disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                title="Next page"
+                            >
+                                <ChevronRight size={14} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Event JSON Modal */}
@@ -1024,6 +1343,43 @@ const WebLogs = () => {
                                     <span className="font-mono text-text-main text-[11px] truncate">{selectedEventModal.visitor_id}</span>
                                 </div>
                             </div>
+
+                            {selectedEventModal.metadata?.geo && (
+                                <div className="p-3.5 bg-gradient-to-br from-blue-50/90 to-indigo-50/60 rounded-xl border border-blue-100 space-y-2.5">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-1.5 text-primary font-black text-xs uppercase tracking-wider font-outfit">
+                                            <MapPin size={14} />
+                                            <span>Geo-Location & Network Intelligence</span>
+                                        </div>
+                                        <span className="text-base">{selectedEventModal.metadata.geo.flag || '🇧🇩'}</span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2 text-xs font-outfit">
+                                        <div>
+                                            <span className="text-text-muted text-[11px] block">Location:</span>
+                                            <span className="font-bold text-text-main">
+                                                {selectedEventModal.metadata.geo.city || 'Unknown City'}
+                                                {selectedEventModal.metadata.geo.region ? `, ${selectedEventModal.metadata.geo.region}` : ''}
+                                                {selectedEventModal.metadata.geo.country ? ` (${selectedEventModal.metadata.geo.country})` : ''}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span className="text-text-muted text-[11px] block">Internet Provider (ISP):</span>
+                                            <span className="font-bold text-text-main flex items-center gap-1 truncate" title={selectedEventModal.metadata.geo.isp}>
+                                                <Wifi size={12} className="text-emerald-500 shrink-0" />
+                                                <span className="truncate">{selectedEventModal.metadata.geo.isp || 'Broadband'}</span>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span className="text-text-muted text-[11px] block">Public IP Address:</span>
+                                            <span className="font-mono text-text-main text-[11px] font-bold">{selectedEventModal.metadata.geo.ip || 'Hidden'}</span>
+                                        </div>
+                                        <div>
+                                            <span className="text-text-muted text-[11px] block">ASN Network:</span>
+                                            <span className="font-mono text-text-muted text-[11px]">{selectedEventModal.metadata.geo.asn ? `AS${selectedEventModal.metadata.geo.asn}` : 'Standard'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
                             <div>
                                 <h4 className="font-bold text-text-muted uppercase text-[10px] tracking-wider mb-1.5">Raw JSON Metadata</h4>
