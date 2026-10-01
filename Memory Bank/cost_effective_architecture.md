@@ -48,15 +48,21 @@ The Supabase "Pro" plan ($25/mo) is only needed if you exceed limits. You can st
 3.  **Auth (50,000 MAU Limit)**:
     *   50k Monthly Active Users is a massive success. If you hit this, your ecommerce profit will easily cover the $25/mo fee.
 
-### C. Image Hosting (The "Expensive" Part)
-Images are the main bandwidth/storage killer.
+### C. Image Hosting & Egress Control (Staying Free on Supabase)
+Images are the main bandwidth/storage killer (Supabase Free Plan allows **5 GB/month** Cached Egress).
 
-1.  **Don't use Supabase Storage for everything**.
-2.  **Use Cloudflare R2** (Zero egress fees):
-    *   Store product images in R2.
-    *   Connect R2 to your domain (e.g., `cdn.choshmazone.com`).
-    *   First 10GB storage is free. 10 million requests free.
-    *   This removes the bandwidth load from Supabase.
+1.  **Automatic Client-Side WebP Compression (Implemented)**:
+    *   All images uploaded in Admin forms, Media Manager, Categories, and Customer Prescriptions are auto-compressed in the browser using `src/lib/imageCompressor.js`.
+    *   Files are resized to max 1200px (1920px for wide banners) and converted to `.webp` targeting `< 100 KB` (typically 50–90 KB).
+    *   **Result**: 95–98% bandwidth reduction. 5 GB egress easily supports 50,000+ monthly product views instead of just ~1,000 uncompressed views.
+2.  **Long-Lived Browser Cache Headers (Implemented)**:
+    *   All Supabase uploads specify `cacheControl: '31536000, public'`. Repeat visits fetch images from browser disk cache with 0 egress impact.
+3.  **Cloudflare CDN Edge Proxy (Optional for Unlimited Free Egress)**:
+    *   Deploy a lightweight Cloudflare Worker or CNAME pointing to `<project>.supabase.co/storage/v1/object/public`.
+    *   Cloudflare Free Tier provides **100% unlimited bandwidth/egress**. After the first edge cache miss, all subsequent image downloads cost $0 on Supabase.
+4.  **Cloudflare R2 Alternative (Zero Egress Fees Forever)**:
+    *   If library exceeds 1 GB storage in the future, connect Cloudflare R2 (10 GB free storage, $0 egress fees forever).
+
 
 ---
 

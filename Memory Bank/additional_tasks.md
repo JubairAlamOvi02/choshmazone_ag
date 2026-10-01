@@ -374,4 +374,21 @@
     - [x] Added `ip_address`, `city`, `region`, `country`, and `isp` columns to `visitor_sessions` with city indexing.
     - [x] Created `VisitorGeoMap.jsx` and integrated regional map visualization tab in `WebLogs.jsx`.
 
+## Phase 35: Client-Side WebP Compression & Supabase Free Tier Egress Optimization
+- [x] **Automatic WebP Image Compressor (`imageCompressor.js`)**:
+    - [x] Built native HTML5 canvas and WebP compression module with iterative quality control (< 100 KB target).
+    - [x] Resizes images exceeding 1200px (or 1920px for wide banners) while preserving aspect ratio.
+    - [x] Auto-converts JPG, PNG, and HEIC to WebP while safely maintaining transparency and skipping SVGs/GIFs.
+- [x] **Core API Upload Interceptor**:
+    - [x] Updated `productParams.uploadImage` in `products.js` to automatically compress all product images.
+    - [x] Added `cacheControl: '31536000, public'` (1 year) header to all Supabase storage uploads.
+    - [x] Updated `settingsParams.uploadAsset` in `settings.js` to compress site banners, logos, and category assets.
+    - [x] Updated `Checkout.jsx` to auto-compress customer prescription slip uploads (< 120 KB).
+- [x] **Admin Upload UX**:
+    - [x] Updated `ProductForm.jsx` to compress files on selection in the background.
+    - [x] Added `Auto-compressing to WebP < 100 KB` badge in the media section header.
+    - [x] Added live file size indicators on thumbnails (`⚡ XX KB WebP`).
+    - [x] Auto-compressed variant images to WebP (< 90 KB).
+
+
 

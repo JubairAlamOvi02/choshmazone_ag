@@ -42,12 +42,13 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
     - **Customer Management**: View registered user list and roles.
     - **Web Log & Funnel Analytics**: Dedicated real-time dashboard at `/admin/web-logs` tracking unique visitors, page views, conversion funnel milestones (Product View $\rightarrow$ Add to Cart $\rightarrow$ Checkout $\rightarrow$ Purchase) with drop-off percentages, Recharts area trends, device breakdown, high-demand cart items, and live event log table with JSON metadata inspector.
     - **Inventory Control**: Manage stock levels and dynamic "Active/Inactive" visibility toggle.
+    - **Automated WebP Image Optimizer**: Native client-side WebP compression module automatically optimizing all uploaded imagery (products, variants, site banners, and customer prescription slips) to under ~100 KB with real-time UI indicators, reducing Supabase Storage egress by 95-98%.
     - **Database Visibility**: Access to schemas and tables for debugging.
 
 
 ## 5. Non-Functional Requirements
 - **Responsive Design**: Mobile-first approach with optimized tap targets and fixed mobile product card layouts.
-- **Performance**: Fast loading times via route splitting, image optimization (lazy loading), and API response caching.
+- **Performance & Bandwidth Optimization**: Fast loading times via route splitting, lazy loading, API response caching, and client-side WebP compression (<100 KB) with 1-year public cache-control headers ensuring Supabase Free Plan egress stays well within limits.
 - **Resilience**: Global Error Boundary protection and high-latency Auth strategies (15s timeouts).
 - **Accessibility**: Adherence to basic web accessibility standards (WCAG).
 

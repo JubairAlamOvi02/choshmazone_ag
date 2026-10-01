@@ -433,5 +433,17 @@
   - Added `VisitorGeoMap.jsx` component inside `src/components/admin/` for regional and city-level visual analytics.
   - Integrated Map View tab controls and quick copy utilities in `src/pages/admin/WebLogs.jsx`.
 
+- Task 95 (Automatic WebP Client-Side Image Compression & Free Plan Egress Optimization): Completed
+  - Resolved Supabase Storage Free Plan cached egress limit (5 GB/month) overage by eliminating large uncompressed photo uploads.
+  - Implemented `src/lib/imageCompressor.js` with browser-native HTML5 Canvas and WebP compression (`compressImage`, `compressImages`).
+  - Auto-converts `.jpg`, `.jpeg`, `.png`, `.jfif`, `.HEIC` uploads to WebP under ~100 KB with preserved aspect ratio (max dimension 1200px or 1920px for wide banners).
+  - Preserves PNG alpha transparency and passes SVGs and animated GIFs through untouched.
+  - Integrated directly into core API upload interceptors:
+    - `src/lib/api/products.js` (`uploadImage` with 1-year public browser cache headers: `cacheControl: '31536000, public'`).
+    - `src/lib/api/settings.js` (`uploadAsset` for site banners, logos, category images, and Media Manager).
+    - `src/pages/Checkout.jsx` (customer prescription camera uploads compressed to WebP < 120 KB).
+  - Enhanced admin UX in `src/pages/admin/ProductForm.jsx` with background WebP compression on file selection, real-time file size indicators (`⚡ XX KB WebP`), and `Auto-compressing to WebP < 100 KB` status badge.
+
+
 
 

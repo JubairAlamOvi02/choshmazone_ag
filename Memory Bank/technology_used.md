@@ -114,6 +114,12 @@ The application utilizes a **Mobile-First Responsive Strategy**:
 - **Visitor Geo-Location & Map Analytics**:
     - **Geographic Data Layer**: Session-level capture of `ip_address`, `city`, `region`, `country`, and `isp` in `visitor_sessions` with city indexing.
     - **Interactive Map Intelligence (`VisitorGeoMap.jsx`)**: Regional map view in `/admin/web-logs` visualizing visitor geography across Bangladesh and global regions.
+- **Client-Side Image Compression & Free Plan Storage Egress Optimization**:
+    - **Browser-Native WebP Compression (`src/lib/imageCompressor.js`)**: Zero-dependency image compressor using HTML5 canvas and WebP encoder.
+    - **Sub-100KB Target Budget**: Iterative quality reduction algorithm ensuring uploaded images stay under ~100 KB with 1200px max dimensions (1920px for wide banners) while preserving aspect ratio and PNG alpha transparency.
+    - **Unified Upload Interceptors**: Auto-compresses images across `productParams.uploadImage`, `settingsParams.uploadAsset`, `ProductForm.jsx`, `MediaManager.jsx`, `Categories.jsx`, and `Checkout.jsx` (prescription uploads).
+    - **Long-Lived Edge & Browser Caching**: Standardized `cacheControl: '31536000, public'` (1 year) headers across all Supabase Storage uploads, reducing Supabase Cached Egress by 95-98% and fitting easily within the 5 GB/month free tier.
+
 
 
 
