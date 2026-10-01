@@ -1,4 +1,5 @@
 import { supabase } from '../supabaseClient';
+import { compressImage } from '../imageCompressor';
 
 const CACHE_STORAGE_KEY = 'cz_site_settings_cache';
 
@@ -190,12 +191,24 @@ export const settingsParams = {
     },
 
     uploadAsset: async (file, path = 'site-assets') => {
-        const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+        // Automatically compress image before uploading
+        const isBanner = path.includes('banner') || (file.name && file.name.toLowerCase().includes('banner'));
+        const compressedFile = await compressImage(file, {
+            maxWidth: isBanner ? 1920 : 1200,
+            maxHeight: isBanner ? 1080 : 1200,
+            maxSizeBytes: isBanner ? 150 * 1024 : 100 * 1024
+        });
+
+        const fileName = `${Date.now()}-${compressedFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
         const filePath = `${path}/${fileName}`;
 
         const { data, error } = await supabase.storage
             .from('products') // Use the existing 'products' bucket
-            .upload(filePath, file);
+            .upload(filePath, compressedFile, {
+                contentType: compressedFile.type || 'image/webp',
+                cacheControl: '31536000, public',
+                upsert: false
+            });
 
         if (error) throw error;
 

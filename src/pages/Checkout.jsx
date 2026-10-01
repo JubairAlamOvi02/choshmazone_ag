@@ -13,6 +13,7 @@ import { getDistricts, getThanas, calculateDeliveryCharge } from '../data/bangla
 import { sendTelegramOrderNotification } from '../lib/telegramNotifier';
 import { settingsParams, DEFAULT_CHECKOUT_FIELD_SETTINGS } from '../lib/api/settings';
 import { trackEvent } from '../lib/tracker';
+import { compressImage } from '../lib/imageCompressor';
 
 // Bangladesh 11-digit phone validation helpers
 export const normalizeBDPhone = (input) => {
@@ -275,13 +276,18 @@ const Checkout = () => {
                 let uploadedPrescriptionUrl = '';
                 if (item.lensOption?.prescriptionFile) {
                     try {
-                        const file = item.lensOption.prescriptionFile;
-                        const fileExt = file.name ? file.name.split('.').pop() : 'jpg';
-                        const fileName = `rx_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                        const originalFile = item.lensOption.prescriptionFile;
+                        const compressedFile = await compressImage(originalFile, {
+                            maxWidth: 1400,
+                            maxHeight: 1400,
+                            maxSizeBytes: 120 * 1024
+                        });
+                        const fileName = `rx_${Date.now()}_${Math.random().toString(36).substring(7)}-${compressedFile.name}`;
                         const { data: uploadData, error: uploadErr } = await supabase.storage
                             .from('products')
-                            .upload(`prescriptions/${fileName}`, file, {
-                                cacheControl: '3600',
+                            .upload(`prescriptions/${fileName}`, compressedFile, {
+                                contentType: compressedFile.type || 'image/webp',
+                                cacheControl: '31536000, public',
                                 upsert: false
                             });
 

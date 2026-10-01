@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { productParams } from '../../lib/api/products';
 import { categoryParams } from '../../lib/api/categories';
+import { compressImage } from '../../lib/imageCompressor';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import { ChevronLeft, Upload, X, Plus, Package, DollarSign, Layers, Tag, Eye } from 'lucide-react';
@@ -123,17 +124,42 @@ const ProductForm = () => {
         }));
     };
 
-    const handleMediaAdd = (e) => {
+    const handleMediaAdd = async (e) => {
         const files = Array.from(e.target.files);
         if (!files.length) return;
         
+        // Immediate local previews
         const newItems = files.map(file => ({
             type: 'file',
             data: file,
             preview: URL.createObjectURL(file),
-            id: Math.random().toString()
+            id: Math.random().toString(),
+            isCompressing: true,
+            fileSize: `${(file.size / 1024).toFixed(0)} KB`
         }));
         setMediaItems(prev => [...prev, ...newItems]);
+
+        // Compress each image in background to WebP under ~100 KB
+        for (const item of newItems) {
+            try {
+                const compressed = await compressImage(item.data, {
+                    maxWidth: 1200,
+                    maxHeight: 1200,
+                    maxSizeBytes: 100 * 1024
+                });
+                const compressedPreview = URL.createObjectURL(compressed);
+                setMediaItems(prev => prev.map(m => m.id === item.id ? {
+                    ...m,
+                    data: compressed,
+                    preview: compressedPreview,
+                    isCompressing: false,
+                    fileSize: `${(compressed.size / 1024).toFixed(0)} KB WebP`
+                } : m));
+            } catch (err) {
+                console.warn('Compression error for item:', err);
+                setMediaItems(prev => prev.map(m => m.id === item.id ? { ...m, isCompressing: false } : m));
+            }
+        }
     };
 
     const handleDragStart = (e, index) => {
@@ -193,14 +219,23 @@ const ProductForm = () => {
         });
     };
 
-    const handleVariantImageUpload = (index, variantId, e) => {
+    const handleVariantImageUpload = async (index, variantId, e) => {
         const file = e.target.files[0];
         if (!file) return;
         
-        setVariantFiles(prev => ({ ...prev, [variantId]: file }));
-        
         const previewUrl = URL.createObjectURL(file);
         handleVariantChange(index, 'image_url', previewUrl);
+
+        try {
+            const compressed = await compressImage(file, {
+                maxWidth: 1000,
+                maxHeight: 1000,
+                maxSizeBytes: 90 * 1024
+            });
+            setVariantFiles(prev => ({ ...prev, [variantId]: compressed }));
+        } catch {
+            setVariantFiles(prev => ({ ...prev, [variantId]: file }));
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -333,7 +368,13 @@ const ProductForm = () => {
                         
                         {/* Media Section */}
                         <section className="bg-white p-6 rounded-xl border border-border shadow-sm space-y-4">
-                            <h3 className="text-sm font-medium text-text-main">Media</h3>
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-sm font-medium text-text-main">Media</h3>
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    Auto-compressing to WebP &lt; 100 KB
+                                </span>
+                            </div>
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                 {mediaItems.map((item, index) => (
                                     <div 
@@ -352,10 +393,15 @@ const ProductForm = () => {
                                             alt={`Media ${index}`} 
                                             className="w-full h-full object-contain pointer-events-none" 
                                         />
+                                        {item.fileSize && (
+                                            <span className="absolute bottom-2 left-2 px-1.5 py-0.5 bg-black/75 text-[10px] text-emerald-300 font-mono rounded backdrop-blur-sm pointer-events-none shadow-sm flex items-center gap-1 z-10">
+                                                {item.isCompressing ? '⚡ Compressing...' : `⚡ ${item.fileSize}`}
+                                            </span>
+                                        )}
                                         <button
                                             type="button"
                                             onClick={() => removeMediaItem(index)}
-                                            className="absolute top-2 right-2 p-1.5 bg-white/90 text-red-500 rounded-md shadow hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
+                                            className="absolute top-2 right-2 p-1.5 bg-white/90 text-red-500 rounded-md shadow hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 z-10"
                                         >
                                             <X size={14} />
                                         </button>

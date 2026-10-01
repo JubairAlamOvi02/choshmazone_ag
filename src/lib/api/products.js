@@ -1,5 +1,6 @@
 import { supabase } from '../supabaseClient';
 import { cacheManager } from '../cache';
+import { compressImage } from '../imageCompressor';
 
 export const productParams = {
     // Fetch all products with caching
@@ -117,13 +118,22 @@ export const productParams = {
         return true;
     },
 
-    // Upload image to Storage
+    // Upload image to Storage (auto-compressed to WebP under ~100 KB)
     uploadImage: async (file) => {
+        const compressedFile = await compressImage(file, {
+            maxWidth: 1200,
+            maxHeight: 1200,
+            maxSizeBytes: 100 * 1024
+        });
         const randomStr = Math.random().toString(36).substring(2, 8);
-        const fileName = `${Date.now()}-${randomStr}-${file.name}`;
+        const fileName = `${Date.now()}-${randomStr}-${compressedFile.name}`;
         const { error } = await supabase.storage
             .from('products')
-            .upload(fileName, file);
+            .upload(fileName, compressedFile, {
+                contentType: compressedFile.type || 'image/webp',
+                cacheControl: '31536000, public',
+                upsert: false
+            });
 
         if (error) throw error;
 
