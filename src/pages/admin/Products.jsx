@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { productParams } from '../../lib/api/products';
-import { Plus, Edit3, Trash2, Copy, Power, PowerOff, Glasses, Search, Filter } from 'lucide-react';
+import { Plus, Edit3, Trash2, Copy, Power, PowerOff, Glasses, Search, Filter, FileSpreadsheet } from 'lucide-react';
+import ExportWooCommerceModal from '../../components/admin/ExportWooCommerceModal';
 
 const AdminProducts = () => {
     const [products, setProducts] = useState([]);
@@ -9,6 +10,7 @@ const AdminProducts = () => {
     const [error, setError] = useState(null);
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [isProcessingBulk, setIsProcessingBulk] = useState(false);
+    const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
     useEffect(() => {
         fetchProducts();
@@ -163,6 +165,15 @@ const AdminProducts = () => {
                             className="bg-transparent border-none outline-none text-sm font-outfit w-40"
                         />
                     </div>
+                    <button
+                        type="button"
+                        onClick={() => setIsExportModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-3 bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 font-bold rounded-xl transition-all shadow-sm font-outfit text-sm"
+                        title="Export products to WooCommerce CSV format"
+                    >
+                        <FileSpreadsheet size={18} />
+                        <span>Export for WooCommerce</span>
+                    </button>
                     <Link to="/admin/products/new" className="flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/95 transition-all shadow-lg shadow-primary/20 font-outfit uppercase tracking-widest text-sm">
                         <Plus size={18} />
                         New Product
@@ -190,6 +201,14 @@ const AdminProducts = () => {
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
                         </select>
+                        <button
+                            type="button"
+                            onClick={() => setIsExportModalOpen(true)}
+                            className="flex items-center gap-2 px-3 py-2 bg-white border border-purple-200 text-purple-700 hover:bg-purple-50 rounded-lg text-sm font-bold font-outfit transition-colors shadow-sm"
+                        >
+                            <FileSpreadsheet size={16} />
+                            Export Selected ({selectedProducts.length})
+                        </button>
                         <button
                             onClick={handleBulkDelete}
                             disabled={isProcessingBulk}
@@ -320,6 +339,13 @@ const AdminProducts = () => {
                     </table>
                 </div>
             </div>
+
+            <ExportWooCommerceModal
+                isOpen={isExportModalOpen}
+                onClose={() => setIsExportModalOpen(false)}
+                allProducts={products}
+                selectedProductIds={selectedProducts}
+            />
         </div>
     );
 };

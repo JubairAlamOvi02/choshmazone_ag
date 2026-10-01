@@ -582,6 +582,23 @@
   - [x] Added real-time file size badges on media thumbnails (e.g., `⚡ 74 KB WebP`).
   - [x] Auto-compressed variant images to WebP (< 90 KB).
 
+## Phase 55: WooCommerce Bulk Product Exporter & WordPress Catalog Sync
+- [x] **WooCommerce Standard Product Exporter (Task Id: 603)**:
+  - [x] Built `src/lib/woocommerceExporter.js` generating standard, fully compliant WooCommerce CSV files according to RFC 4180 with UTF-8 BOM encoding.
+  - [x] Structured complete product data mapping including title, SKU, published status, regular/sale price, categories, tags, and stock quantities.
+  - [x] Formatted product specifications into descriptions (brand, style, frame/lens material, lens technology, face shape, dimensions, and shipping policy).
+  - [x] Consolidated all public cloud-hosted image URLs (`image_url`, gallery array, and variant images) into comma-separated strings for automated WordPress media downloading.
+  - [x] Provided dual export architectures:
+    - **Variable & Simple**: Parent variable rows linked with child variations for Color/Size options and individual stock/prices.
+    - **Standalone Simple**: Converts all variants into standalone individual simple products.
+- [x] **Admin Inventory UI Integration (Task Id: 604)**:
+  - [x] Created `src/components/admin/ExportWooCommerceModal.jsx` offering scope selection (All vs Selected), mode toggle (Variable vs Standalone), inactive product filtering, live CSV row calculation, and 3-step WordPress import guide.
+  - [x] Added "Export for WooCommerce" button in header and "Export Selected" button in the bulk action bar in `src/pages/admin/Products.jsx`.
+- [x] **CLI Script & Initial Export (Task Id: 605)**:
+  - [x] Created standalone CLI script `export_woocommerce.js` and added `npm run export:woocommerce` script in `package.json`.
+  - [x] Generated ready-to-import CSV file `choshmazone_woocommerce_export_2026-10-01.csv` containing all 25 catalog products (49 rows).
+
+
 
 
 

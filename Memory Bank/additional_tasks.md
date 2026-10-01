@@ -390,5 +390,19 @@
     - [x] Added live file size indicators on thumbnails (`⚡ XX KB WebP`).
     - [x] Auto-compressed variant images to WebP (< 90 KB).
 
+## Phase 36: WooCommerce Bulk Product Exporter & Admin Integration
+- [x] **WooCommerce Standard Product Exporter (`woocommerceExporter.js`)**:
+    - [x] Built RFC 4180 CSV generation engine with UTF-8 BOM encoding and standard WooCommerce column mappings.
+    - [x] Configured support for both Variable Products (with variations, colors, sizes, stock, prices) and Standalone Simple Products.
+    - [x] Mapped product metadata and technical specs (materials, lens tech, face shape, dimensions, shipping notes) into HTML descriptions.
+    - [x] Aggregated all public image URLs into comma-separated strings for automated WordPress media ingestion.
+- [x] **Admin Export Modal & Inventory Actions**:
+    - [x] Created `ExportWooCommerceModal.jsx` with scope control (All vs Selected), topology selection, inactive filter, live row counter, and 3-step import guide.
+    - [x] Added "Export for WooCommerce" button in header and "Export Selected" button in the bulk action bar of `Products.jsx`.
+- [x] **CLI Script & Initial Export**:
+    - [x] Added `export_woocommerce.js` and `npm run export:woocommerce` script in `package.json`.
+    - [x] Pre-generated ready-to-import CSV `choshmazone_woocommerce_export_2026-10-01.csv`.
+
+
 
 

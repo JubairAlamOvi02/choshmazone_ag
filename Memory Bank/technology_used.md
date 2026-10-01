@@ -34,6 +34,7 @@ The project utilizes [Supabase](https://supabase.com/) as a Comprehensive Backen
     *   **Cash on Delivery (COD)**: Support for offline payments.
 *   **Transactional Email**: Google Apps Script acting as a lightweight mail gateway for OTP verification and automated order confirmations.
 *   **Analytics**: **Facebook Pixel / Meta Pixel** with standard event tracking (PageView, ViewContent, AddToCart, InitiateCheckout, Purchase).
+*   **WordPress & WooCommerce Integration**: Standardized CSV export engine adhering to native WooCommerce product importer specifications for bulk catalog migration and automated media library downloading.
 
 ## 4. Key Architectural Features
 *   **Role-Based Access Control (RBAC)**: Distinct permissions for 'Admin' and 'Customer' users.
@@ -78,6 +79,7 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **Product Duplication System**: Instant one-click cloning from the admin inventory list with auto `(Copy)` naming, ID sanitization, variant ID regeneration, and asset reuse.
     - **Unified Media Gallery**: Drag-and-drop image reordering system in Admin with automatic primary image selection.
     - **Shopify-Style Variant Table**: Combined option display (Color / Size) for a professional inventory management experience.
+    - **WooCommerce Bulk Product Exporter**: Integrated export suite (`src/lib/woocommerceExporter.js`, `ExportWooCommerceModal.jsx`, `export_woocommerce.js`) generating RFC 4180 / UTF-8 BOM CSV files. Maps Variable/Variation structures or Standalone Simple products, packs rich technical specifications into HTML descriptions, and consolidates public Supabase image URLs for automated downloading by WordPress.
 - **Dynamic CMS & Site Settings Engine**:
     - **Global Site Settings (`site_settings`)**: PostgreSQL key-value persistence layer for promotional banners, brand visual assets, optical lens packages, and storefront text.
     - **Homepage Hero Banner Customizer**: Complete customizer for background imagery, badge text, split title with gold accent highlight, multiline description, and live real-time sticky preview.

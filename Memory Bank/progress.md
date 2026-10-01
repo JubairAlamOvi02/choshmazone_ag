@@ -444,6 +444,19 @@
     - `src/pages/Checkout.jsx` (customer prescription camera uploads compressed to WebP < 120 KB).
   - Enhanced admin UX in `src/pages/admin/ProductForm.jsx` with background WebP compression on file selection, real-time file size indicators (`⚡ XX KB WebP`), and `Auto-compressing to WebP < 100 KB` status badge.
 
+- Task 96 (WooCommerce Product Bulk Exporter & WordPress Catalog Sync): Completed
+  - Created standard WooCommerce CSV exporter module (`src/lib/woocommerceExporter.js`) complying with official WooCommerce product importer schema:
+    - RFC 4180 CSV escaping and UTF-8 BOM encoding for special and Bengali characters.
+    - Collects all public cloud image URLs (`image_url`, `images` gallery, variant images) into comma-separated links for automatic media library ingestion by WordPress.
+    - Generates rich HTML specifications in the product description combining brand, style, frame/lens material, lens tech, face shape, shipping notes, and dimension measurements.
+    - Supports two distinct export topologies:
+      - **Variable & Simple Products**: Generates parent variable rows with attribute sets (Color, Size) and linked child variation rows with specific pricing and stock.
+      - **Standalone Simple Products**: Flattens every variant into an independent, individual simple product.
+  - Created interactive Admin modal (`src/components/admin/ExportWooCommerceModal.jsx`) allowing filtering by scope (All vs Selected), product status (Active only vs Inactive/Drafts), format toggle, live preview row counter, and 3-step WordPress import guide.
+  - Added "Export for WooCommerce" button in header and "Export Selected" button in the bulk action bar in `src/pages/admin/Products.jsx`.
+  - Added CLI export script (`export_woocommerce.js`) and npm script `npm run export:woocommerce` in `package.json`.
+  - Generated initial catalog export file `choshmazone_woocommerce_export_2026-10-01.csv` containing all 25 products and 49 CSV rows.
+
 
 
 
