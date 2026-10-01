@@ -364,3 +364,14 @@
     - [x] Validated `src` attribute in `OptimizedImage.jsx` to prevent unintentional requests to `/shop`.
     - [x] Fixed Meta Pixel HTML markup in `index.html`, moving `<noscript>` into `<body>` and closing `<script>` tag.
 
+## Phase 34: Recently Purchased Section & Visitor Geo Map
+- [x] **Recently Purchased Homepage Showcase**:
+    - [x] Created `src/components/RecentlyPurchased.jsx` replicating the "NEW ARRIVALS" headline styling (centered uppercase font-outfit with signature gold underline bar) and responsive 4-column product grid with `ProductCard`.
+    - [x] Implemented `orderParams.fetchRecentPurchased` in `src/lib/api/orders.js` fetching purchased products safely from `order_items` with zero customer details exposed.
+    - [x] Added product de-duplication and 3-minute caching with automatic invalidation when new orders are created.
+    - [x] Integrated `<RecentlyPurchased />` on the home page below the promotional banner.
+- [x] **Visitor Geo-Location & Map Analytics**:
+    - [x] Added `ip_address`, `city`, `region`, `country`, and `isp` columns to `visitor_sessions` with city indexing.
+    - [x] Created `VisitorGeoMap.jsx` and integrated regional map visualization tab in `WebLogs.jsx`.
+
+

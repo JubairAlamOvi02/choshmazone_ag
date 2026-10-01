@@ -1,5 +1,6 @@
 
 import { supabase } from '../supabaseClient';
+import { cacheManager } from '../cache';
 
 export const orderParams = {
     // Create a new order with its items
@@ -62,7 +63,80 @@ export const orderParams = {
 
         if (itemsError) throw itemsError;
 
+        // Invalidate recent purchased cache so fresh purchases show up
+        cacheManager.invalidatePattern('recent_purchased_');
+
         return order;
+    },
+
+    // Fetch recently purchased items (Public-safe: NO customer details whatsoever)
+    fetchRecentPurchased: async (limit = 4) => {
+        const cacheKey = `recent_purchased_${limit}`;
+        const cached = cacheManager.get(cacheKey);
+        if (cached) return cached;
+
+        try {
+            const { data, error } = await supabase
+                .from('order_items')
+                .select(`
+                    id,
+                    created_at,
+                    products (
+                        id,
+                        name,
+                        price,
+                        image_url,
+                        images,
+                        stock_quantity,
+                        category,
+                        is_active,
+                        variants
+                    ),
+                    orders (
+                        status
+                    )
+                `)
+                .order('created_at', { ascending: false })
+                .limit(limit * 4);
+
+            if (error) throw error;
+            if (!data || data.length === 0) return [];
+
+            const seenProductIds = new Set();
+            const recentProducts = [];
+
+            for (const item of data) {
+                // Ensure product exists and is active
+                if (!item.products || !item.products.id || item.products.is_active === false) {
+                    continue;
+                }
+                // Skip cancelled orders if status is available
+                if (item.orders && item.orders.status === 'cancelled') {
+                    continue;
+                }
+                // De-duplicate products so unique items are displayed
+                if (!seenProductIds.has(item.products.id)) {
+                    seenProductIds.add(item.products.id);
+                    recentProducts.push({
+                        ...item.products,
+                        title: item.products.name,
+                        image: item.products.image_url,
+                        images: item.products.images || [],
+                        purchased_at: item.created_at
+                    });
+                }
+                if (recentProducts.length >= limit) {
+                    break;
+                }
+            }
+
+            // Cache for 3 minutes for high responsiveness
+            cacheManager.set(cacheKey, recentProducts, 1000 * 60 * 3);
+            return recentProducts;
+        } catch (err) {
+            console.error('Error fetching recently purchased products:', err);
+            return [];
+        }
     },
 
     // Fetch all orders (Admin)

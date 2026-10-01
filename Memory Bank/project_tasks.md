@@ -554,5 +554,17 @@
   - [x] Fixed missing closing `</script>` tag for Meta Pixel code, eliminating `Uncaught SyntaxError: Unexpected token '<'`.
   - [x] Validated production build (`npm run build`) completing with code 0.
 
+## Phase 53: Recently Purchased Items Section & Visitor Geo Map Analytics
+- [x] **Public Recently Purchased Showcase (Task Id: 598)**:
+  - [x] Created `orderParams.fetchRecentPurchased` in `src/lib/api/orders.js` fetching recent purchases from `order_items` and joined `products`.
+  - [x] Enforced complete privacy protection: Customer names, phone numbers, delivery addresses, and user profiles are strictly excluded from queries and state.
+  - [x] Added product de-duplication and 3-minute client-side caching with automatic cache invalidation upon new order placement.
+  - [x] Built `src/components/RecentlyPurchased.jsx` replicating the signature "NEW ARRIVALS" section design with centered uppercase title, gold underline bar (`bg-secondary`), and 4-column responsive grid with `ProductCard`.
+  - [x] Integrated `<RecentlyPurchased />` into `src/pages/Home.jsx` below the Promotional Banner.
+- [x] **Visitor Geo Map & Regional Analytics (Task Id: 599)**:
+  - [x] Added `ip_address`, `city`, `region`, `country`, and `isp` columns to `visitor_sessions` with city indexing (`add_geo_to_sessions.sql`).
+  - [x] Created `VisitorGeoMap.jsx` inside `src/components/admin/` and integrated map visualization in `src/pages/admin/WebLogs.jsx`.
+
+
 
 

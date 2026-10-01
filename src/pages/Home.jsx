@@ -4,6 +4,7 @@ import Hero from '../components/Hero';
 import FeaturedCollections from '../components/FeaturedCollections';
 import ProductCard from '../components/ProductCard';
 import PromotionalBanner from '../components/PromotionalBanner';
+import RecentlyPurchased from '../components/RecentlyPurchased';
 import RecentlyViewed from '../components/RecentlyViewed';
 import Footer from '../components/Footer';
 
@@ -66,6 +67,7 @@ const Home = () => {
                 </section>
 
                 <PromotionalBanner />
+                <RecentlyPurchased />
                 <RecentlyViewed />
             </main>
 

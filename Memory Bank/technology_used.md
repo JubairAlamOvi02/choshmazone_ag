@@ -107,6 +107,14 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **Google Search Favicons**: Configured dedicated high-resolution favicon links and manifest icons for optimal search engine display and home screen shortcuts.
 - **Data Visualization & Chart Resilience**:
     - **Recharts Container Hardening**: Client-side hydration tracking (`isMounted`), flex/grid `min-w-0` layout safeguards, and `<ResponsiveContainer>` debouncing preventing `-1` dimension calculation warnings.
+- **Recently Purchased Social Proof Engine**:
+    - **Privacy-Guaranteed Showcase (`RecentlyPurchased.jsx`)**: Displays recently bought eyewear on the homepage mirroring the New Arrivals 4-column layout and gold accent bar styling (`bg-secondary`), using `ProductCard`.
+    - **Secure Data Pipeline (`orderParams.fetchRecentPurchased`)**: Queries only product line items from `order_items`, strictly excluding all customer personal details (names, phone numbers, addresses, emails, user IDs).
+    - **De-Duplication & Cache Management**: Automatic distinct product filtering and 3-minute local caching with instant cache invalidation upon new order placement.
+- **Visitor Geo-Location & Map Analytics**:
+    - **Geographic Data Layer**: Session-level capture of `ip_address`, `city`, `region`, `country`, and `isp` in `visitor_sessions` with city indexing.
+    - **Interactive Map Intelligence (`VisitorGeoMap.jsx`)**: Regional map view in `/admin/web-logs` visualizing visitor geography across Bangladesh and global regions.
+
 
 
 

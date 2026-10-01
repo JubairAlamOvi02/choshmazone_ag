@@ -419,4 +419,19 @@
   - Moved Meta Pixel `<noscript><img ...></noscript>` fallback inside `<body>` in `index.html`, eliminating Vite/Rollup `disallowed-content-in-noscript-in-head` parse errors.
   - Ensured correct closing `</script>` tag syntax for Meta Pixel tracking snippet, resolving `Uncaught SyntaxError: Unexpected token '<'`.
 
+- Task 93 (Recently Purchased Items Showcase on Home Page): Completed
+  - Created `orderParams.fetchRecentPurchased(limit = 4)` in `src/lib/api/orders.js` querying recent orders from `order_items`.
+  - Enforced strict visitor privacy: Zero customer details (no names, phone numbers, addresses, emails, or user IDs) are ever queried or transmitted to clients.
+  - Implemented product-level de-duplication so visitors see distinct items.
+  - Integrated with `cacheManager` for 3-minute caching and automatic invalidation whenever new orders are created.
+  - Created `src/components/RecentlyPurchased.jsx` replicating the signature "NEW ARRIVALS" header styling (centered uppercase font-outfit with signature gold underline bar `bg-secondary`) and 4-column responsive product card grid using `ProductCard`.
+  - Added graceful fallback returning `null` if no purchases exist yet.
+  - Integrated `<RecentlyPurchased />` into `src/pages/Home.jsx` between the Promotional Banner and Recently Viewed sections.
+
+- Task 94 (Visitor Geo-Location & Interactive Map View in Web Logs): Completed
+  - Extended `visitor_sessions` schema with `ip_address`, `city`, `region`, `country`, and `isp` columns and city indexing (`add_geo_to_sessions.sql`).
+  - Added `VisitorGeoMap.jsx` component inside `src/components/admin/` for regional and city-level visual analytics.
+  - Integrated Map View tab controls and quick copy utilities in `src/pages/admin/WebLogs.jsx`.
+
+
 

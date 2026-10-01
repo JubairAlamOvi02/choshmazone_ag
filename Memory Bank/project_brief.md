@@ -16,7 +16,7 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 
 ## 4. Functional Requirements
 ### Core Features
-- **Homepage**: Hero banner, featured collections, and promotional highlights.
+- **Homepage**: Hero banner, featured collections, New Arrivals product grid, promotional highlights, and dynamic **Recently Purchased** showcase (privacy-guaranteed displaying latest purchased products without customer details).
 - **Product Catalog**: Advanced Grid view with "Premium Tag" filtering (Frame Style, Category, Price) and dynamic active filter chips for effortless navigation.
 - **Product Details Page**: High-resolution interactive image gallery with thumbnail support, floating navigation arrows, detailed rich text descriptions, specifications, custom Prescription Lens selection modal, and "Add to Bag" / "Buy Now" controls.
 - **Optical Prescription Flow**: Dedicated lens package selection (Single Vision, Blue Cut, Photochromic, Progressive) with 3 prescription submission flows (Slip Upload, Manual SPH/CYL/AXIS/PD matrix, WhatsApp Later).

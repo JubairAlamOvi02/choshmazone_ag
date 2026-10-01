@@ -122,6 +122,11 @@ CREATE TABLE public.visitor_sessions (
   device_type text, -- 'mobile', 'tablet', 'desktop'
   browser text,
   operating_system text,
+  ip_address text,
+  city text,
+  region text,
+  country text,
+  isp text,
   page_views_count integer DEFAULT 1,
   has_viewed_product boolean DEFAULT false,
   has_added_to_cart boolean DEFAULT false,

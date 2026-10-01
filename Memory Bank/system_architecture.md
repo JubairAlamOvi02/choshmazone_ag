@@ -51,6 +51,8 @@
     *   `Web Log & Funnel Analytics Engine`: Real-time visitor activity stream, persistent visitor/session tracking (`src/lib/tracker.js`), non-blocking event logging (`page_view`, `view_product`, `add_to_cart`, `remove_from_cart`, `initiate_checkout`, `purchase`), and comprehensive admin analytics dashboard (`WebLogs.jsx`) with step-by-step conversion funnel visualization, drop-off metrics, Recharts area trends, device breakdown, and JSON metadata inspector.
     *   `Product Duplication Engine`: Administrative cloning pipeline (`Products.jsx` + `ProductForm.jsx`) supporting instant product duplication with auto `(Copy)` naming, ID sanitization, variant regeneration, image re-referencing, and direct new-product persistence.
     *   `Guarded Image Rendering`: Explicit `hasValidSrc` validation in `OptimizedImage.jsx` and `CartItem.jsx` to prevent empty/undefined image sources from generating invalid client requests.
+    *   `Recently Purchased Showcase`: Public homepage component (`RecentlyPurchased.jsx`) displaying recent purchases matching the New Arrivals 4-column layout and header style (`bg-secondary` bar). Data is queried via `orderParams.fetchRecentPurchased` with strict exclusion of all customer details, automatic product de-duplication, and 3-minute local cache management.
+    *   `Visitor Geo-Map & Regional Analytics`: Administrative map visualization (`VisitorGeoMap.jsx`) integrated with `visitor_sessions` geo-tracking (`ip_address`, `city`, `region`, `country`, `isp`) for geographic intelligence in `/admin/web-logs`.
 *   **PWA & Service Worker Resiliency**:
     - **Offline Caching**: Service Worker (`public/sw.js`) with cache versioning (`choshmazone-v2`) and pre-caching for core static assets (`/`, `/index.html`, `/manifest.json`).
     - **Safe Rejection Handling**: Network fetches inside `event.respondWith` are wrapped with `.catch()` returning synthetic 408 responses, preventing `TypeError: Failed to fetch` unhandled promise rejections.
@@ -140,12 +142,13 @@
 *   `updated_at` (Timestamp)
 
 #### 8. `visitor_sessions`
-*Tracks unique visitor sessions and conversion milestones.*
+*Tracks unique visitor sessions, geo-location, and conversion milestones.*
 *   `id` (Text, Primary Key) - Session UUID (sessionStorage)
 *   `visitor_id` (Text) - Persistent client ID (localStorage)
 *   `user_id` (UUID, References `profiles.id`, Nullable)
 *   `first_page` (Text), `last_page` (Text), `referrer` (Text)
 *   `device_type` (Text), `browser` (Text), `operating_system` (Text)
+*   `ip_address` (Text), `city` (Text), `region` (Text), `country` (Text), `isp` (Text)
 *   `page_views_count` (Integer, Default: 1)
 *   `has_viewed_product` (Boolean), `has_added_to_cart` (Boolean), `has_initiated_checkout` (Boolean), `has_purchased` (Boolean)
 *   `total_purchased_amount` (Numeric, Default: 0), `order_id` (UUID)
