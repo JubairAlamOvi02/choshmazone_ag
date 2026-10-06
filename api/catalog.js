@@ -30,9 +30,16 @@ export default async function handler(req, res) {
     const baseUrl = `${protocol}://${host}`;
 
     // Helper functions for formatting
+    const sanitizeXmlText = (str) => {
+      if (!str) return '';
+      // Remove XML 1.0 invalid control characters
+      return String(str).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+    };
+
     const cleanCdata = (str) => {
       if (!str) return '';
-      return `<![CDATA[${String(str).replace(/\]\]>/g, ']] >')}]]>`;
+      const sanitized = sanitizeXmlText(str).replace(/\]\]>/g, ']] >');
+      return `<![CDATA[${sanitized}]]>`;
     };
 
     const getAbsoluteUrl = (url) => {
@@ -41,11 +48,20 @@ export default async function handler(req, res) {
       return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
     };
 
+    const escapeXmlUrl = (url) => {
+      if (!url) return '';
+      const absUrl = getAbsoluteUrl(url);
+      return sanitizeXmlText(absUrl)
+        .replace(/&(?!(amp|lt|gt|quot|apos);)/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    };
+
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
   <channel>
     <title>Choshmazone Catalog Feed</title>
-    <link>${baseUrl}</link>
+    <link>${escapeXmlUrl(baseUrl)}</link>
     <description>Facebook Product Catalog Feed for Choshmazone</description>
 `;
 
@@ -82,8 +98,8 @@ export default async function handler(req, res) {
             ? `${parentName} - ${details.join(' / ')}`
             : parentName;
 
-          const link = `${baseUrl}/product/${parentId}?variant=${variantId}`;
-          const imageLink = getAbsoluteUrl(variant.image_url || product.image_url);
+          const link = escapeXmlUrl(`${baseUrl}/product/${parentId}?variant=${variantId}`);
+          const imageLink = escapeXmlUrl(variant.image_url || product.image_url);
           
           // Price formatting: variant price or fall back to main price
           const priceVal = variant.price || product.price;
@@ -123,8 +139,8 @@ export default async function handler(req, res) {
         }
       } else {
         // Output the product itself if there are no variants
-        const link = `${baseUrl}/product/${parentId}`;
-        const imageLink = getAbsoluteUrl(product.image_url);
+        const link = escapeXmlUrl(`${baseUrl}/product/${parentId}`);
+        const imageLink = escapeXmlUrl(product.image_url);
         const priceStr = `${Number(product.price).toFixed(2)} BDT`;
         const availability = Number(product.stock_quantity) > 0 ? 'in stock' : 'out of stock';
 
