@@ -8,6 +8,8 @@ import {
     Copy, Check, Truck, Image as ImageIcon 
 } from 'lucide-react';
 import { testTelegramNotification } from '../../lib/telegramNotifier';
+import { supabase } from '../../lib/supabaseClient';
+import { playChaChingSound, vibratePhone } from '../../lib/orderSoundNotifier';
 
 // Reusable CopyButton with instant feedback and animated checkmark
 const CopyButton = ({ 
@@ -273,6 +275,27 @@ const AdminOrders = () => {
 
     useEffect(() => {
         fetchOrders();
+
+        const channel = supabase
+            .channel('admin_orders_page_realtime')
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'orders' },
+                async () => {
+                    try {
+                        const data = await orderParams.fetchAll();
+                        setOrders(data);
+                        showToast('New order placed! List updated.', 'info');
+                    } catch (e) {
+                        console.error('Failed to auto-refresh orders:', e);
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
     const fetchOrders = async () => {
@@ -548,6 +571,18 @@ const AdminOrders = () => {
                     <p className="text-text-muted font-outfit">Review and manage all customer transactions.</p>
                 </div>
                 <div className="flex items-center gap-3 flex-wrap">
+                    <button 
+                        onClick={() => {
+                            playChaChingSound();
+                            vibratePhone();
+                            showToast('Cash Register (Kaching) sound played!', 'success');
+                        }}
+                        title="Test the Cash Register (Kaching) sound and phone vibration"
+                        className="flex items-center gap-2 px-5 py-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-sm font-bold hover:bg-amber-100 transition-all font-outfit uppercase tracking-widest shadow-sm cursor-pointer"
+                    >
+                        <span>💰</span>
+                        <span>Test Kaching</span>
+                    </button>
                     <button 
                         onClick={handleTestTelegram}
                         disabled={isTestingTelegram}

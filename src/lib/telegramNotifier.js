@@ -118,7 +118,8 @@ export const sendTelegramOrderNotification = async (orderData) => {
                 chat_id: TELEGRAM_CHAT_ID,
                 text: text,
                 parse_mode: 'HTML',
-                disable_web_page_preview: true
+                disable_web_page_preview: true,
+                disable_notification: false // Explicitly enable sound and vibration on phone
             })
         });
 
@@ -165,7 +166,8 @@ Your order notification system is now working. You will receive real-time push a
             body: JSON.stringify({
                 chat_id: TELEGRAM_CHAT_ID,
                 text: testText,
-                parse_mode: 'HTML'
+                parse_mode: 'HTML',
+                disable_notification: false
             })
         });
 

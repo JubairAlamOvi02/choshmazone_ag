@@ -105,3 +105,86 @@ self.addEventListener('fetch', (event) => {
         })
     );
 });
+
+// ==========================================
+// PWA Push Notifications & Interaction
+// ==========================================
+
+self.addEventListener('push', (event) => {
+    let payload = {
+        title: '💰 New Order Received!',
+        body: 'A customer just placed a new order on Choshma Zone.',
+        url: '/admin/orders'
+    };
+
+    try {
+        if (event.data) {
+            const json = event.data.json();
+            payload = { ...payload, ...json };
+        }
+    } catch {
+        if (event.data) {
+            payload.body = event.data.text();
+        }
+    }
+
+    const options = {
+        body: payload.body,
+        icon: '/pwa-192x192.png',
+        badge: '/favicon.svg',
+        vibrate: [200, 100, 200, 100, 400],
+        tag: payload.tag || 'choshmazone-order',
+        renotify: true,
+        data: {
+            url: payload.url || '/admin/orders',
+            orderId: payload.orderId || null
+        },
+        actions: [
+            { action: 'open', title: '👁️ View Order' },
+            { action: 'dismiss', title: 'Dismiss' }
+        ]
+    };
+
+    event.waitUntil(self.registration.showNotification(payload.title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+
+    if (event.action === 'dismiss') {
+        return;
+    }
+
+    const targetUrl = (event.notification.data && event.notification.data.url) 
+        ? event.notification.data.url 
+        : '/admin/orders';
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+            for (const client of clientList) {
+                if ('focus' in client && client.url.includes('/admin')) {
+                    if ('navigate' in client && targetUrl) {
+                        client.navigate(targetUrl);
+                    }
+                    return client.focus();
+                }
+            }
+            if (clients.openWindow) {
+                return clients.openWindow(targetUrl);
+            }
+        })
+    );
+});
+
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
+        const { title, options } = event.data;
+        self.registration.showNotification(title, {
+            icon: '/pwa-192x192.png',
+            badge: '/favicon.svg',
+            vibrate: [200, 100, 200, 100, 400],
+            ...options
+        });
+    }
+});
+

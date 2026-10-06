@@ -1,12 +1,13 @@
 {
-    "name": "Choshma Zone",
+    "name": "Choshma Zone - Store & Admin",
     "short_name": "ChoshmaZone",
-    "start_url": "/",
+    "start_url": "/admin/dashboard",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#000000",
-    "description": "Premium eyewear store in Bangladesh",
-    "orientation": "portrait",
+    "description": "Choshma Zone Store Management & Real-time Order Alerts",
+    "orientation": "portrait-primary",
+    "categories": ["shopping", "business", "productivity"],
     "icons": [
         {
             "src": "/pwa-192x192.png",
@@ -19,6 +20,22 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "View Orders",
+            "short_name": "Orders",
+            "description": "Open live order management",
+            "url": "/admin/orders",
+            "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Dashboard",
+            "short_name": "Dashboard",
+            "description": "Sales & visitor analytics",
+            "url": "/admin/dashboard",
+            "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
         }
     ]
 }
