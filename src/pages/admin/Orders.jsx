@@ -9,7 +9,12 @@ import {
 } from 'lucide-react';
 import { testTelegramNotification } from '../../lib/telegramNotifier';
 import { supabase } from '../../lib/supabaseClient';
-import { playChaChingSound, vibratePhone } from '../../lib/orderSoundNotifier';
+import { 
+    playChaChingSound, 
+    vibratePhone, 
+    testIosPwaNotification, 
+    testAndroidPwaNotification 
+} from '../../lib/orderSoundNotifier';
 
 // Reusable CopyButton with instant feedback and animated checkmark
 const CopyButton = ({ 
@@ -272,6 +277,8 @@ const AdminOrders = () => {
     const [selectedOrders, setSelectedOrders] = useState([]);
     const [isProcessingBulk, setIsProcessingBulk] = useState(false);
     const [isTestingTelegram, setIsTestingTelegram] = useState(false);
+    const [isTestingIos, setIsTestingIos] = useState(false);
+    const [isTestingAndroid, setIsTestingAndroid] = useState(false);
 
     useEffect(() => {
         fetchOrders();
@@ -551,6 +558,36 @@ const AdminOrders = () => {
         }
     };
 
+    const handleTestIos = async () => {
+        setIsTestingIos(true);
+        try {
+            const res = await testIosPwaNotification();
+            showToast(res.message, res.success ? 'success' : 'info');
+            if (!res.success) {
+                alert(res.message);
+            }
+        } catch (e) {
+            alert('iOS Test Error: ' + e.message);
+        } finally {
+            setIsTestingIos(false);
+        }
+    };
+
+    const handleTestAndroid = async () => {
+        setIsTestingAndroid(true);
+        try {
+            const res = await testAndroidPwaNotification();
+            showToast(res.message, res.success ? 'success' : 'info');
+            if (!res.success) {
+                alert(res.message);
+            }
+        } catch (e) {
+            alert('Android Test Error: ' + e.message);
+        } finally {
+            setIsTestingAndroid(false);
+        }
+    };
+
     const handleTestTelegram = async () => {
         setIsTestingTelegram(true);
         try {
@@ -571,26 +608,37 @@ const AdminOrders = () => {
                     <p className="text-text-muted font-outfit">Review and manage all customer transactions.</p>
                 </div>
                 <div className="flex items-center gap-3 flex-wrap">
+                    {/* iOS PWA Test Button */}
                     <button 
-                        onClick={() => {
-                            playChaChingSound();
-                            vibratePhone();
-                            showToast('Cash Register (Kaching) sound played!', 'success');
-                        }}
-                        title="Test the Cash Register (Kaching) sound and phone vibration"
-                        className="flex items-center gap-2 px-5 py-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-sm font-bold hover:bg-amber-100 transition-all font-outfit uppercase tracking-widest shadow-sm cursor-pointer"
+                        onClick={handleTestIos}
+                        disabled={isTestingIos}
+                        title="Test Cash Register (Kaching) sound & Push Notification on iPhone / iOS PWA"
+                        className="flex items-center gap-2 px-5 py-3 bg-zinc-900 border border-zinc-800 text-white rounded-xl text-sm font-bold hover:bg-zinc-800 transition-all font-outfit uppercase tracking-widest shadow-sm cursor-pointer disabled:opacity-50"
                     >
-                        <span>💰</span>
-                        <span>Test Kaching</span>
+                        <span>🍎</span>
+                        <span>{isTestingIos ? 'Testing iOS...' : 'Test iOS PWA'}</span>
                     </button>
+
+                    {/* Android PWA Test Button */}
+                    <button 
+                        onClick={handleTestAndroid}
+                        disabled={isTestingAndroid}
+                        title="Test Cash Register (Kaching) sound, Vibration & Push Notification on Android PWA"
+                        className="flex items-center gap-2 px-5 py-3 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-xl text-sm font-bold hover:bg-emerald-100 transition-all font-outfit uppercase tracking-widest shadow-sm cursor-pointer disabled:opacity-50"
+                    >
+                        <span>🤖</span>
+                        <span>{isTestingAndroid ? 'Testing Android...' : 'Test Android PWA'}</span>
+                    </button>
+
+                    {/* Telegram Instant Alert Test */}
                     <button 
                         onClick={handleTestTelegram}
                         disabled={isTestingTelegram}
-                        title="Send a test notification to your phone via Telegram Bot"
-                        className="flex items-center gap-2 px-5 py-3 bg-blue-50 border border-blue-200 text-blue-600 rounded-xl text-sm font-bold hover:bg-blue-100 transition-all font-outfit uppercase tracking-widest shadow-sm disabled:opacity-50"
+                        title="Send a test notification to your phone via Telegram Bot (Lock screen alert)"
+                        className="flex items-center gap-2 px-5 py-3 bg-blue-50 border border-blue-200 text-blue-600 rounded-xl text-sm font-bold hover:bg-blue-100 transition-all font-outfit uppercase tracking-widest shadow-sm disabled:opacity-50 cursor-pointer"
                     >
                         <Bell size={16} className={isTestingTelegram ? 'animate-bounce' : ''} />
-                        {isTestingTelegram ? 'Sending Test...' : 'Test Phone Alert'}
+                        {isTestingTelegram ? 'Sending Test...' : 'Test Telegram'}
                     </button>
                     <button className="p-3 bg-white border border-border rounded-xl text-text-muted hover:text-text-main transition-colors">
                         <Search size={20} />

@@ -294,3 +294,174 @@ export const notifyNewOrder = async (order = {}) => {
         }
     }
 };
+
+/**
+ * Dedicated test for iOS PWA
+ */
+export const testIosPwaNotification = async () => {
+    // 1. Play sound
+    playKachingSound();
+
+    const isHttp = typeof window !== 'undefined' && window.location.protocol === 'http:' && window.location.hostname !== 'localhost';
+    const hasNotification = typeof window !== 'undefined' && 'Notification' in window;
+
+    if (!hasNotification) {
+        return {
+            success: false,
+            message: '🍎 iOS Notice: Apple requires launching ChoshmaZone from your iPhone Home Screen icon (tap Share ➔ "Add to Home Screen" in Safari first) to enable push notifications.'
+        };
+    }
+
+    if (isHttp) {
+        return {
+            success: false,
+            message: '⚠️ Apple iOS Security: Apple strictly blocks Web Push on insecure HTTP (http://192.168...). Sound played! To test the notification banner on iPhone, open your HTTPS domain (choshmazone.com or Vercel).'
+        };
+    }
+
+    let permission = Notification.permission;
+    if (permission !== 'granted') {
+        permission = await Notification.requestPermission();
+    }
+
+    if (permission !== 'granted') {
+        return {
+            success: false,
+            message: '🍎 Permission not granted: Please allow notifications when prompted by iOS, or check iPhone Settings ➔ Notifications ➔ ChoshmaZone.'
+        };
+    }
+
+    try {
+        let reg = null;
+        if ('serviceWorker' in navigator) {
+            reg = await navigator.serviceWorker.getRegistration();
+            if (!reg) {
+                reg = await navigator.serviceWorker.register('/sw.js');
+            }
+        }
+
+        const title = '💰 New Order #CZ-1042 (৳1,850)';
+        const options = {
+            body: 'Customer Rakibul just ordered Aviator Gold.\nTap to view details.',
+            icon: '/pwa-192x192.png',
+            badge: '/favicon.svg',
+            tag: 'ios-test-order',
+            data: { url: '/admin/orders' }
+        };
+
+        if (reg && reg.showNotification) {
+            await reg.showNotification(title, options);
+
+            // Schedule a second notification in 5 seconds so user can test lock screen
+            setTimeout(() => {
+                reg.showNotification('🔔 Lock Screen Test: Order #CZ-1043 (৳2,400)', {
+                    body: 'Another order received while screen was locked! Tap to open.',
+                    icon: '/pwa-192x192.png',
+                    tag: 'ios-lockscreen-test',
+                    data: { url: '/admin/orders' }
+                }).catch(() => {});
+            }, 5000);
+
+            return {
+                success: true,
+                message: '🍎 iOS Test Sent! Kaching sound played. Another banner will arrive in 5 seconds — lock your screen now to test lock-screen banner!'
+            };
+        } else {
+            return {
+                success: false,
+                message: '🍎 Service Worker is not active yet. Please make sure the app was launched from the Home Screen.'
+            };
+        }
+    } catch (err) {
+        return {
+            success: false,
+            message: `iOS Error: ${err.message}`
+        };
+    }
+};
+
+/**
+ * Dedicated test for Android PWA
+ */
+export const testAndroidPwaNotification = async () => {
+    // 1. Play sound
+    playKachingSound();
+
+    // 2. Vibrate phone
+    vibratePhone();
+
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+        return {
+            success: false,
+            message: '🤖 Notifications are not supported in this browser.'
+        };
+    }
+
+    let permission = Notification.permission;
+    if (permission !== 'granted') {
+        permission = await Notification.requestPermission();
+    }
+
+    if (permission !== 'granted') {
+        return {
+            success: false,
+            message: '🤖 Permission denied: Please allow notifications in your browser settings.'
+        };
+    }
+
+    try {
+        let reg = null;
+        if ('serviceWorker' in navigator) {
+            reg = await navigator.serviceWorker.getRegistration();
+            if (!reg) {
+                reg = await navigator.serviceWorker.register('/sw.js');
+            }
+        }
+
+        const title = '💰 New Order #CZ-1042 (৳1,850)';
+        const options = {
+            body: 'Customer Rakibul ordered Aviator Classic.\nTap to view full details.',
+            icon: '/pwa-192x192.png',
+            badge: '/favicon.svg',
+            vibrate: [200, 100, 200, 100, 400],
+            tag: 'android-test-order',
+            actions: [
+                { action: 'open', title: '👁️ View Order' },
+                { action: 'dismiss', title: 'Dismiss' }
+            ],
+            data: { url: '/admin/orders' }
+        };
+
+        if (reg && reg.showNotification) {
+            await reg.showNotification(title, options);
+
+            // Schedule delayed notification in 5s so user can minimize/lock screen
+            setTimeout(() => {
+                reg.showNotification('🔔 Background Alert: Order #CZ-1043 (৳3,200)', {
+                    body: 'New order received in background! Tap to view.',
+                    icon: '/pwa-192x192.png',
+                    vibrate: [200, 100, 200, 100, 400],
+                    tag: 'android-bg-test',
+                    data: { url: '/admin/orders' }
+                }).catch(() => {});
+            }, 5000);
+
+            return {
+                success: true,
+                message: '🤖 Android Test Sent! Kaching sound played & phone vibrated. Another banner will arrive in 5s — minimize or lock your phone now to test!'
+            };
+        } else {
+            new Notification(title, options);
+            return {
+                success: true,
+                message: '🤖 Android Window notification displayed & sound played!'
+            };
+        }
+    } catch (err) {
+        return {
+            success: false,
+            message: `Android Error: ${err.message}`
+        };
+    }
+};
+
