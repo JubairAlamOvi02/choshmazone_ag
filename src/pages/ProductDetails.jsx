@@ -332,7 +332,7 @@ const ProductDetails = () => {
                         <ChevronRight size={12} strokeWidth={3} className="text-border" />
                         <Link to="/shop" className="hover:text-primary transition-colors">Shop</Link>
                         <ChevronRight size={12} strokeWidth={3} className="text-border" />
-                        <span className="text-primary truncate max-w-[150px] md:max-w-none">{product.title}</span>
+                        <span className="text-primary truncate max-w-[200px] sm:max-w-xs md:max-w-none">{product.title}</span>
                     </nav>
                 </div>
             </div>
@@ -340,7 +340,7 @@ const ProductDetails = () => {
             <main className="container mx-auto px-4 py-6 md:py-10 pb-24 lg:pb-16 max-w-7xl">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-start">
                     {/* Left: Image Gallery */}
-                    <div className="flex flex-col gap-4 relative lg:sticky top-[72px] lg:top-24 h-fit z-10 bg-white lg:bg-transparent pb-2 lg:pb-0">
+                    <div className="flex flex-col gap-4 lg:sticky lg:top-24 h-fit">
                         <div className="relative group bg-background-alt rounded-2xl overflow-hidden aspect-square w-full flex items-center justify-center border border-border/50 shadow-sm transition-all duration-500 hover:shadow-xl mx-auto">
                             <OptimizedImage
                                 src={mainImage}
@@ -419,7 +419,7 @@ const ProductDetails = () => {
                                 )}
                             </div>
 
-                            <h1 className="text-2xl md:text-3xl xl:text-4xl font-bold text-text-main mb-3 font-outfit leading-[1.1] tracking-tight break-words">
+                            <h1 className="text-2xl md:text-3xl xl:text-4xl font-bold text-text-main mb-3 font-outfit leading-snug md:leading-tight tracking-tight break-words">
                                 {product.title}
                             </h1>
 
