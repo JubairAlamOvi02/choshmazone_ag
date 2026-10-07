@@ -7,6 +7,7 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { orderParams } from '../lib/api/orders';
 import { supabase } from '../lib/supabaseClient';
 import { getDistricts, getThanas, calculateDeliveryCharge } from '../data/bangladeshLocations';
@@ -35,12 +36,14 @@ export const isValidBDPhone = (phone) => {
 const Checkout = () => {
     const { cartItems, cartTotal, clearCart, updateQuantity, resetQuantities, removeFromCart } = useCart();
     const { user } = useAuth();
+    const { showToast } = useToast();
     const navigate = useNavigate();
 
     const [showStockModal, setShowStockModal] = useState(false);
     const [outOfStockItems, setOutOfStockItems] = useState([]);
     const [fieldSettings, setFieldSettings] = useState(DEFAULT_CHECKOUT_FIELD_SETTINGS);
     const [phoneError, setPhoneError] = useState('');
+    const [formErrors, setFormErrors] = useState({});
 
     // Fetch dynamic field settings from Admin Panel
     useEffect(() => {
@@ -113,8 +116,30 @@ const Checkout = () => {
         }
     }, [formData.district]);
 
+    const focusAndScrollToField = (elementId) => {
+        const el = document.getElementById(elementId);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => {
+                try {
+                    el.focus({ preventScroll: true });
+                } catch {
+                    el.focus();
+                }
+            }, 350);
+        }
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
+
+        // Clear errors on change
+        setFormErrors(prev => {
+            if (!prev[name]) return prev;
+            const updated = { ...prev };
+            delete updated[name];
+            return updated;
+        });
 
         if (name === 'phone') {
             const rawVal = value;
@@ -139,6 +164,12 @@ const Checkout = () => {
         // If district changes, reset thana
         if (name === 'district') {
             setFormData(prev => ({ ...prev, [name]: value, thana: '' }));
+            setFormErrors(prev => {
+                const updated = { ...prev };
+                delete updated.district;
+                delete updated.thana;
+                return updated;
+            });
         } else {
             setFormData(prev => ({ ...prev, [name]: value }));
         }
@@ -147,66 +178,107 @@ const Checkout = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 1. Phone number validation (11 digits)
-        const isPhoneRequired = fieldSettings.phone?.required !== false && fieldSettings.phone?.enabled !== false;
+        const errors = {};
+        let firstInvalid = null;
+
+        const recordError = (fieldKey, elementId, message) => {
+            if (!errors[fieldKey]) {
+                errors[fieldKey] = message;
+            }
+            if (!firstInvalid) {
+                firstInvalid = { key: fieldKey, id: elementId, message };
+            }
+        };
+
+        const isFieldRequired = (key, defaultRequired = false) => {
+            const field = fieldSettings[key];
+            if (field?.enabled === false) return false;
+            if (field?.required !== undefined) return Boolean(field.required);
+            return defaultRequired;
+        };
+
+        // 1. Phone number validation
         const cleanPhone = normalizeBDPhone(formData.phone);
-
-        if (isPhoneRequired || formData.phone.trim()) {
+        if (isFieldRequired('phone', true)) {
             if (!formData.phone.trim()) {
-                setPhoneError('Phone number is required');
-                alert('Please enter your phone number.');
-                return;
-            }
-            if (!isValidBDPhone(formData.phone)) {
+                recordError('phone', 'field-phone', 'Please enter your phone number');
+            } else if (!isValidBDPhone(formData.phone)) {
                 if (cleanPhone.length !== 11) {
-                    const msg = `Phone number must be exactly 11 digits (currently ${cleanPhone.length} digits). Example: 01712345678`;
-                    setPhoneError(msg);
-                    alert(msg);
+                    recordError('phone', 'field-phone', `Phone number must be exactly 11 digits (currently ${cleanPhone.length})`);
                 } else {
-                    const msg = 'Please enter a valid Bangladesh mobile number starting with 01 (e.g. 01712345678)';
-                    setPhoneError(msg);
-                    alert(msg);
+                    recordError('phone', 'field-phone', 'Please enter a valid Bangladesh mobile number starting with 01');
                 }
-                return;
             }
+        } else if (formData.phone.trim() && !isValidBDPhone(formData.phone)) {
+            recordError('phone', 'field-phone', 'Please enter a valid Bangladesh mobile number starting with 01');
         }
 
-        // 2. Validate other configured required fields
-        if (fieldSettings.name?.enabled !== false && fieldSettings.name?.required && !formData.name.trim()) {
-            alert('Please enter your full name');
-            return;
-        }
-        if (fieldSettings.address?.enabled !== false && fieldSettings.address?.required && !formData.address.trim()) {
-            alert('Please enter your street address');
-            return;
-        }
-        if (fieldSettings.district?.enabled !== false && fieldSettings.district?.required && !formData.district.trim()) {
-            alert('Please select your delivery district');
-            return;
-        }
-        if (fieldSettings.thana?.enabled !== false && fieldSettings.thana?.required && !formData.thana.trim()) {
-            alert('Please select your Thana / Upazila');
-            return;
-        }
-        if (fieldSettings.email?.enabled !== false && fieldSettings.email?.required && !formData.email.trim()) {
-            alert('Please enter your email address');
-            return;
-        }
-        if (fieldSettings.city?.enabled !== false && fieldSettings.city?.required && !formData.city.trim()) {
-            alert('Please enter your city');
-            return;
-        }
-        if (fieldSettings.zip?.enabled !== false && fieldSettings.zip?.required && !formData.zip.trim()) {
-            alert('Please enter your postal / zip code');
-            return;
+        // 2. Email Address
+        if (isFieldRequired('email', false)) {
+            if (!formData.email.trim()) {
+                recordError('email', 'field-email', 'Please enter your email address');
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+                recordError('email', 'field-email', 'Please enter a valid email address');
+            }
+        } else if (formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+            recordError('email', 'field-email', 'Please enter a valid email address');
         }
 
+        // 3. Full Name
+        if (isFieldRequired('name', true) && !formData.name.trim()) {
+            recordError('name', 'field-name', 'Please enter your full name');
+        }
+
+        // 4. Street Address
+        if (isFieldRequired('address', true) && !formData.address.trim()) {
+            recordError('address', 'field-address', 'Please enter your street address');
+        }
+
+        // 5. District
+        if (isFieldRequired('district', true) && !formData.district.trim()) {
+            recordError('district', 'field-district', 'Please select your delivery district');
+        }
+
+        // 6. Thana / Upazila
+        if (isFieldRequired('thana', false) && !formData.thana.trim()) {
+            recordError('thana', 'field-thana', 'Please select your Thana / Upazila');
+        }
+
+        // 7. City
+        if (isFieldRequired('city', false) && !formData.city.trim()) {
+            recordError('city', 'field-city', 'Please enter your city');
+        }
+
+        // 8. Zip / Postal Code
+        if (isFieldRequired('zip', false) && !formData.zip.trim()) {
+            recordError('zip', 'field-zip', 'Please enter your postal / zip code');
+        }
+
+        // 9. Order Notes
+        if (isFieldRequired('notes', false) && !formData.notes?.trim()) {
+            recordError('notes', 'field-notes', 'Please enter order notes');
+        }
+
+        // 10. Payment Method (bKash)
         if (formData.paymentMethod === 'bkash') {
-            if (!formData.bkashNumber || !formData.bkashTrxId) {
-                alert('Please enter bKash details');
-                return;
+            if (!formData.bkashNumber.trim()) {
+                recordError('bkashNumber', 'field-bkashNumber', 'Please enter your bKash mobile number');
+            }
+            if (!formData.bkashTrxId.trim()) {
+                recordError('bkashTrxId', 'field-bkashTrxId', 'Please enter the bKash Transaction ID (TrxID)');
             }
         }
+
+        if (firstInvalid) {
+            setFormErrors(errors);
+            setPhoneError(errors.phone || '');
+            showToast(firstInvalid.message, 'error');
+            focusAndScrollToField(firstInvalid.id);
+            return;
+        }
+
+        setFormErrors({});
+        setPhoneError('');
 
         setIsSubmitting(true);
 
@@ -401,7 +473,7 @@ const Checkout = () => {
             navigate('/order-success');
         } catch (error) {
             console.error('Error placing order:', error);
-            alert('There was an issue processing your order: ' + error.message);
+            showToast('There was an issue processing your order: ' + error.message, 'error');
         } finally {
             setIsSubmitting(false);
         }
@@ -481,7 +553,7 @@ const Checkout = () => {
             <main className="container mx-auto px-4 py-12 md:py-16">
                 <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-12 lg:gap-20">
                     {/* Left Column: Forms */}
-                    <form onSubmit={handleSubmit} className="flex flex-col">
+                    <form noValidate onSubmit={handleSubmit} className="flex flex-col">
                         {/* Contact Information */}
                         {(fieldSettings.phone?.enabled !== false || fieldSettings.email?.enabled !== false) && (
                             <div className="mb-12">
@@ -493,7 +565,7 @@ const Checkout = () => {
                                     {fieldSettings.phone?.enabled !== false && (
                                         <div className="flex flex-col gap-1.5 w-full">
                                             <div className="flex items-center justify-between ml-1">
-                                                <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit">
+                                                <label htmlFor="field-phone" className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit">
                                                     {fieldSettings.phone?.label || 'Phone Number'}
                                                     {fieldSettings.phone?.required !== false ? (
                                                         <span className="text-error ml-1">*</span>
@@ -515,23 +587,23 @@ const Checkout = () => {
                                             </div>
                                             <div className="relative">
                                                 <input
+                                                    id="field-phone"
                                                     type="tel"
                                                     name="phone"
                                                     placeholder={fieldSettings.phone?.placeholder || '01XXXXXXXXX (11 digits)'}
                                                     value={formData.phone}
                                                     onChange={handleChange}
-                                                    required={fieldSettings.phone?.required !== false}
                                                     className={`
                                                         w-full bg-gray-50 border px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm
-                                                        ${phoneError ? 'border-red-500 bg-red-50' : 'border-border/50'}
+                                                        ${(phoneError || formErrors.phone) ? 'border-red-500 bg-red-50/50 ring-2 ring-red-400/30' : 'border-border/50'}
                                                     `}
                                                 />
                                                 {isValidBDPhone(formData.phone) && (
                                                     <CheckCircle2 size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-600 pointer-events-none" />
                                                 )}
                                             </div>
-                                            {phoneError ? (
-                                                <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider ml-1 font-outfit">{phoneError}</span>
+                                            {(phoneError || formErrors.phone) ? (
+                                                <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider ml-1 font-outfit">{phoneError || formErrors.phone}</span>
                                             ) : (
                                                 <span className="text-[11px] text-text-muted font-outfit ml-1">Must be 11 digits (e.g. 01712345678)</span>
                                             )}
@@ -541,7 +613,7 @@ const Checkout = () => {
                                     {/* Email Field */}
                                     {fieldSettings.email?.enabled !== false && (
                                         <div className="flex flex-col gap-1.5 w-full">
-                                            <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                            <label htmlFor="field-email" className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
                                                 {fieldSettings.email?.label || 'Email Address'}
                                                 {fieldSettings.email?.required ? (
                                                     <span className="text-error ml-1">*</span>
@@ -552,14 +624,19 @@ const Checkout = () => {
                                                 )}
                                             </label>
                                             <input
+                                                id="field-email"
                                                 type="email"
                                                 name="email"
                                                 placeholder={fieldSettings.email?.placeholder || '(Required for order tracking)'}
                                                 value={formData.email}
                                                 onChange={handleChange}
-                                                required={fieldSettings.email?.required}
-                                                className="w-full bg-gray-50 border border-border/50 px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                                className={`w-full bg-gray-50 border px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm ${
+                                                    formErrors.email ? 'border-red-500 bg-red-50/50 ring-2 ring-red-400/30' : 'border-border/50'
+                                                }`}
                                             />
+                                            {formErrors.email && (
+                                                <span className="text-[10px] font-bold text-red-500 font-outfit ml-1">{formErrors.email}</span>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -575,7 +652,7 @@ const Checkout = () => {
                             {/* Full Name */}
                             {fieldSettings.name?.enabled !== false && (
                                 <div className="mb-6 flex flex-col gap-1.5 w-full">
-                                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                    <label htmlFor="field-name" className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
                                         {fieldSettings.name?.label || 'Full Name'}
                                         {fieldSettings.name?.required !== false ? (
                                             <span className="text-error ml-1">*</span>
@@ -584,21 +661,26 @@ const Checkout = () => {
                                         )}
                                     </label>
                                     <input
+                                        id="field-name"
                                         type="text"
                                         name="name"
                                         placeholder={fieldSettings.name?.placeholder || 'Enter your full name'}
                                         value={formData.name}
                                         onChange={handleChange}
-                                        required={fieldSettings.name?.required !== false}
-                                        className="w-full bg-gray-50 border border-border/50 px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                        className={`w-full bg-gray-50 border px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm ${
+                                            formErrors.name ? 'border-red-500 bg-red-50/50 ring-2 ring-red-400/30' : 'border-border/50'
+                                        }`}
                                     />
+                                    {formErrors.name && (
+                                        <span className="text-[10px] font-bold text-red-500 font-outfit ml-1">{formErrors.name}</span>
+                                    )}
                                 </div>
                             )}
 
                             {/* Address */}
                             {fieldSettings.address?.enabled !== false && (
                                 <div className="mb-6 flex flex-col gap-1.5 w-full">
-                                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                    <label htmlFor="field-address" className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
                                         {fieldSettings.address?.label || 'Address'}
                                         {fieldSettings.address?.required !== false ? (
                                             <span className="text-error ml-1">*</span>
@@ -607,14 +689,19 @@ const Checkout = () => {
                                         )}
                                     </label>
                                     <input
+                                        id="field-address"
                                         type="text"
                                         name="address"
                                         placeholder={fieldSettings.address?.placeholder || 'Street address, apartment, etc.'}
                                         value={formData.address}
                                         onChange={handleChange}
-                                        required={fieldSettings.address?.required !== false}
-                                        className="w-full bg-gray-50 border border-border/50 px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                        className={`w-full bg-gray-50 border px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm ${
+                                            formErrors.address ? 'border-red-500 bg-red-50/50 ring-2 ring-red-400/30' : 'border-border/50'
+                                        }`}
                                     />
+                                    {formErrors.address && (
+                                        <span className="text-[10px] font-bold text-red-500 font-outfit ml-1">{formErrors.address}</span>
+                                    )}
                                 </div>
                             )}
 
@@ -623,7 +710,7 @@ const Checkout = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     {fieldSettings.district?.enabled !== false && (
                                         <div className="flex flex-col gap-1.5">
-                                            <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                            <label htmlFor="field-district" className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
                                                 {fieldSettings.district?.label || 'District'}
                                                 {fieldSettings.district?.required !== false ? (
                                                     <span className="text-error ml-1">*</span>
@@ -632,23 +719,28 @@ const Checkout = () => {
                                                 )}
                                             </label>
                                             <select
+                                                id="field-district"
                                                 name="district"
                                                 value={formData.district}
                                                 onChange={handleChange}
-                                                required={fieldSettings.district?.required !== false}
-                                                className="w-full px-4 py-3 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-outfit bg-gray-50 text-sm"
+                                                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-outfit text-sm ${
+                                                    formErrors.district ? 'border-red-500 bg-red-50/50 ring-2 ring-red-400/30' : 'border-border/50 bg-gray-50'
+                                                }`}
                                             >
                                                 <option value="">{fieldSettings.district?.placeholder || 'Select District'}</option>
                                                 {getDistricts().map(district => (
                                                     <option key={district} value={district}>{district}</option>
                                                 ))}
                                             </select>
+                                            {formErrors.district && (
+                                                <span className="text-[10px] font-bold text-red-500 font-outfit ml-1">{formErrors.district}</span>
+                                            )}
                                         </div>
                                     )}
 
                                     {fieldSettings.thana?.enabled !== false && (
                                         <div className="flex flex-col gap-1.5">
-                                            <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                            <label htmlFor="field-thana" className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
                                                 {fieldSettings.thana?.label || 'Thana'}
                                                 {fieldSettings.thana?.required ? (
                                                     <span className="text-error ml-1">*</span>
@@ -657,18 +749,23 @@ const Checkout = () => {
                                                 )}
                                             </label>
                                             <select
+                                                id="field-thana"
                                                 name="thana"
                                                 value={formData.thana}
                                                 onChange={handleChange}
-                                                required={fieldSettings.thana?.required}
                                                 disabled={!formData.district}
-                                                className="w-full px-4 py-3 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-outfit bg-gray-50 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-outfit text-sm disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                                                    formErrors.thana ? 'border-red-500 bg-red-50/50 ring-2 ring-red-400/30' : 'border-border/50 bg-gray-50'
+                                                }`}
                                             >
                                                 <option value="">{fieldSettings.thana?.placeholder || 'Select Thana'}</option>
                                                 {availableThanas.map(thana => (
                                                     <option key={thana} value={thana}>{thana}</option>
                                                 ))}
                                             </select>
+                                            {formErrors.thana && (
+                                                <span className="text-[10px] font-bold text-red-500 font-outfit ml-1">{formErrors.thana}</span>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -679,7 +776,7 @@ const Checkout = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     {fieldSettings.city?.enabled !== false && (
                                         <div className="flex flex-col gap-1.5 w-full">
-                                            <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                            <label htmlFor="field-city" className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
                                                 {fieldSettings.city?.label || 'City'}
                                                 {fieldSettings.city?.required ? (
                                                     <span className="text-error ml-1">*</span>
@@ -688,20 +785,25 @@ const Checkout = () => {
                                                 )}
                                             </label>
                                             <input
+                                                id="field-city"
                                                 type="text"
                                                 name="city"
                                                 placeholder={fieldSettings.city?.placeholder || 'City / Area'}
                                                 value={formData.city}
                                                 onChange={handleChange}
-                                                required={fieldSettings.city?.required}
-                                                className="w-full bg-gray-50 border border-border/50 px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                                className={`w-full bg-gray-50 border px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm ${
+                                                    formErrors.city ? 'border-red-500 bg-red-50/50 ring-2 ring-red-400/30' : 'border-border/50'
+                                                }`}
                                             />
+                                            {formErrors.city && (
+                                                <span className="text-[10px] font-bold text-red-500 font-outfit ml-1">{formErrors.city}</span>
+                                            )}
                                         </div>
                                     )}
 
                                     {fieldSettings.zip?.enabled !== false && (
                                         <div className="flex flex-col gap-1.5 w-full">
-                                            <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                            <label htmlFor="field-zip" className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
                                                 {fieldSettings.zip?.label || 'Zip / Postal Code'}
                                                 {fieldSettings.zip?.required ? (
                                                     <span className="text-error ml-1">*</span>
@@ -710,14 +812,19 @@ const Checkout = () => {
                                                 )}
                                             </label>
                                             <input
+                                                id="field-zip"
                                                 type="text"
                                                 name="zip"
                                                 placeholder={fieldSettings.zip?.placeholder || 'Postal code'}
                                                 value={formData.zip}
                                                 onChange={handleChange}
-                                                required={fieldSettings.zip?.required}
-                                                className="w-full bg-gray-50 border border-border/50 px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm"
+                                                className={`w-full bg-gray-50 border px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm ${
+                                                    formErrors.zip ? 'border-red-500 bg-red-50/50 ring-2 ring-red-400/30' : 'border-border/50'
+                                                }`}
                                             />
+                                            {formErrors.zip && (
+                                                <span className="text-[10px] font-bold text-red-500 font-outfit ml-1">{formErrors.zip}</span>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -726,7 +833,7 @@ const Checkout = () => {
                             {/* Order Notes */}
                             {fieldSettings.notes?.enabled !== false && (
                                 <div className="flex flex-col gap-1.5 w-full">
-                                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
+                                    <label htmlFor="field-notes" className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit ml-1">
                                         {fieldSettings.notes?.label || 'Order Notes'}
                                         {fieldSettings.notes?.required ? (
                                             <span className="text-error ml-1">*</span>
@@ -735,14 +842,19 @@ const Checkout = () => {
                                         )}
                                     </label>
                                     <textarea
+                                        id="field-notes"
                                         name="notes"
                                         rows={2}
                                         placeholder={fieldSettings.notes?.placeholder || 'Notes about your order (e.g. special delivery instructions)'}
                                         value={formData.notes || ''}
                                         onChange={handleChange}
-                                        required={fieldSettings.notes?.required}
-                                        className="w-full bg-gray-50 border border-border/50 px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm resize-none"
+                                        className={`w-full bg-gray-50 border px-4 py-3 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-outfit text-sm resize-none ${
+                                            formErrors.notes ? 'border-red-500 bg-red-50/50 ring-2 ring-red-400/30' : 'border-border/50'
+                                        }`}
                                     />
+                                    {formErrors.notes && (
+                                        <span className="text-[10px] font-bold text-red-500 font-outfit ml-1">{formErrors.notes}</span>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -797,20 +909,22 @@ const Checkout = () => {
                                         </p>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <Input
+                                                id="field-bkashNumber"
                                                 label="bKash Number"
                                                 name="bkashNumber"
                                                 placeholder="017XXXXXXXX"
                                                 value={formData.bkashNumber}
                                                 onChange={handleChange}
-                                                required
+                                                error={formErrors.bkashNumber}
                                             />
                                             <Input
+                                                id="field-bkashTrxId"
                                                 label="Transaction ID (TrxID)"
                                                 name="bkashTrxId"
                                                 placeholder="8N7..."
                                                 value={formData.bkashTrxId}
                                                 onChange={handleChange}
-                                                required
+                                                error={formErrors.bkashTrxId}
                                             />
                                         </div>
                                     </div>
