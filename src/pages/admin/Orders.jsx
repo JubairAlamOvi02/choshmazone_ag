@@ -8,6 +8,7 @@ import {
     Copy, Check, Truck, Image as ImageIcon 
 } from 'lucide-react';
 import { testTelegramNotification } from '../../lib/telegramNotifier';
+import { testNtfyNotification, getNtfyTopic } from '../../lib/ntfyNotifier';
 import { supabase } from '../../lib/supabaseClient';
 import { 
     playChaChingSound, 
@@ -279,6 +280,9 @@ const AdminOrders = () => {
     const [isTestingTelegram, setIsTestingTelegram] = useState(false);
     const [isTestingIos, setIsTestingIos] = useState(false);
     const [isTestingAndroid, setIsTestingAndroid] = useState(false);
+    const [isTestingNtfy, setIsTestingNtfy] = useState(false);
+    const [showNtfyModal, setShowNtfyModal] = useState(false);
+    const ntfyTopic = getNtfyTopic();
 
     useEffect(() => {
         fetchOrders();
@@ -600,6 +604,23 @@ const AdminOrders = () => {
         }
     };
 
+    const handleTestNtfy = async () => {
+        setIsTestingNtfy(true);
+        try {
+            const res = await testNtfyNotification();
+            showToast(res.message, res.success ? 'success' : 'error');
+            if (res.success) {
+                alert(`🚀 ${res.message}\n\nMake sure your phone is subscribed to topic:\n👉 ${res.topic}`);
+            } else {
+                alert('Test failed: ' + res.message);
+            }
+        } catch (e) {
+            alert('Failed to send ntfy test: ' + e.message);
+        } finally {
+            setIsTestingNtfy(false);
+        }
+    };
+
     return (
         <div className="animate-in fade-in duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
@@ -639,6 +660,16 @@ const AdminOrders = () => {
                     >
                         <Bell size={16} className={isTestingTelegram ? 'animate-bounce' : ''} />
                         {isTestingTelegram ? 'Sending Test...' : 'Test Telegram'}
+                    </button>
+
+                    {/* ntfy Instant Phone Push Setup & Test */}
+                    <button 
+                        onClick={() => setShowNtfyModal(true)}
+                        title="Setup & Test real-time lock screen phone alerts on Android & iPhone (ntfy)"
+                        className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-sm font-bold hover:brightness-110 transition-all font-outfit uppercase tracking-widest shadow-md cursor-pointer"
+                    >
+                        <span>📲</span>
+                        <span>Phone Alerts (ntfy)</span>
                     </button>
                     <button className="p-3 bg-white border border-border rounded-xl text-text-muted hover:text-text-main transition-colors">
                         <Search size={20} />
@@ -1239,6 +1270,128 @@ const AdminOrders = () => {
                             alt="Product Preview"
                             className="rounded-3xl shadow-2xl max-h-[80vh] object-contain bg-white p-4"
                         />
+                    </div>
+                </div>
+            )}
+
+            {/* ntfy Setup & Test Modal */}
+            {showNtfyModal && (
+                <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+                    <div
+                        className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300"
+                        onClick={() => setShowNtfyModal(false)}
+                    ></div>
+                    <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl p-6 sm:p-8 animate-in zoom-in-95 duration-300 border border-zinc-100 max-h-[92vh] overflow-y-auto">
+                        <button
+                            onClick={() => setShowNtfyModal(false)}
+                            className="absolute top-6 right-6 p-2 rounded-full hover:bg-zinc-100 text-zinc-400 hover:text-zinc-800 transition-colors"
+                        >
+                            <X size={20} />
+                        </button>
+
+                        <div className="flex items-center gap-3 mb-4">
+                            <span className="text-3xl">📲</span>
+                            <div>
+                                <h2 className="text-xl font-extrabold text-zinc-900 font-outfit uppercase tracking-tight">
+                                    Instant Phone Notifications
+                                </h2>
+                                <p className="text-xs text-zinc-500 font-outfit">
+                                    Shopify-style lock screen push alerts for Android & iPhone via <b>ntfy</b> (100% Free)
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4 my-6 font-outfit text-sm">
+                            {/* Step 1 */}
+                            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-4">
+                                <div className="flex items-center gap-2 font-bold text-zinc-800 mb-2">
+                                    <span className="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs">1</span>
+                                    Install the free <b>ntfy</b> app on your phone
+                                </div>
+                                <p className="text-xs text-zinc-600 mb-3">
+                                    Download <b>ntfy</b> from your phone's official store (no signup or account needed):
+                                </p>
+                                <div className="flex gap-2 flex-wrap">
+                                    <a
+                                        href="https://play.google.com/store/apps/details?id=io.heckel.ntfy"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-zinc-900 text-white rounded-xl text-xs font-bold hover:bg-zinc-800 transition-colors"
+                                    >
+                                        <span>🤖 Google Play (Android)</span>
+                                        <ExternalLink size={12} />
+                                    </a>
+                                    <a
+                                        href="https://apps.apple.com/app/ntfy/id1625396347"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-zinc-900 text-white rounded-xl text-xs font-bold hover:bg-zinc-800 transition-colors"
+                                    >
+                                        <span>🍎 App Store (iPhone)</span>
+                                        <ExternalLink size={12} />
+                                    </a>
+                                </div>
+                            </div>
+
+                            {/* Step 2 */}
+                            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-4">
+                                <div className="flex items-center gap-2 font-bold text-zinc-800 mb-2">
+                                    <span className="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs">2</span>
+                                    Subscribe to your store's private topic
+                                </div>
+                                <p className="text-xs text-zinc-600 mb-2">
+                                    Open the app, tap <b>"+" (Add Topic)</b>, and enter this topic name:
+                                </p>
+                                <div className="flex items-center justify-between gap-2 p-3 bg-white border border-amber-300 rounded-xl">
+                                    <code className="font-mono font-bold text-amber-800 text-sm select-all">
+                                        {ntfyTopic}
+                                    </code>
+                                    <CopyButton
+                                        text={ntfyTopic}
+                                        label="Copy"
+                                        className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-lg text-xs font-bold"
+                                    />
+                                </div>
+                                <div className="mt-2 text-[11px] text-zinc-500">
+                                    💡 Or open directly in your phone browser:{' '}
+                                    <a
+                                        href={`https://ntfy.sh/${ntfyTopic}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 underline font-mono"
+                                    >
+                                        ntfy.sh/{ntfyTopic}
+                                    </a>
+                                </div>
+                            </div>
+
+                            {/* Step 3 */}
+                            <div className="bg-amber-50/60 border border-amber-200 rounded-2xl p-4">
+                                <div className="flex items-center gap-2 font-bold text-amber-900 mb-2">
+                                    <span className="w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs">3</span>
+                                    Test your phone's notification
+                                </div>
+                                <p className="text-xs text-amber-800 mb-3">
+                                    Tap the button below. Your phone will immediately receive a high-priority order alert with sound, customer info, and quick-call buttons!
+                                </p>
+                                <button
+                                    onClick={handleTestNtfy}
+                                    disabled={isTestingNtfy}
+                                    className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer disabled:opacity-50 text-sm"
+                                >
+                                    <span>{isTestingNtfy ? '🚀 Dispatched...' : '🔔 Send Test Alert to My Phone Now'}</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="text-center">
+                            <button
+                                onClick={() => setShowNtfyModal(false)}
+                                className="text-xs text-zinc-400 hover:text-zinc-600 font-semibold"
+                            >
+                                Done / Close Window
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

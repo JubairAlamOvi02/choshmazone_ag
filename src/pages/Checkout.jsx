@@ -12,6 +12,7 @@ import { orderParams } from '../lib/api/orders';
 import { supabase } from '../lib/supabaseClient';
 import { getDistricts, getThanas, calculateDeliveryCharge } from '../data/bangladeshLocations';
 import { sendTelegramOrderNotification } from '../lib/telegramNotifier';
+import { sendNtfyOrderNotification } from '../lib/ntfyNotifier';
 import { settingsParams, DEFAULT_CHECKOUT_FIELD_SETTINGS } from '../lib/api/settings';
 import { trackEvent } from '../lib/tracker';
 import { compressImage } from '../lib/imageCompressor';
@@ -429,6 +430,19 @@ const Checkout = () => {
                 orderDate: now.toLocaleDateString(),
                 orderTime: now.toLocaleTimeString()
             }).catch(err => console.error("Telegram notification failed:", err));
+
+            // Send real-time phone push notification via ntfy (Works on iOS & Android lock screen)
+            sendNtfyOrderNotification({
+                orderId: orderDisplayId,
+                customerName: formData.name.trim() || 'Valued Customer',
+                phone: cleanPhone || formData.phone,
+                address: formData.address,
+                district: formData.district,
+                thana: formData.thana,
+                totalAmount: totalWithDelivery,
+                paymentMethod: formData.paymentMethod,
+                items: preparedItems
+            }).catch(err => console.error("ntfy notification failed:", err));
 
             fetch(import.meta.env.VITE_GOOGLE_SCRIPT_URL, {
                 method: 'POST',
