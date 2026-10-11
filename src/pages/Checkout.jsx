@@ -776,6 +776,9 @@ const Checkout = () => {
                                                 {availableThanas.map(thana => (
                                                     <option key={thana} value={thana}>{thana}</option>
                                                 ))}
+                                                {availableThanas.length > 0 && (
+                                                    <option value="Other">Other / অন্যান্য</option>
+                                                )}
                                             </select>
                                             {formErrors.thana && (
                                                 <span className="text-[10px] font-bold text-red-500 font-outfit ml-1">{formErrors.thana}</span>
