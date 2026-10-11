@@ -457,6 +457,10 @@
   - Added CLI export script (`export_woocommerce.js`) and npm script `npm run export:woocommerce` in `package.json`.
   - Generated initial catalog export file `choshmazone_woocommerce_export_2026-10-01.csv` containing all 25 products and 49 CSV rows.
 
-
-
-
+- Task 97 (Nationwide Bangladesh 64 Districts & Steadfast Courier Coverage): Completed
+  - Expanded `src/data/bangladeshLocations.js` from 23 limited districts to the complete nationwide database covering all **64 districts** of Bangladesh + Dhaka Sub-Urban.
+  - Added comprehensive coverage of over **500+ thanas and upazilas** matching Steadfast Courier's full delivery network, including both administrative upazilas and major metropolitan police stations (Dhaka, Chittagong, Rajshahi, Khulna, Sylhet, Barisal, Rangpur, Mymensingh, etc.).
+  - Added seamless dual-spelling aliases for modern and traditional transliterations (`Chattogram` ↔ `Chittagong`, `Bogura` ↔ `Bogra`, `Jashore` ↔ `Jessore`, `Cumilla` ↔ `Comilla`, `Barishal` ↔ `Barisal`, `Coxsbazar` ↔ `Cox's Bazar`, `Jhalakathi` ↔ `Jhalokati`) allowing customers to find their home district under either naming convention.
+  - Implemented an `Other / অন্যান্য` fallback option in the Thana selection dropdown in `src/pages/Checkout.jsx` to ensure customers in remote unions or newly declared zones are never blocked by form validation.
+  - Maintained delivery charge calculation logic (Dhaka inside ৳70, Outside Dhaka & Sub-Urban ৳120) and courier copy formatting in `Orders.jsx` adhering strictly to Steadfast / Pathao / RedX parcel booking formats.
+  - Validated zero errors via `npm run build`.

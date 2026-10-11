@@ -21,7 +21,7 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 - **Product Details Page**: High-resolution interactive image gallery with thumbnail support, floating navigation arrows, detailed rich text descriptions, specifications, custom Prescription Lens selection modal, and "Add to Bag" / "Buy Now" controls.
 - **Optical Prescription Flow**: Dedicated lens package selection (Single Vision, Blue Cut, Photochromic, Progressive) with 3 prescription submission flows (Slip Upload, Manual SPH/CYL/AXIS/PD matrix, WhatsApp Later).
 - **Shopping Cart**: Review selected items, adjust quantities, view lens package details, and dynamic subtotal calculation.
-- **Checkout Flow**: Dynamic guest/user checkout with configurable required/optional fields, strict 11-digit Bangladesh phone number validation (`013`–`019`) with live character counter, shipping information with district-based delivery charges (৳60 for Dhaka, ৳120 for other districts), item removal directly from order summary, optional Order Notes, and payment integration (Support for **bKash** and **Cash on Delivery**).
+- **Checkout Flow**: Dynamic guest/user checkout with configurable required/optional fields, strict 11-digit Bangladesh phone number validation (`013`–`019`) with live character counter, complete nationwide coverage across all **64 districts** and **500+ thanas/upazilas** aligned with Steadfast Courier (with `Other / অন্যান্য` fallback), district-based delivery charges (৳70 for Dhaka, ৳120 for outside Dhaka & sub-urban), item removal directly from order summary, optional Order Notes, and payment integration (Support for **bKash** and **Cash on Delivery**).
 - **User Portal**:
     - Registration and Login system.
     - View Order History and Profile.

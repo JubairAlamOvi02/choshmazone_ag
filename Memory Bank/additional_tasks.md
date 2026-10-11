@@ -403,6 +403,11 @@
     - [x] Added `export_woocommerce.js` and `npm run export:woocommerce` script in `package.json`.
     - [x] Pre-generated ready-to-import CSV `choshmazone_woocommerce_export_2026-10-01.csv`.
 
-
-
-
+## Phase 37: Nationwide 64 Districts & Steadfast Courier Coverage
+- [x] **Complete 64 Districts Geocoding & Logistics Expansion**:
+    - [x] Integrated all 64 official administrative districts of Bangladesh + Dhaka Sub-Urban in `src/data/bangladeshLocations.js`.
+    - [x] Integrated 500+ thanas and upazilas covering Steadfast Courier's full delivery reach.
+    - [x] Mapped dual-transliteration aliases (`Chattogram` ↔ `Chittagong`, `Bogura` ↔ `Bogra`, `Jashore` ↔ `Jessore`, `Cumilla` ↔ `Comilla`, `Barishal` ↔ `Barisal`, `Coxsbazar` ↔ `Cox's Bazar`, `Jhalakathi` ↔ `Jhalokati`).
+- [x] **Checkout Safety Fallback & Validation Polish**:
+    - [x] Added `Other / অন্যান্য` option to the Thana dropdown in `src/pages/Checkout.jsx` to prevent any checkout blockers for remote unions.
+    - [x] Preserved delivery charge logic (Inside Dhaka: ৳70, Outside Dhaka & Sub-Urban: ৳120).
