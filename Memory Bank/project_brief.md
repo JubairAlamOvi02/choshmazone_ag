@@ -36,8 +36,13 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
     - **Lens Packages Management**: Full CRUD, pricing, feature list, active toggle, and reordering for optical lens packages at `/admin/lenses`.
     - **Checkout Form Settings**: Full control at `/admin/settings` to toggle Required vs Optional and Shown vs Hidden for every checkout field (`name`, `phone`, `email`, `address`, `district`, `thana`, `city`, `zip`, `notes`), plus custom label/placeholder management.
     - **Order Management**: Monitor sales, update statuses, administrative deletion, view attached prescription slips/details, clickable rows for direct detail viewing, and Comprehensive Order Details Modal.
-    - **Real-Time Mobile Alerts**: Instant push notifications with sound directly to the store owner's phone via Telegram Bot on new orders, plus a built-in "Test Phone Alert" feature in the Admin panel.
-    - **Media & Content Manager (CMS)**: Manage global assets, customize Homepage Hero Banner (headline typography, gold accent highlight, subtext, background photography, and button design dropdown selectors for color/shape/size/icon) with Live Homepage Preview, edit Promotional Banner copy/imagery, customize Collections hero banner, and configure category collection artwork.
+    - **Real-Time Order Alerting Suite**: 
+        - **Cash Register Audio Chime**: Web Audio API tone synthesis and audio playback (`/sounds/cha-ching.mp3`) producing an authentic "Cha-Ching!" sound and device vibration on new orders.
+        - **Live Floating Admin Banner**: Supabase Realtime PostgreSQL subscription displaying animated order popups and unread counter badge.
+        - **ntfy.sh Mobile Push Alerts**: Zero-cost, zero-setup push alerts to Android & iOS with interactive `View Order` and `Call Customer` action buttons.
+        - **Telegram Bot**: Instant Markdown notifications with interactive inline keyboard buttons for immediate response.
+    - **Media & Content Manager (CMS)**: Manage global assets, customize Homepage Hero Banner (headline typography, gold accent highlight, subtext, background photography, and button design dropdown selectors for color/shape/size/icon) with Live Homepage Preview, edit Promotional Banner copy/imagery, customize Collections hero banner, configure category collection artwork, and customize the **Contact Us Page** (Heading, Subtitle, Showroom Address, Email Support, Hotline) with live interactive preview.
+    - **Facebook Catalog Feed**: Automated XML feed (`api/catalog.js`) compliant with Meta Commerce Manager for dynamic product catalog syncing and Facebook/Instagram Shop integration.
     - **Category & Collection Control**: Manage dynamic store categories with active/deactivation state toggles (`Active` vs `Deactivated`) to temporarily hide categories without deleting, instant "Featured" toggling (★ / ☆), and live category status tab filters.
     - **Customer Management**: View registered user list and roles.
     - **Web Log & Funnel Analytics**: Dedicated real-time dashboard at `/admin/web-logs` tracking unique visitors, page views, conversion funnel milestones (Product View $\rightarrow$ Add to Cart $\rightarrow$ Checkout $\rightarrow$ Purchase) with drop-off percentages, Recharts area trends, device breakdown, high-demand cart items, and live event log table with JSON metadata inspector.
@@ -54,7 +59,8 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 
 ## 6. Chosen Tech Stack
 - **Frontend**: React (Vite), Lucide Icons, Tailwind CSS v4.
-- **Backend/Data**: **Supabase** (PostgreSQL, Auth, Storage).
+- **Backend/Data**: **Supabase** (PostgreSQL, Realtime, Auth, Storage).
 - **Redundancy & Email**: Google Sheets Integration for order backups + Google Apps Script for transactional emails.
-- **Mobile Notification**: Telegram Bot API for instant sound alerts on phone.
+- **Mobile Notification & Audio Alerts**: ntfy.sh push notification protocol, Web Audio API Cha-Ching synthesizer, and Telegram Bot API with inline keyboards.
+
 

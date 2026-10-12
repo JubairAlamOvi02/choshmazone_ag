@@ -411,3 +411,41 @@
 - [x] **Checkout Safety Fallback & Validation Polish**:
     - [x] Added `Other / অন্যান্য` option to the Thana dropdown in `src/pages/Checkout.jsx` to prevent any checkout blockers for remote unions.
     - [x] Preserved delivery charge logic (Inside Dhaka: ৳70, Outside Dhaka & Sub-Urban: ৳120).
+
+## Phase 38: Facebook Catalog XML Serialization & Meta URL Sanitization
+- [x] **Meta Product Feed Entity Encoding (`api/catalog.js`)**:
+    - [x] Added rigorous XML character escaping for reserved characters (`&`, `<`, `>`, `"`, `'`).
+    - [x] Sanitized high-resolution product imagery and deep-link product URLs for error-free Meta Catalog sync.
+    - [x] Validated standard Google/Meta product RSS namespace tags (`<g:id>`, `<g:title>`, `<g:link>`, `<g:price>`, `<g:availability>`).
+
+## Phase 39: Real-Time Order Audio Notifications & Floating Banner
+- [x] **Audio Notifier & Cash Register Chime (`orderSoundNotifier.js`)**:
+    - [x] Built hybrid audio engine combining Web Audio API tone synthesis and `/sounds/cha-ching.mp3` for audible "Cha-Ching!" alerts.
+    - [x] Added vibration pattern triggers on mobile phones and browser desktop push notifications.
+    - [x] Implemented Web Audio autoplay unlocking (`unlockAudio`) on first click.
+- [x] **Admin Real-Time Order Toast & Sound Toggle (`AdminLayout.jsx`)**:
+    - [x] Connected Supabase real-time channel (`admin_realtime_orders_layout`) listening for `INSERT` events on `orders`.
+    - [x] Added floating animated toast banner displaying customer name and order amount.
+    - [x] Integrated audio mute toggle (`Volume2`/`VolumeX`) with local storage persistence.
+
+## Phase 40: ntfy.sh Real-Time Mobile Push Notification Engine
+- [x] **Zero-Cost Instant Mobile Push Alerts (`ntfyNotifier.js`)**:
+    - [x] Integrated ntfy.sh push notification protocol with support for iOS and Android via the free ntfy mobile app.
+    - [x] Configured rich notification payloads with priority tags, cash emoji, and direct action buttons (`View Order`, `Call Customer`).
+    - [x] Automated push dispatch on order placement in `Checkout.jsx`.
+    - [x] Added interactive "Test ntfy Notification" diagnostic tool in `Orders.jsx`.
+
+## Phase 41: Interactive Telegram Bot Order Notifications
+- [x] **Telegram Inline Keyboard Buttons (`telegramNotifier.js`)**:
+    - [x] Enhanced Telegram order notifications with interactive `inline_keyboard` buttons.
+    - [x] Added one-tap action buttons: `👁 View Order` (opens admin) and `📞 Call Customer` (dials customer mobile directly).
+    - [x] Formatted order breakdown with bold styling, order ID, items list, bKash transaction/COD details, and full delivery address.
+
+## Phase 42: Dynamic Contact Page CMS & Media Manager Overhaul
+- [x] **Customizable Contact Page CMS (`Contact.jsx` & `MediaManager.jsx`)**:
+    - [x] Refactored `/contact` to dynamically render heading, subtitle, showroom address, email support, and hotline number from `site_settings`.
+    - [x] Implemented synchronous cache reads to eliminate initial page load layout shifts.
+    - [x] Added multi-line address support (`whitespace-pre-line`) and clickable `mailto:` / `tel:` links.
+    - [x] Built **Section 6: Contact & Support Details** in `MediaManager.jsx` with real-time live preview mirroring the public contact page.
+    - [x] Added quick-jump pill navigation in Media & Content Manager and cross-link card in `CheckoutSettings.jsx`.
+

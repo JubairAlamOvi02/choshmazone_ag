@@ -464,3 +464,69 @@
   - Implemented an `Other / অন্যান্য` fallback option in the Thana selection dropdown in `src/pages/Checkout.jsx` to ensure customers in remote unions or newly declared zones are never blocked by form validation.
   - Maintained delivery charge calculation logic (Dhaka inside ৳70, Outside Dhaka & Sub-Urban ৳120) and courier copy formatting in `Orders.jsx` adhering strictly to Steadfast / Pathao / RedX parcel booking formats.
   - Validated zero errors via `npm run build`.
+
+- Task 98 (Facebook Catalog XML Feed Sanitization & RFC URL Escaping): Completed
+  - Hardened Meta/Facebook Catalog XML feed generator (`api/catalog.js`).
+  - Added strict XML entity sanitization replacing raw `&`, `<`, `>`, `"`, and `'` to prevent XML parsing syntax errors in Meta Commerce Manager.
+  - Properly escaped special characters in product URLs and image links.
+  - Ensured correct RSS/Atom feed headers, availability codes (`in stock` / `out of stock`), and item condition tags.
+
+- Task 99 (Meta Pixel Conversion & Tracking Hardening): Completed
+  - Verified Meta Pixel script tags and standard events (`PageView`, `ViewContent`, `AddToCart`, `InitiateCheckout`, `Purchase`) in `index.html`.
+  - Fixed HTML5 parsing warnings by placing fallback `<noscript><img ...></noscript>` tags safely inside the document `<body>`.
+
+- Task 100 (Real-Time Order Sound Notifier & In-App Cash Register Chime): Completed
+  - Implemented audio notification engine (`src/lib/orderSoundNotifier.js`) combining Web Audio API synthesized tones and dedicated audio files (`/sounds/cha-ching.mp3`, `/sounds/kaching.mp3`).
+  - Automatically plays authentic "Cha-Ching!" cash register chime (`playChaChingSound`) whenever a new order is detected.
+  - Triggered hardware vibration on supported mobile devices (`vibratePhone`: `[200, 100, 200, 100, 400]`).
+  - Added Web Audio auto-unlock listener (`unlockAudio`) on initial user interaction to bypass modern browser autoplay restrictions.
+  - Integrated system/browser desktop notifications (`notifyNewOrder`) with sound and custom app icons.
+
+- Task 101 (Supabase Real-Time Order Subscription & Live Floating Toast): Completed
+  - Subscribed to Supabase PostgreSQL real-time replication (`postgres_changes` event `INSERT` on table `public.orders`) in `src/layouts/AdminLayout.jsx`.
+  - Designed an animated floating toast banner in the Admin panel displaying incoming order details, customer name, total amount, and quick-action links.
+  - Added sound toggle controls (`Volume2` / `VolumeX`) with local storage persistence (`admin_order_sound`).
+  - Built a real-time notification history dropdown tracking the latest 20 incoming alerts with unread counter badge.
+  - Provided `enable_orders_realtime.sql` script to activate replication on `public.orders`.
+
+- Task 102 (ntfy.sh Real-Time Instant Phone Push Notifications): Completed
+  - Implemented `src/lib/ntfyNotifier.js` utilizing the lightweight, open-source ntfy.sh protocol for free phone push notifications.
+  - Direct delivery to Android and iOS devices with high-priority tags, custom sound, and emoji indicators.
+  - Added interactive actionable buttons: `View Order` (opens admin order details) and `Call Customer` (dials the customer's phone number directly).
+  - Integrated automated dispatch on order placement in `src/pages/Checkout.jsx`.
+  - Added interactive "Test ntfy Notification" button with connection diagnostic feedback in `src/pages/admin/Orders.jsx`.
+  - Configured `VITE_NTFY_TOPIC` in `.env` for zero-setup, zero-cost push alerts.
+
+- Task 103 (Interactive Telegram Order Notifications with Inline Action Buttons): Completed
+  - Enhanced `src/lib/telegramNotifier.js` with Telegram Bot API `inline_keyboard` markup.
+  - Added direct tap-to-act buttons on Telegram messages:
+    - 👁️ **View Order**: Direct URL to order details in the admin dashboard.
+    - 📞 **Call Customer**: Clickable `tel:` action for instant phone calling.
+  - Refined message formatting with Markdown styling, total price, order items summary, and delivery location.
+
+- Task 104 (Checkout Feedback Toast Notification & Mobile Viewport Polish): Completed
+  - Upgraded order submission feedback in `src/pages/Checkout.jsx` with non-blocking toast alerts via `ToastContext`.
+  - Fixed mobile screen text truncation and phone number container wrapping in `src/pages/ProductDetails.jsx`.
+  - Tuned viewport configuration in `index.html` for enhanced touch responsiveness and screen protector sensitivity.
+
+- Task 105 (Dynamic Contact Page CMS & Admin Live Preview Customizer): Completed
+  - Converted the static Contact page (`src/pages/Contact.jsx`) into a fully database-driven CMS module.
+  - Extended `src/lib/api/settings.js` with `DEFAULT_CONTACT_SETTINGS`, `getContactSettings()`, and `saveContactSettings()`.
+  - Synchronous cache read prevents any layout shift on initial page load.
+  - Showroom address supports clean multi-line display (`whitespace-pre-line`).
+  - Added clickable `mailto:` and `tel:` links for immediate customer interaction.
+  - Built **Section 6: Contact & Support Information** in `src/pages/admin/MediaManager.jsx` with a real-time Live Preview card mirroring the public layout.
+  - Enables editing:
+    - Main heading (e.g., `GET IN TOUCH`)
+    - Subtitle / intro paragraph
+    - Showroom title and multi-line address
+    - Email support title and email address
+    - Hotline title and phone number
+  - Added quick-jump pill navigation bar at the top of Media & Content Manager.
+  - Renamed sidebar item to "Media & Content" in `src/layouts/AdminLayout.jsx`.
+  - Added a direct cross-link card in `src/pages/admin/CheckoutSettings.jsx` to navigate directly to Contact settings.
+
+- Task 106 (High-Resolution Asset Refresh): Completed
+  - Added updated high-resolution product and branding imagery in `src/assets/`.
+  - Maintained complete build integrity with `npm run build` exiting code 0.
+

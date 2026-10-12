@@ -121,6 +121,24 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **Sub-100KB Target Budget**: Iterative quality reduction algorithm ensuring uploaded images stay under ~100 KB with 1200px max dimensions (1920px for wide banners) while preserving aspect ratio and PNG alpha transparency.
     - **Unified Upload Interceptors**: Auto-compresses images across `productParams.uploadImage`, `settingsParams.uploadAsset`, `ProductForm.jsx`, `MediaManager.jsx`, `Categories.jsx`, and `Checkout.jsx` (prescription uploads).
     - **Long-Lived Edge & Browser Caching**: Standardized `cacheControl: '31536000, public'` (1 year) headers across all Supabase Storage uploads, reducing Supabase Cached Egress by 95-98% and fitting easily within the 5 GB/month free tier.
+- **Real-Time Order Sound & Web Audio Engine**:
+    - **Cash Register Chime (`src/lib/orderSoundNotifier.js`)**: Web Audio API tone synthesis and audio playback (`/sounds/cha-ching.mp3`) producing an authentic "Cha-Ching!" sound whenever an order is submitted.
+    - **Browser Autoplay Bypass (`unlockAudio`)**: AudioContext unlock event listeners on initial user click to guarantee audible alerts without browser autoplay blocks.
+    - **Mobile Hardware Vibration (`vibratePhone`)**: Triggers multi-burst vibration on supported smartphones (`navigator.vibrate([200, 100, 200, 100, 400])`).
+    - **Live Floating Order Banner (`AdminLayout.jsx`)**: Supabase Realtime channel subscription with animated banner, customer name, total amount, and volume mute toggle.
+- **ntfy.sh Mobile Push Notification Protocol**:
+    - **Zero-Cost Instant Push Service (`src/lib/ntfyNotifier.js`)**: Delivers real-time notifications to store owners via the free open-source ntfy mobile app on Android & iOS without requiring paid Apple Developer accounts or Firebase credentials.
+    - **Interactive Action Buttons**: Directly embeds `View Order` (opens admin order details) and `Call Customer` (`tel:` direct phone dialer) action buttons into the phone's notification shade.
+- **Telegram Bot API with Interactive Inline Keyboards**:
+    - **Instant Order Dispatch (`src/lib/telegramNotifier.js`)**: Dispatches detailed Markdown order summaries with customer info, payment method, and itemized lists to Telegram.
+    - **Inline Keyboard Markup (`inline_keyboard`)**: Interactive tap-to-act buttons for one-tap admin order review and instant customer phone calling.
+- **Dynamic Contact Page CMS & Media Manager Suite**:
+    - **Database-Driven Contact Us (`src/pages/Contact.jsx`)**: Synchronously cached and dynamically fetched heading, subtitle, showroom title & multi-line address, email support, and hotline number from Supabase `site_settings`.
+    - **Admin Live Preview Customizer (`src/pages/admin/MediaManager.jsx`)**: Section 6 in Media & Content Manager providing a live side-by-side preview panel that updates in real-time as the administrator types.
+    - **Quick Jump Pill Navigation**: Anchor bar in Media Manager enabling rapid navigation to Hero Banner, Promo Banner, Collections Header, Logos, Categories, and Contact Info.
+- **Facebook Catalog Feed XML Engine**:
+    - **Compliant RSS/Atom Generator (`api/catalog.js`)**: Serverless function serving Meta Commerce Manager with XML-safe character entity sanitization and RFC-compliant URL escaping.
+
 
 
 

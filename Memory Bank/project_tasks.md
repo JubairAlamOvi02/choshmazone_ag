@@ -608,3 +608,37 @@
   - [x] Added `Other / অন্যান্য` option to the Thana dropdown in `src/pages/Checkout.jsx` to prevent any form submission blockage for remote or newly created zones.
   - [x] Preserved Dhaka vs Outside Dhaka delivery charge logic (৳70 inside Dhaka, ৳120 outside Dhaka & sub-urban).
   - [x] Verified compatibility with courier booking format in `Orders.jsx` matching Steadfast, Pathao, and RedX standards.
+
+## Phase 57: Facebook Catalog Feed Hardening & XML Validation
+- [x] **Meta Catalog XML Serialization & URL Escaping (Task Id: 608)**:
+  - [x] Cleaned up RSS/Atom XML product feed in `api/catalog.js` by converting reserved characters (`&`, `<`, `>`, `"`, `'`) to compliant XML entities.
+  - [x] Sanitized product destination links and high-res image URLs to eliminate Meta Commerce Manager ingestion rejections.
+  - [x] Confirmed XML tag validity for `<g:id>`, `<g:title>`, `<g:description>`, `<g:link>`, `<g:image_link>`, `<g:availability>`, `<g:price>`, `<g:brand>`, `<g:condition>`.
+
+## Phase 58: Supabase Real-Time Order Stream & Cash Register Sound Engine
+- [x] **PostgreSQL Realtime Subscription & Live Audio Alerts (Task Id: 609)**:
+  - [x] Configured Supabase `postgres_changes` listener in `AdminLayout.jsx` for instant order detection without manual page refresh.
+  - [x] Built `src/lib/orderSoundNotifier.js` utilizing Web Audio API sound synthesis and `/sounds/cha-ching.mp3` for audible "Cha-Ching!" cash register notifications.
+  - [x] Integrated mobile hardware vibration (`navigator.vibrate`) and system/browser notification toasts (`notifyNewOrder`).
+  - [x] Designed persistent floating new-order banner with quick navigation to order details and volume mute toggle.
+
+## Phase 59: ntfy.sh Instant Mobile Push Notification Engine
+- [x] **Zero-Cost Phone Push Notification Engine (Task Id: 610)**:
+  - [x] Implemented `src/lib/ntfyNotifier.js` utilizing the open-source ntfy.sh protocol for real-time mobile push notifications to store managers.
+  - [x] Integrated high-priority sound alerts, emoji tags, and dual interactive action buttons: `View Order` (opens admin) and `Call Customer` (dials phone).
+  - [x] Embedded automated dispatch inside `src/pages/Checkout.jsx` and added an interactive test diagnostic trigger in `src/pages/admin/Orders.jsx`.
+  - [x] Configured `VITE_NTFY_TOPIC` environment variable with zero-cost setup.
+
+## Phase 60: Telegram Inline Keyboard Action Buttons
+- [x] **Telegram Interactive Order Actions (Task Id: 611)**:
+  - [x] Upgraded `src/lib/telegramNotifier.js` to dispatch interactive inline keyboard buttons (`inline_keyboard`).
+  - [x] Enabled one-tap order inspection (`👁 View Order`) and direct customer call action (`📞 Call Customer`).
+  - [x] Formatted order line items, bKash/COD payment method, and complete shipping address for instant notification readability.
+
+## Phase 61: Dynamic Contact Page CMS & Media Manager Overhaul
+- [x] **Dynamic Contact Page & Admin Live Customizer (Task Id: 612)**:
+  - [x] Made all sections on `/contact` (`Contact.jsx`) dynamic: Main Heading, Subtitle, Showroom Title & Multi-line Address, Email Support Title & Address, Hotline Title & Phone Number.
+  - [x] Built **Section 6: Contact & Support Details** in `src/pages/admin/MediaManager.jsx` with a real-time live preview panel mirroring the contact card.
+  - [x] Added quick-jump pill navigation in Media & Content Manager and cross-linked from `CheckoutSettings.jsx`.
+  - [x] Formatted clickable `mailto:` and `tel:` links on the public storefront.
+
