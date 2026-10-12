@@ -98,6 +98,17 @@ export const DEFAULT_CHECKOUT_FIELD_SETTINGS = {
     }
 };
 
+export const DEFAULT_CONTACT_SETTINGS = {
+    contact_title: 'Get in Touch',
+    contact_description: 'Have questions about our premium eyewear or your recent order? Our dedicated support team is here to assist you.',
+    contact_showroom_title: 'Visit Our Showroom',
+    contact_showroom_address: '123 Vision Street, Suite 456\nDhaka, Bangladesh',
+    contact_email_title: 'Email Support',
+    contact_email: 'support@choshmazone.com',
+    contact_phone_title: 'Call Our Hotline',
+    contact_phone: '+880 1234 567890'
+};
+
 export const settingsParams = {
     getCachedAll: () => settingsCache || [],
 
@@ -188,6 +199,32 @@ export const settingsParams = {
 
     saveCheckoutFieldSettings: async (fieldSettings) => {
         return await settingsParams.set('checkout_field_settings', fieldSettings);
+    },
+
+    getContactSettings: async () => {
+        try {
+            await settingsParams.fetchAll();
+            return {
+                contact_title: settingsParams.getCached('contact_title') || DEFAULT_CONTACT_SETTINGS.contact_title,
+                contact_description: settingsParams.getCached('contact_description') || DEFAULT_CONTACT_SETTINGS.contact_description,
+                contact_showroom_title: settingsParams.getCached('contact_showroom_title') || DEFAULT_CONTACT_SETTINGS.contact_showroom_title,
+                contact_showroom_address: settingsParams.getCached('contact_showroom_address') || DEFAULT_CONTACT_SETTINGS.contact_showroom_address,
+                contact_email_title: settingsParams.getCached('contact_email_title') || DEFAULT_CONTACT_SETTINGS.contact_email_title,
+                contact_email: settingsParams.getCached('contact_email') || DEFAULT_CONTACT_SETTINGS.contact_email,
+                contact_phone_title: settingsParams.getCached('contact_phone_title') || DEFAULT_CONTACT_SETTINGS.contact_phone_title,
+                contact_phone: settingsParams.getCached('contact_phone') || DEFAULT_CONTACT_SETTINGS.contact_phone
+            };
+        } catch (e) {
+            console.warn('[Settings] Failed to fetch contact settings:', e);
+            return DEFAULT_CONTACT_SETTINGS;
+        }
+    },
+
+    saveContactSettings: async (contactSettings) => {
+        const promises = Object.entries(contactSettings).map(([key, val]) =>
+            settingsParams.set(key, val)
+        );
+        return await Promise.all(promises);
     },
 
     uploadAsset: async (file, path = 'site-assets') => {

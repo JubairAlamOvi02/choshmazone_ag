@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { settingsParams } from '../../lib/api/settings';
+import { settingsParams, DEFAULT_CONTACT_SETTINGS } from '../../lib/api/settings';
 import { productParams } from '../../lib/api/products';
 import { categoryParams } from '../../lib/api/categories';
 import { getCategoryFallbackImage } from '../../components/FeaturedCollections';
@@ -8,7 +8,7 @@ import { HERO_BUTTON_STYLES, HERO_BUTTON_SHAPES, HERO_BUTTON_SIZES } from '../..
 import {
     Upload, X, Save, Image as ImageIcon, Layout, Box, CheckCircle2,
     AlertCircle, RefreshCw, ShoppingBag, Sparkles, Type, Link as LinkIcon,
-    Eye, Layers, Palette, ArrowRight
+    Eye, Layers, Palette, ArrowRight, Mail, Phone, MapPin, Headphones, ExternalLink
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import heroBannerFallback from '../../assets/hero_banner.png';
@@ -47,6 +47,14 @@ const AdminMedia = () => {
         men_collection: menFallback,
         women_collection: womenFallback,
         unisex_collection: unisexFallback,
+        contact_title: DEFAULT_CONTACT_SETTINGS.contact_title,
+        contact_description: DEFAULT_CONTACT_SETTINGS.contact_description,
+        contact_showroom_title: DEFAULT_CONTACT_SETTINGS.contact_showroom_title,
+        contact_showroom_address: DEFAULT_CONTACT_SETTINGS.contact_showroom_address,
+        contact_email_title: DEFAULT_CONTACT_SETTINGS.contact_email_title,
+        contact_email: DEFAULT_CONTACT_SETTINGS.contact_email,
+        contact_phone_title: DEFAULT_CONTACT_SETTINGS.contact_phone_title,
+        contact_phone: DEFAULT_CONTACT_SETTINGS.contact_phone,
     });
     const [previewAssets, setPreviewAssets] = useState({});
     const [pendingProducts, setPendingProducts] = useState({}); // productId -> newUrl
@@ -321,8 +329,32 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
 
             {activeTab === 'site' ? (
                 <div className="space-y-12 pb-32">
+                    {/* Quick Section Navigation Pills */}
+                    <div className="flex flex-wrap items-center gap-2 p-2 bg-white/70 backdrop-blur-md rounded-2xl border border-border/60 shadow-sm">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted px-2">Jump to:</span>
+                        <a href="#hero-banner-section" className="px-3 py-1.5 bg-gray-50 hover:bg-primary hover:text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-all">
+                            Hero Banner
+                        </a>
+                        <a href="#promo-banner-section" className="px-3 py-1.5 bg-gray-50 hover:bg-primary hover:text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-all">
+                            Promo Banner
+                        </a>
+                        <a href="#collections-header-section" className="px-3 py-1.5 bg-gray-50 hover:bg-primary hover:text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-all">
+                            Collections Header
+                        </a>
+                        <a href="#logos-section" className="px-3 py-1.5 bg-gray-50 hover:bg-primary hover:text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-all">
+                            Brand Logos
+                        </a>
+                        <a href="#categories-section" className="px-3 py-1.5 bg-gray-50 hover:bg-primary hover:text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-all">
+                            Categories
+                        </a>
+                        <a href="#contact-support-section" className="px-3 py-1.5 bg-primary/10 hover:bg-primary hover:text-white text-primary rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-all flex items-center gap-1.5">
+                            <Headphones size={13} />
+                            Contact & Support Info
+                        </a>
+                    </div>
+
                     {/* SECTION 1: Homepage Hero Banner Editor with Live Preview */}
-                    <div className="bg-white rounded-[2.5rem] border border-border/60 p-6 md:p-10 shadow-sm">
+                    <div id="hero-banner-section" className="bg-white rounded-[2.5rem] border border-border/60 p-6 md:p-10 shadow-sm scroll-mt-6">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-border/50 mb-8">
                             <div className="flex items-center gap-3">
                                 <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
@@ -610,7 +642,7 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                     </div>
 
                     {/* SECTION 2: Homepage Promotional Banner Editor with Live Preview */}
-                    <div className="bg-white rounded-[2.5rem] border border-border/60 p-6 md:p-10 shadow-sm">
+                    <div id="promo-banner-section" className="bg-white rounded-[2.5rem] border border-border/60 p-6 md:p-10 shadow-sm scroll-mt-6">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-border/50 mb-8">
                             <div className="flex items-center gap-3">
                                 <div className="w-12 h-12 bg-secondary/20 text-secondary-dark rounded-2xl flex items-center justify-center">
@@ -790,7 +822,7 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                     </div>
 
                     {/* SECTION 3: Collections Page Hero Banner Editor with Live Preview */}
-                    <div className="bg-white rounded-[2.5rem] border border-border/60 p-6 md:p-10 shadow-sm">
+                    <div id="collections-header-section" className="bg-white rounded-[2.5rem] border border-border/60 p-6 md:p-10 shadow-sm scroll-mt-6">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-border/50 mb-8">
                             <div className="flex items-center gap-3">
                                 <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
@@ -937,7 +969,7 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                     </div>
 
                     {/* SECTION 4: Brand Identity & Logos */}
-                    <div>
+                    <div id="logos-section" className="scroll-mt-6">
                         <div className="mb-6">
                             <h2 className="text-xl font-bold text-text-main font-outfit uppercase tracking-tight flex items-center gap-3">
                                 <Layout className="text-primary" size={20} />
@@ -978,7 +1010,7 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                     </div>
 
                     {/* SECTION 5: Dynamic Category Collections */}
-                    <div>
+                    <div id="categories-section" className="scroll-mt-6">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                             <div>
                                 <h2 className="text-xl font-bold text-text-main font-outfit uppercase tracking-tight flex items-center gap-3">
@@ -1020,6 +1052,274 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                                     </div>
                                 );
                             })}
+                        </div>
+                    </div>
+
+                    {/* SECTION 6: Contact & Support Information (Contact Us Page) */}
+                    <div id="contact-support-section" className="bg-white rounded-[2.5rem] border border-border/60 p-6 md:p-10 shadow-sm scroll-mt-6">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-border/50 mb-8">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
+                                    <Headphones size={24} className="text-primary" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-bold text-text-main font-outfit uppercase tracking-tight flex items-center gap-2">
+                                        Contact & Support Details (Contact Us Page)
+                                        {(previewAssets.contact_title !== undefined ||
+                                            previewAssets.contact_description !== undefined ||
+                                            previewAssets.contact_showroom_title !== undefined ||
+                                            previewAssets.contact_showroom_address !== undefined ||
+                                            previewAssets.contact_email_title !== undefined ||
+                                            previewAssets.contact_email !== undefined ||
+                                            previewAssets.contact_phone_title !== undefined ||
+                                            previewAssets.contact_phone !== undefined) && (
+                                                <span className="text-[10px] bg-primary/10 text-primary font-bold px-2.5 py-1 rounded-full uppercase animate-pulse">Draft</span>
+                                            )}
+                                    </h2>
+                                    <p className="text-text-muted font-outfit text-xs md:text-sm">
+                                        Customize heading, subtitle, showroom address, email support, and hotline phone number shown on the Contact page.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <a
+                                    href="/contact"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-text-main rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-all inline-flex items-center gap-1.5"
+                                >
+                                    <ExternalLink size={13} />
+                                    View Live Page
+                                </a>
+
+                                {(previewAssets.contact_title !== undefined ||
+                                    previewAssets.contact_description !== undefined ||
+                                    previewAssets.contact_showroom_title !== undefined ||
+                                    previewAssets.contact_showroom_address !== undefined ||
+                                    previewAssets.contact_email_title !== undefined ||
+                                    previewAssets.contact_email !== undefined ||
+                                    previewAssets.contact_phone_title !== undefined ||
+                                    previewAssets.contact_phone !== undefined) && (
+                                        <button
+                                            type="button"
+                                            onClick={handleSaveAll}
+                                            disabled={saving}
+                                            className="px-5 py-2 bg-primary text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all inline-flex items-center gap-1.5 disabled:opacity-50"
+                                        >
+                                            <Save size={13} />
+                                            Save Changes
+                                        </button>
+                                    )}
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                            {/* Form inputs */}
+                            <div className="lg:col-span-6 space-y-6">
+                                {/* Header & Intro */}
+                                <div className="bg-gray-50/80 p-5 rounded-2xl border border-border/50 space-y-4">
+                                    <div className="flex items-center gap-2 text-xs font-bold font-outfit uppercase tracking-wider text-text-main">
+                                        <Type size={14} className="text-primary" /> Main Heading & Description
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1.5">
+                                            Heading (e.g. GET IN TOUCH)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={getSettingValue('contact_title')}
+                                            onChange={(e) => handleTextChange('contact_title', e.target.value)}
+                                            placeholder="Get in Touch"
+                                            className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm font-outfit font-bold focus:border-primary outline-none transition-all uppercase"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1.5">
+                                            Subheading / Intro Paragraph
+                                        </label>
+                                        <textarea
+                                            rows={3}
+                                            value={getSettingValue('contact_description')}
+                                            onChange={(e) => handleTextChange('contact_description', e.target.value)}
+                                            placeholder="Have questions about our premium eyewear or your recent order? Our dedicated support team is here to assist you."
+                                            className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm font-outfit focus:border-primary outline-none transition-all resize-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Showroom / Location */}
+                                <div className="bg-gray-50/80 p-5 rounded-2xl border border-border/50 space-y-4">
+                                    <div className="flex items-center gap-2 text-xs font-bold font-outfit uppercase tracking-wider text-text-main">
+                                        <MapPin size={14} className="text-primary" /> Showroom / Store Location
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1.5">
+                                            Showroom Section Title
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={getSettingValue('contact_showroom_title')}
+                                            onChange={(e) => handleTextChange('contact_showroom_title', e.target.value)}
+                                            placeholder="Visit Our Showroom"
+                                            className="w-full px-4 py-2.5 bg-white border border-border rounded-xl text-xs font-outfit font-bold focus:border-primary outline-none transition-all uppercase"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1.5">
+                                            Showroom Address (supports multi-line)
+                                        </label>
+                                        <textarea
+                                            rows={3}
+                                            value={getSettingValue('contact_showroom_address')}
+                                            onChange={(e) => handleTextChange('contact_showroom_address', e.target.value)}
+                                            placeholder={"123 Vision Street, Suite 456\nDhaka, Bangladesh"}
+                                            className="w-full px-4 py-2.5 bg-white border border-border rounded-xl text-xs font-outfit focus:border-primary outline-none transition-all resize-none leading-relaxed"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Email Support */}
+                                <div className="bg-gray-50/80 p-5 rounded-2xl border border-border/50 space-y-4">
+                                    <div className="flex items-center gap-2 text-xs font-bold font-outfit uppercase tracking-wider text-text-main">
+                                        <Mail size={14} className="text-primary" /> Email Support
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-[11px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1.5">
+                                                Email Section Title
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={getSettingValue('contact_email_title')}
+                                                onChange={(e) => handleTextChange('contact_email_title', e.target.value)}
+                                                placeholder="Email Support"
+                                                className="w-full px-4 py-2.5 bg-white border border-border rounded-xl text-xs font-outfit font-bold focus:border-primary outline-none transition-all uppercase"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[11px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1.5">
+                                                Email Address
+                                            </label>
+                                            <input
+                                                type="email"
+                                                value={getSettingValue('contact_email')}
+                                                onChange={(e) => handleTextChange('contact_email', e.target.value)}
+                                                placeholder="support@choshmazone.com"
+                                                className="w-full px-4 py-2.5 bg-white border border-border rounded-xl text-xs font-outfit focus:border-primary outline-none transition-all font-mono"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Phone / Hotline Support */}
+                                <div className="bg-gray-50/80 p-5 rounded-2xl border border-border/50 space-y-4">
+                                    <div className="flex items-center gap-2 text-xs font-bold font-outfit uppercase tracking-wider text-text-main">
+                                        <Phone size={14} className="text-primary" /> Call Our Hotline
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-[11px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1.5">
+                                                Hotline Section Title
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={getSettingValue('contact_phone_title')}
+                                                onChange={(e) => handleTextChange('contact_phone_title', e.target.value)}
+                                                placeholder="Call Our Hotline"
+                                                className="w-full px-4 py-2.5 bg-white border border-border rounded-xl text-xs font-outfit font-bold focus:border-primary outline-none transition-all uppercase"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[11px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1.5">
+                                                Hotline Phone Number
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={getSettingValue('contact_phone')}
+                                                onChange={(e) => handleTextChange('contact_phone', e.target.value)}
+                                                placeholder="+880 1234 567890"
+                                                className="w-full px-4 py-2.5 bg-white border border-border rounded-xl text-xs font-outfit focus:border-primary outline-none transition-all font-mono"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Live Interactive Preview Box */}
+                            <div className="lg:col-span-6 sticky top-24">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <Eye size={16} className="text-primary" />
+                                    <span className="text-xs font-bold font-outfit uppercase tracking-widest text-text-muted">Live Contact Page Preview</span>
+                                </div>
+
+                                <div className="bg-white rounded-3xl border border-border p-8 md:p-10 shadow-xl space-y-8">
+                                    <div>
+                                        <h3 className="text-3xl sm:text-4xl font-bold font-outfit uppercase tracking-tighter text-text-main mb-4 leading-tight">
+                                            {getSettingValue('contact_title') || 'Get in Touch'}
+                                        </h3>
+                                        <p className="text-sm text-text-muted font-outfit leading-relaxed max-w-md">
+                                            {getSettingValue('contact_description') || 'Have questions about our premium eyewear or your recent order? Our dedicated support team is here to assist you.'}
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-6 pt-4 border-t border-border/40">
+                                        {/* Showroom */}
+                                        <div className="flex gap-5 items-start">
+                                            <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center border border-border text-text-main shrink-0 shadow-sm">
+                                                <MapPin size={22} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-xs font-bold uppercase tracking-widest text-text-main mb-1 font-outfit">
+                                                    {getSettingValue('contact_showroom_title') || 'Visit Our Showroom'}
+                                                </h4>
+                                                <p className="text-xs text-text-muted font-outfit leading-relaxed whitespace-pre-line">
+                                                    {getSettingValue('contact_showroom_address') || '123 Vision Street, Suite 456\nDhaka, Bangladesh'}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Email */}
+                                        <div className="flex gap-5 items-start">
+                                            <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center border border-border text-text-main shrink-0 shadow-sm">
+                                                <Mail size={22} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-xs font-bold uppercase tracking-widest text-text-main mb-1 font-outfit">
+                                                    {getSettingValue('contact_email_title') || 'Email Support'}
+                                                </h4>
+                                                <p className="text-xs text-text-muted font-outfit leading-relaxed">
+                                                    {getSettingValue('contact_email') || 'support@choshmazone.com'}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Phone */}
+                                        <div className="flex gap-5 items-start">
+                                            <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center border border-border text-text-main shrink-0 shadow-sm">
+                                                <Phone size={22} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-xs font-bold uppercase tracking-widest text-text-main mb-1 font-outfit">
+                                                    {getSettingValue('contact_phone_title') || 'Call Our Hotline'}
+                                                </h4>
+                                                <p className="text-xs text-text-muted font-outfit leading-relaxed">
+                                                    {getSettingValue('contact_phone') || '+880 1234 567890'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-4 border-t border-dashed border-border flex items-center justify-between text-[11px] text-text-muted font-outfit">
+                                        <span className="flex items-center gap-1.5 text-emerald-600 font-bold">
+                                            <CheckCircle2 size={14} /> Live preview renders instantly as you type
+                                        </span>
+                                        <a href="/contact" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-bold inline-flex items-center gap-1">
+                                            Preview Contact Page ↗
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

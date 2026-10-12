@@ -1,13 +1,47 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { settingsParams, DEFAULT_CONTACT_SETTINGS } from '../lib/api/settings';
 
 const Contact = () => {
     const [status, setStatus] = useState(null);
+
+    // Synchronous initial cache read to avoid layout shift
+    const [contactInfo, setContactInfo] = useState(() => ({
+        title: settingsParams.getCached('contact_title') || DEFAULT_CONTACT_SETTINGS.contact_title,
+        description: settingsParams.getCached('contact_description') || DEFAULT_CONTACT_SETTINGS.contact_description,
+        showroomTitle: settingsParams.getCached('contact_showroom_title') || DEFAULT_CONTACT_SETTINGS.contact_showroom_title,
+        showroomAddress: settingsParams.getCached('contact_showroom_address') || DEFAULT_CONTACT_SETTINGS.contact_showroom_address,
+        emailTitle: settingsParams.getCached('contact_email_title') || DEFAULT_CONTACT_SETTINGS.contact_email_title,
+        email: settingsParams.getCached('contact_email') || DEFAULT_CONTACT_SETTINGS.contact_email,
+        phoneTitle: settingsParams.getCached('contact_phone_title') || DEFAULT_CONTACT_SETTINGS.contact_phone_title,
+        phone: settingsParams.getCached('contact_phone') || DEFAULT_CONTACT_SETTINGS.contact_phone
+    }));
+
+    useEffect(() => {
+        const loadSettings = async () => {
+            try {
+                const settings = await settingsParams.getContactSettings();
+                setContactInfo({
+                    title: settings.contact_title,
+                    description: settings.contact_description,
+                    showroomTitle: settings.contact_showroom_title,
+                    showroomAddress: settings.contact_showroom_address,
+                    emailTitle: settings.contact_email_title,
+                    email: settings.contact_email,
+                    phoneTitle: settings.contact_phone_title,
+                    phone: settings.contact_phone
+                });
+            } catch (err) {
+                console.error('Failed to load contact settings:', err);
+            }
+        };
+        loadSettings();
+    }, []);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -23,11 +57,10 @@ const Contact = () => {
                     {/* Contact Info */}
                     <div className="animate-in slide-in-from-left-4 duration-700">
                         <h1 className="text-4xl md:text-5xl font-bold font-outfit uppercase tracking-tighter text-text-main mb-6">
-                            Get in Touch
+                            {contactInfo.title}
                         </h1>
                         <p className="text-lg text-text-muted mb-12 font-outfit max-w-md">
-                            Have questions about our premium eyewear or your recent order?
-                            Our dedicated support team is here to assist you.
+                            {contactInfo.description}
                         </p>
 
                         <div className="space-y-8">
@@ -36,10 +69,9 @@ const Contact = () => {
                                     <MapPin size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-bold uppercase tracking-widest text-text-main mb-1 font-outfit">Visit Our Showroom</h3>
-                                    <p className="text-text-muted font-outfit leading-relaxed">
-                                        123 Vision Street, Suite 456<br />
-                                        Dhaka, Bangladesh
+                                    <h3 className="text-sm font-bold uppercase tracking-widest text-text-main mb-1 font-outfit">{contactInfo.showroomTitle}</h3>
+                                    <p className="text-text-muted font-outfit leading-relaxed whitespace-pre-line">
+                                        {contactInfo.showroomAddress}
                                     </p>
                                 </div>
                             </div>
@@ -49,8 +81,10 @@ const Contact = () => {
                                     <Mail size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-bold uppercase tracking-widest text-text-main mb-1 font-outfit">Email Support</h3>
-                                    <p className="text-text-muted font-outfit leading-relaxed">support@choshmazone.com</p>
+                                    <h3 className="text-sm font-bold uppercase tracking-widest text-text-main mb-1 font-outfit">{contactInfo.emailTitle}</h3>
+                                    <a href={`mailto:${contactInfo.email}`} className="text-text-muted hover:text-primary transition-colors font-outfit leading-relaxed">
+                                        {contactInfo.email}
+                                    </a>
                                 </div>
                             </div>
 
@@ -59,8 +93,10 @@ const Contact = () => {
                                     <Phone size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-bold uppercase tracking-widest text-text-main mb-1 font-outfit">Call Our Hotline</h3>
-                                    <p className="text-text-muted font-outfit leading-relaxed">+880 1234 567890</p>
+                                    <h3 className="text-sm font-bold uppercase tracking-widest text-text-main mb-1 font-outfit">{contactInfo.phoneTitle}</h3>
+                                    <a href={`tel:${contactInfo.phone.replace(/[^0-9+]/g, '')}`} className="text-text-muted hover:text-primary transition-colors font-outfit leading-relaxed">
+                                        {contactInfo.phone}
+                                    </a>
                                 </div>
                             </div>
                         </div>

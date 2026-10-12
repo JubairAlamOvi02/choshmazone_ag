@@ -191,7 +191,7 @@ const AdminLayout = () => {
                         <AdminNavLink to="/admin/products" icon={Box} label="Inventory" isActive={isActive('/admin/products')} onClick={closeMobileMenu} />
                         <AdminNavLink to="/admin/categories" icon={Tags} label="Categories" isActive={isActive('/admin/categories')} onClick={closeMobileMenu} />
                         <AdminNavLink to="/admin/lenses" icon={Glasses} label="Lens Packages" isActive={isActive('/admin/lenses')} onClick={closeMobileMenu} />
-                        <AdminNavLink to="/admin/media" icon={ImageIcon} label="Media" isActive={isActive('/admin/media')} onClick={closeMobileMenu} />
+                        <AdminNavLink to="/admin/media" icon={ImageIcon} label="Media & Content" isActive={isActive('/admin/media')} onClick={closeMobileMenu} />
                         <AdminNavLink to="/admin/customers" icon={Users} label="Members" isActive={isActive('/admin/customers')} onClick={closeMobileMenu} />
                         <AdminNavLink to="/admin/facebook-catalog" icon={Facebook} label="FB Catalog" isActive={isActive('/admin/facebook-catalog')} onClick={closeMobileMenu} />
                         <AdminNavLink to="/admin/settings" icon={Settings} label="Checkout Form" isActive={isActive('/admin/settings')} onClick={closeMobileMenu} />

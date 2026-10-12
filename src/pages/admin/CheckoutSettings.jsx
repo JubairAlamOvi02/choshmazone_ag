@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { 
     Settings, 
     Save, 
@@ -16,7 +17,9 @@ import {
     Building2, 
     Navigation, 
     FileText, 
-    Info 
+    Info,
+    Headphones,
+    ArrowRight
 } from 'lucide-react';
 import { settingsParams, DEFAULT_CHECKOUT_FIELD_SETTINGS } from '../../lib/api/settings';
 import { useToast } from '../../context/ToastContext';
@@ -205,6 +208,29 @@ const CheckoutSettings = () => {
                         {saving ? 'Saving...' : hasUnsavedChanges ? 'Save Changes' : 'Saved'}
                     </button>
                 </div>
+            </div>
+
+            {/* Quick Link to Store Contact & Support Settings */}
+            <div className="p-4 bg-primary/5 border border-primary/20 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                        <Headphones size={20} />
+                    </div>
+                    <div>
+                        <p className="text-xs font-bold text-text-main font-outfit uppercase tracking-wider">
+                            Looking to change Showroom Address, Hotline Phone, or Support Email?
+                        </p>
+                        <p className="text-xs text-text-muted font-outfit mt-0.5">
+                            You can customize the Contact page details and see live preview in Media & Content Manager.
+                        </p>
+                    </div>
+                </div>
+                <Link
+                    to="/admin/media#contact-support-section"
+                    className="self-start sm:self-auto px-4 py-2.5 bg-primary text-white text-xs font-bold font-outfit uppercase tracking-wider rounded-xl hover:bg-primary/90 transition-all inline-flex items-center gap-2 shadow-sm shrink-0"
+                >
+                    Edit Contact Info <ArrowRight size={14} />
+                </Link>
             </div>
 
             {/* Quick Summary / Info Alert */}
