@@ -30,6 +30,7 @@ You have two main choices for hosting the frontend (the visible website).
     *   Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
     *   Add `VITE_GOOGLE_SCRIPT_URL`
     *   Add `VITE_TELEGRAM_BOT_TOKEN` and `VITE_TELEGRAM_CHAT_ID`
+    *   Add `VITE_NTFY_TOPIC` (Secret topic name for instant phone push alerts)
 5.  **Deploy**: Click "Deploy". It will build and go live in minutes.
 6.  **Custom Domain**: Go to Settings > Domains and add `www.choshmazone.com`. Follow the DNS instructions to point your domain.
 
@@ -81,7 +82,7 @@ If you use cPanel, your domain is likely already connected.
 ## 4. Verification Checklist
 
 - [ ] **Supabase URL**: Is the "Site URL" updated in Supabase Dashboard?
-- [ ] **Environment Variables**: Are `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_GOOGLE_SCRIPT_URL`, `VITE_TELEGRAM_BOT_TOKEN`, and `VITE_TELEGRAM_CHAT_ID` configured?
+- [ ] **Environment Variables**: Are `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_GOOGLE_SCRIPT_URL`, `VITE_TELEGRAM_BOT_TOKEN`, `VITE_TELEGRAM_CHAT_ID`, and `VITE_NTFY_TOPIC` configured?
 - [ ] **Routing**: Does refreshing a page like `/shop` or `/login` work without a 404 error? (If not, check `.htaccess` or Vercel "Rewrites" config).
 - [ ] **SSL**: Is the site loading with `https://`?
 

@@ -7,11 +7,12 @@ Hostinger is a great choice for hosting your React application. It uses a custom
 Before uploading anything, you need to create the production version of your site.
 
 1.  **Open Terminal** in VS Code.
-2.  Run the build command:
+2.  Ensure your local **`.env`** contains production credentials (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_GOOGLE_SCRIPT_URL`, `VITE_TELEGRAM_BOT_TOKEN`, `VITE_TELEGRAM_CHAT_ID`, `VITE_NTFY_TOPIC`). Vite bakes these into the bundle during build.
+3.  Run the build command:
     ```bash
     npm run build
     ```
-3.  This creates a **`dist`** folder in your project.
+4.  This creates a **`dist`** folder in your project.
 
 ### ⚠️ IMPORTANT: Handle Routing (Prevent 404 Errors)
 React is a Single Page Application (SPA). By default, if you refresh a page like `/shop` on Hostinger, you might get a 404 error. You need a configuration file to fix this.

@@ -159,3 +159,11 @@ CREATE TABLE public.web_events (
 -- 'hero_banner_*': Homepage hero configuration (image, badge, title, highlight, description, btn_text, btn_link, btn_style, btn_shape, btn_size, btn_icon)
 -- 'collections_hero_*': Collections page header banner (bg, badge, title, description)
 -- 'promo_banner_*': Promotional highlight banner configuration (image, badge, title, description, button, link)
+-- 'contact_title', 'contact_description': Main headline and intro paragraph for the Contact Us page
+-- 'contact_showroom_title', 'contact_showroom_address': Showroom physical location title and multi-line address
+-- 'contact_email_title', 'contact_email': Support email label and recipient address
+-- 'contact_phone_title', 'contact_phone': Hotline section label and telephone number
+
+-- Realtime Publication (enable live order alerts without polling):
+-- ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
+-- ALTER TABLE public.orders REPLICA IDENTITY FULL;

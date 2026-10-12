@@ -12,6 +12,7 @@ Instead of paying for expensive "Pro" tiers, we will use **generous free tiers**
 | **Database & Auth** | Supabase (Free Tier) | **$0/mo** | 500MB DB & 50k monthly users is HUGE. Sufficient for starting. |
 | **Image Storage** | Cloudflare R2 / Backblaze | ~$0/mo (First 10GB free) | Cheaper than Supabase Storage if you have thousands of HD images. |
 | **Transactional Email** | Resend / Brevo / **Google Apps Script** | **$0/mo** | 3,000 emails/mo free. Google Apps Script is $0/mo (uses Gmail). |
+| **Real-Time Push Alerts** | **ntfy.sh + Telegram Bot** | **$0/mo** | Replaces expensive SMS (~$0.05/SMS) & Apple/Google dev fees with instant phone alerts and action buttons. |
 
 ---
 
@@ -63,6 +64,20 @@ Images are the main bandwidth/storage killer (Supabase Free Plan allows **5 GB/m
 4.  **Cloudflare R2 Alternative (Zero Egress Fees Forever)**:
     *   If library exceeds 1 GB storage in the future, connect Cloudflare R2 (10 GB free storage, $0 egress fees forever).
 
+### D. Zero-Cost Instant Order Alerts (ntfy.sh & Telegram Bot)
+Standard ecommerce setups pay $0.05+ per order for SMS (Twilio) or spend hundreds on Apple Developer and Firebase push notification services. We circumvent these costs completely:
+
+1.  **ntfy.sh Mobile Push Alerts (`src/lib/ntfyNotifier.js`)**:
+    *   Store manager installs the free, open-source ntfy app (available on Google Play & iOS App Store).
+    *   Subscribes to your secret topic (`VITE_NTFY_TOPIC`).
+    *   **Result**: Instant high-priority push notifications with sound, vibration, and interactive action buttons (`View Order`, `Call Customer`) delivered within 1 second for **$0/month**.
+2.  **Telegram Bot API (`src/lib/telegramNotifier.js`)**:
+    *   Dispatches formatted Markdown order summaries with interactive inline keyboard buttons.
+    *   Allows immediate calling of the customer or one-tap opening of the admin order dashboard.
+    *   **Cost**: **$0/month** (Telegram API is completely free and unlimited).
+3.  **In-App Audio Chime & Realtime Stream (`orderSoundNotifier.js`)**:
+    *   Uses browser Web Audio API and Supabase Realtime WebSocket listeners.
+    *   Plays an authentic "Cha-Ching!" cash register chime on incoming orders when the Admin tab is open.
 
 ---
 

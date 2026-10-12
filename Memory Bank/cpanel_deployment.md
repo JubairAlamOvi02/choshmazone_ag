@@ -21,12 +21,18 @@ Your project uses **Supabase**, which is a special cloud platform that provides:
 ## Step 1: Prepare Your Frontend (Build)
 
 1.  Open your project in **VS Code**.
-2.  Open the Terminal (`Ctrl + ~`).
-3.  Run this command to create the production files:
+2.  Ensure your **`.env`** file has the required production configuration:
+    *   `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+    *   `VITE_GOOGLE_SCRIPT_URL`
+    *   `VITE_TELEGRAM_BOT_TOKEN` and `VITE_TELEGRAM_CHAT_ID`
+    *   `VITE_NTFY_TOPIC` (for phone push notifications)
+    *(Note: Vite embeds `VITE_*` environment variables during the build step).*
+3.  Open the Terminal (`Ctrl + ~`).
+4.  Run this command to create the production files:
     ```bash
     npm run build
     ```
-4.  Wait for it to finish. You will see a new folder named **`dist`** appear in your project list.
+5.  Wait for it to finish. You will see a new folder named **`dist`** appear in your project list.
 
 ## Step 2: Prepare for Client-Side Routing (Crucial!)
 
