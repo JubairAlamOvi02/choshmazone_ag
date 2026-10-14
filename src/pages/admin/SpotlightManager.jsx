@@ -20,7 +20,7 @@ const SpotlightManager = () => {
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
     // Product Picker Modal State
-    const [pickerTargetItem, setPickerTargetItem] = useState(null); // which item (e.g. col-1) is picking
+    const [pickerTargetItem, setPickerTargetItem] = useState(null);
     const [pickerSearch, setPickerSearch] = useState('');
     const [pickerCategory, setPickerCategory] = useState('ALL');
     const [autoFillMedia, setAutoFillMedia] = useState(true);
@@ -249,41 +249,41 @@ const SpotlightManager = () => {
         const linkedProduct = products.find(p => String(p.id) === String(item.product_id));
 
         return (
-            <div className="bg-white rounded-2xl border border-border/80 p-4 shadow-sm flex flex-col space-y-3.5 relative group/card">
+            <div className="bg-white rounded-2xl border border-border/80 p-5 shadow-sm flex flex-col space-y-4 relative group/card overflow-hidden">
                 {/* Card Title & Type */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <span className="text-xs font-bold font-outfit uppercase tracking-wider text-text-main flex items-center gap-1.5">
-                            <Layers size={13} className="text-primary" />
-                            {label}
+                <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                        <span className="text-xs font-bold font-outfit uppercase tracking-wider text-text-main flex items-center gap-1.5 truncate">
+                            <Layers size={14} className="text-primary shrink-0" />
+                            <span className="truncate">{label}</span>
                         </span>
                         {dimensionsNote && (
-                            <span className="text-[10px] text-text-muted font-outfit block">
+                            <span className="text-[10px] text-text-muted font-outfit block truncate mt-0.5">
                                 {dimensionsNote}
                             </span>
                         )}
                     </div>
                     {/* Media Type Toggle */}
-                    <div className="flex items-center bg-gray-100 p-0.5 rounded-lg border border-border/50 text-[10px] font-bold">
+                    <div className="flex items-center bg-gray-100 p-0.5 rounded-lg border border-border/50 text-[11px] font-bold shrink-0">
                         <button
                             type="button"
                             onClick={() => handleItemChange(item.id, 'type', 'image')}
-                            className={`flex items-center gap-1 px-2 py-1 rounded-md transition-all cursor-pointer ${item.type !== 'video' ? 'bg-white text-primary shadow-xs' : 'text-text-muted hover:text-text-main'}`}
+                            className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all cursor-pointer ${item.type !== 'video' ? 'bg-white text-primary shadow-xs' : 'text-text-muted hover:text-text-main'}`}
                         >
-                            <ImageIcon size={11} /> Image
+                            <ImageIcon size={12} /> Image
                         </button>
                         <button
                             type="button"
                             onClick={() => handleItemChange(item.id, 'type', 'video')}
-                            className={`flex items-center gap-1 px-2 py-1 rounded-md transition-all cursor-pointer ${item.type === 'video' ? 'bg-white text-primary shadow-xs' : 'text-text-muted hover:text-text-main'}`}
+                            className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all cursor-pointer ${item.type === 'video' ? 'bg-white text-primary shadow-xs' : 'text-text-muted hover:text-text-main'}`}
                         >
-                            <Video size={11} /> Video
+                            <Video size={12} /> Video
                         </button>
                     </div>
                 </div>
 
                 {/* Media Preview Box */}
-                <div className="relative w-full aspect-[4/5] bg-slate-900 rounded-xl overflow-hidden border border-border flex items-center justify-center group/preview">
+                <div className="relative w-full aspect-[16/10] bg-slate-900 rounded-xl overflow-hidden border border-border flex items-center justify-center group/preview">
                     {item.url ? (
                         isVid ? (
                             <video
@@ -303,24 +303,24 @@ const SpotlightManager = () => {
                         )
                     ) : (
                         <div className="text-center p-4 text-slate-400">
-                            <ImageIcon size={24} className="mx-auto mb-1 opacity-50" />
+                            <ImageIcon size={28} className="mx-auto mb-1 opacity-50" />
                             <span className="text-xs">No media set</span>
                         </div>
                     )}
 
                     {/* Linked product pill badge on preview */}
                     {linkedProduct && (
-                        <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[10px] font-bold text-secondary flex items-center gap-1 border border-secondary/30">
-                            <ShoppingBag size={10} />
-                            <span>Linked</span>
+                        <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md text-[10px] font-bold text-secondary flex items-center gap-1.5 border border-secondary/30">
+                            <ShoppingBag size={11} />
+                            <span>Linked to Product</span>
                         </div>
                     )}
 
                     {/* Overlay info */}
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                        <label className="px-3 py-1.5 bg-white text-slate-900 rounded-lg text-xs font-bold font-outfit shadow-md cursor-pointer hover:bg-gray-100 transition-colors flex items-center gap-1.5">
-                            <Upload size={12} />
-                            <span>Change Media</span>
+                        <label className="px-3.5 py-2 bg-white text-slate-900 rounded-xl text-xs font-bold font-outfit shadow-md cursor-pointer hover:bg-gray-100 transition-colors flex items-center gap-1.5">
+                            <Upload size={13} />
+                            <span>Change Media File</span>
                             <input
                                 type="file"
                                 accept={item.type === 'video' ? "video/mp4,video/webm,video/quicktime" : "image/*,video/*"}
@@ -332,119 +332,122 @@ const SpotlightManager = () => {
 
                     {isCurrentlyUploading && (
                         <div className="absolute inset-0 bg-black/75 backdrop-blur-xs flex flex-col items-center justify-center text-white text-xs font-bold gap-2">
-                            <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
+                            <div className="animate-spin rounded-full h-7 w-7 border-2 border-white border-t-transparent"></div>
                             <span>Uploading...</span>
                         </div>
                     )}
                 </div>
 
                 {/* 1. LINKED INVENTORY PRODUCT SECTION */}
-                <div className="pt-2 border-t border-border/60">
-                    <div className="flex items-center justify-between mb-1.5">
-                        <label className="text-[10px] font-bold font-outfit uppercase tracking-wider text-text-muted flex items-center gap-1">
-                            <ShoppingBag size={12} className="text-primary" />
-                            Linked Product (Inventory)
+                <div className="pt-3 border-t border-border/60">
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                        <label className="text-xs font-bold font-outfit uppercase tracking-wider text-text-muted flex items-center gap-1.5 truncate">
+                            <ShoppingBag size={13} className="text-primary shrink-0" />
+                            <span>Linked Inventory Product</span>
                         </label>
                         {linkedProduct ? (
-                            <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                                <Check size={10} /> Connected
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
+                                <Check size={11} /> Connected
                             </span>
                         ) : item.product_id ? (
-                            <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded-full">
+                            <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full shrink-0">
                                 ID: {item.product_id}
                             </span>
                         ) : null}
                     </div>
 
                     {linkedProduct ? (
-                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex items-start gap-2.5 shadow-2xs">
-                            <div className="w-12 h-12 rounded-lg bg-white border border-border/80 shrink-0 overflow-hidden flex items-center justify-center">
-                                {getProductImage(linkedProduct) ? (
-                                    <img
-                                        src={getProductImage(linkedProduct)}
-                                        alt={getProductName(linkedProduct)}
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <Package size={18} className="text-text-muted" />
-                                )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <h4 className="text-xs font-bold text-text-main truncate font-outfit" title={getProductName(linkedProduct)}>
-                                    {getProductName(linkedProduct)}
-                                </h4>
-                                <div className="flex items-center gap-2 mt-0.5">
-                                    <span className="text-xs font-black text-primary font-outfit">
-                                        ৳{linkedProduct.price}
-                                    </span>
-                                    {linkedProduct.category && (
-                                        <span className="text-[9px] px-1.5 py-0.2 bg-gray-200 text-text-muted rounded font-medium truncate">
-                                            {linkedProduct.category}
-                                        </span>
+                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2.5">
+                            <div className="flex items-center gap-3">
+                                <div className="w-14 h-14 rounded-lg bg-white border border-border/80 shrink-0 overflow-hidden flex items-center justify-center shadow-2xs">
+                                    {getProductImage(linkedProduct) ? (
+                                        <img
+                                            src={getProductImage(linkedProduct)}
+                                            alt={getProductName(linkedProduct)}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <Package size={20} className="text-text-muted" />
                                     )}
                                 </div>
-
-                                <div className="flex items-center gap-2 mt-2 pt-1.5 border-t border-slate-200/80">
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setPickerTargetItem(item);
-                                            setPickerSearch('');
-                                        }}
-                                        className="text-[10px] font-bold text-primary hover:underline cursor-pointer"
-                                    >
-                                        Change
-                                    </button>
-                                    <span className="text-slate-300">•</span>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleItemChange(item.id, 'product_id', '')}
-                                        className="text-[10px] font-bold text-red-500 hover:underline cursor-pointer"
-                                    >
-                                        Unlink
-                                    </button>
-                                    <span className="text-slate-300">•</span>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleSyncProductToCard(item.id, linkedProduct)}
-                                        className="text-[10px] font-bold text-amber-700 hover:underline flex items-center gap-0.5 cursor-pointer"
-                                        title="Copy product's image and name into this card"
-                                    >
-                                        <Wand2 size={10} /> Sync Media
-                                    </button>
-                                    <span className="text-slate-300">•</span>
-                                    <a
-                                        href={`/product/${linkedProduct.id}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-[10px] text-text-muted hover:text-text-main flex items-center gap-0.5"
-                                        title="Open product page in new tab"
-                                    >
-                                        <ExternalLink size={10} /> Store
-                                    </a>
+                                <div className="flex-1 min-w-0">
+                                    <h4 className="text-xs font-bold text-text-main truncate font-outfit" title={getProductName(linkedProduct)}>
+                                        {getProductName(linkedProduct)}
+                                    </h4>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <span className="text-xs font-black text-primary font-outfit">
+                                            ৳{linkedProduct.price}
+                                        </span>
+                                        {linkedProduct.category && (
+                                            <span className="text-[10px] px-2 py-0.5 bg-gray-200 text-text-muted rounded font-medium truncate">
+                                                {linkedProduct.category}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ) : item.product_id ? (
-                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-2.5 flex items-center justify-between text-xs">
-                            <span className="text-[11px] font-medium text-amber-900 truncate">
-                                Product ID: <span className="font-mono font-bold">{item.product_id}</span>
-                            </span>
-                            <div className="flex items-center gap-2">
+
+                            {/* Action Buttons Grid - Clean, responsive, never overflows */}
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-2 border-t border-slate-200/80">
                                 <button
                                     type="button"
                                     onClick={() => {
                                         setPickerTargetItem(item);
                                         setPickerSearch('');
                                     }}
-                                    className="text-[10px] font-bold text-primary hover:underline cursor-pointer"
+                                    className="px-2 py-1.5 bg-white hover:bg-gray-100 border border-border/80 rounded-lg text-[11px] font-bold text-text-main flex items-center justify-center gap-1 transition-colors cursor-pointer shadow-2xs"
+                                >
+                                    <RefreshCw size={11} />
+                                    <span>Change</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleItemChange(item.id, 'product_id', '')}
+                                    className="px-2 py-1.5 bg-white hover:bg-red-50 border border-red-200 rounded-lg text-[11px] font-bold text-red-600 flex items-center justify-center gap-1 transition-colors cursor-pointer shadow-2xs"
+                                >
+                                    <Trash2 size={11} />
+                                    <span>Unlink</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleSyncProductToCard(item.id, linkedProduct)}
+                                    className="px-2 py-1.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg text-[11px] font-bold text-amber-800 flex items-center justify-center gap-1 transition-colors cursor-pointer shadow-2xs"
+                                    title="Copy product's image and name into this card"
+                                >
+                                    <Wand2 size={11} />
+                                    <span>Sync Media</span>
+                                </button>
+                                <a
+                                    href={`/product/${linkedProduct.id}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-2 py-1.5 bg-white hover:bg-gray-100 border border-border/80 rounded-lg text-[11px] font-bold text-text-muted hover:text-text-main flex items-center justify-center gap-1 transition-colors shadow-2xs"
+                                >
+                                    <ExternalLink size={11} />
+                                    <span>Store</span>
+                                </a>
+                            </div>
+                        </div>
+                    ) : item.product_id ? (
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center justify-between text-xs">
+                            <span className="text-xs font-medium text-amber-900 truncate">
+                                Product ID: <span className="font-mono font-bold">{item.product_id}</span>
+                            </span>
+                            <div className="flex items-center gap-2 shrink-0">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setPickerTargetItem(item);
+                                        setPickerSearch('');
+                                    }}
+                                    className="text-xs font-bold text-primary hover:underline cursor-pointer"
                                 >
                                     Change
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => handleItemChange(item.id, 'product_id', '')}
-                                    className="text-[10px] font-bold text-red-600 hover:underline cursor-pointer"
+                                    className="text-xs font-bold text-red-600 hover:underline cursor-pointer"
                                 >
                                     Unlink
                                 </button>
@@ -467,19 +470,19 @@ const SpotlightManager = () => {
 
                 {/* Media URL Input */}
                 <div>
-                    <label className="block text-[10px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1">
+                    <label className="block text-[11px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1">
                         Media URL / Direct Link
                     </label>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
                         <input
                             type="url"
                             value={item.url || ''}
                             onChange={(e) => handleItemChange(item.id, 'url', e.target.value)}
                             placeholder={item.type === 'video' ? "https://.../video.mp4" : "https://.../photo.jpg"}
-                            className="flex-1 px-2.5 py-1.5 bg-gray-50 border border-border rounded-lg text-xs font-outfit font-medium focus:border-primary outline-none"
+                            className="flex-1 min-w-0 px-3 py-2 bg-gray-50 border border-border rounded-xl text-xs font-outfit font-medium focus:border-primary outline-none"
                         />
-                        <label className="p-1.5 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-lg transition-colors cursor-pointer shrink-0" title="Upload local file">
-                            <Upload size={14} />
+                        <label className="p-2 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-xl transition-colors cursor-pointer shrink-0" title="Upload local file">
+                            <Upload size={15} />
                             <input
                                 type="file"
                                 accept={item.type === 'video' ? "video/mp4,video/webm,video/quicktime" : "image/*,video/*"}
@@ -490,22 +493,22 @@ const SpotlightManager = () => {
                     </div>
                 </div>
 
-                {/* Card Title & Caption */}
-                <div className="grid grid-cols-1 gap-2 pt-1 border-t border-border/40">
+                {/* Card Title & Caption & Custom Link */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border/40">
                     <div>
-                        <label className="block text-[10px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-0.5">
-                            Title / Label
+                        <label className="block text-[11px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1">
+                            Card Title
                         </label>
                         <input
                             type="text"
                             value={item.title || ''}
                             onChange={(e) => handleItemChange(item.id, 'title', e.target.value)}
                             placeholder="e.g. Handcrafted Precision"
-                            className="w-full px-2.5 py-1.5 bg-gray-50 border border-border rounded-lg text-xs font-outfit focus:border-primary outline-none"
+                            className="w-full px-3 py-2 bg-gray-50 border border-border rounded-xl text-xs font-outfit focus:border-primary outline-none"
                         />
                     </div>
                     <div>
-                        <label className="block text-[10px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-0.5">
+                        <label className="block text-[11px] font-bold font-outfit uppercase tracking-wider text-text-muted mb-1">
                             Caption (Optional)
                         </label>
                         <input
@@ -513,11 +516,11 @@ const SpotlightManager = () => {
                             value={item.caption || ''}
                             onChange={(e) => handleItemChange(item.id, 'caption', e.target.value)}
                             placeholder="e.g. Signature luxury frames"
-                            className="w-full px-2.5 py-1.5 bg-gray-50 border border-border rounded-lg text-xs font-outfit focus:border-primary outline-none"
+                            className="w-full px-3 py-2 bg-gray-50 border border-border rounded-xl text-xs font-outfit focus:border-primary outline-none"
                         />
                     </div>
-                    <div>
-                        <label className="block text-[10px] font-medium font-outfit uppercase tracking-wider text-text-muted mb-0.5">
+                    <div className="sm:col-span-2">
+                        <label className="block text-[11px] font-medium font-outfit uppercase tracking-wider text-text-muted mb-1">
                             Custom Fallback URL (Optional)
                         </label>
                         <input
@@ -525,7 +528,7 @@ const SpotlightManager = () => {
                             value={item.custom_link || ''}
                             onChange={(e) => handleItemChange(item.id, 'custom_link', e.target.value)}
                             placeholder="e.g. /shop or /collections"
-                            className="w-full px-2.5 py-1.5 bg-gray-50 border border-border rounded-lg text-xs font-outfit focus:border-primary outline-none"
+                            className="w-full px-3 py-2 bg-gray-50 border border-border rounded-xl text-xs font-outfit focus:border-primary outline-none"
                         />
                     </div>
                 </div>
@@ -679,46 +682,50 @@ const SpotlightManager = () => {
 
             {/* Media Gallery Grid Editor */}
             <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                         <h2 className="text-lg font-bold text-text-main uppercase tracking-wider">
                             Media Cards & Product Links
                         </h2>
                         <p className="text-xs text-text-muted">
-                            Click "Select Product from Inventory" to link any inventory item to each card.
+                            Manage each box's media and connected inventory product.
                         </p>
                     </div>
-                    <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
-                        5-Column Layout
+                    <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full self-start sm:self-auto">
+                        6 Total Boxes
                     </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-5">
-                    {/* Column 1: Tall Card */}
-                    <div className="space-y-3">
-                        {renderCardEditor(col1, '1. Left Tall Card', 'Tall portrait media')}
+                {/* Homepage Layout Mapping Reference Bar */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-2 text-text-muted font-outfit">
+                        <Info size={15} className="text-primary shrink-0" />
+                        <span>Cards map left-to-right on homepage: Col 1 & 2 (Tall/Medium), Col 3 (Top & Bottom stacked), Col 4 & 5 (Medium/Tall).</span>
                     </div>
+                    <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-slate-700 bg-white px-3 py-1.5 rounded-xl border border-slate-200/80 shadow-2xs shrink-0">
+                        <span className="px-1.5 py-0.5 bg-slate-100 rounded">1. Left</span>
+                        <span>•</span>
+                        <span className="px-1.5 py-0.5 bg-slate-100 rounded">2. Mid-L</span>
+                        <span>•</span>
+                        <span className="px-1.5 py-0.5 bg-amber-100 text-amber-900 rounded">3. Center (A+B)</span>
+                        <span>•</span>
+                        <span className="px-1.5 py-0.5 bg-slate-100 rounded">4. Mid-R</span>
+                        <span>•</span>
+                        <span className="px-1.5 py-0.5 bg-slate-100 rounded">5. Right</span>
+                    </div>
+                </div>
 
-                    {/* Column 2: Medium Card */}
-                    <div className="space-y-3">
-                        {renderCardEditor(col2, '2. Mid-Left Card', 'Medium vertical media')}
-                    </div>
+                {/* Balanced, Spacious 3-Column Grid for Admin Cards (2 Rows × 3 Cards) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Row 1 */}
+                    {renderCardEditor(col1, '1. Left Tall Column', 'Homepage leftmost tall portrait card')}
+                    {renderCardEditor(col2, '2. Mid-Left Column', 'Homepage mid-left medium portrait card')}
+                    {renderCardEditor(col3Top, '3A. Center Top Card', 'Homepage center stack (Upper card)')}
 
-                    {/* Column 3: Center Stack (2 cards) */}
-                    <div className="space-y-3">
-                        {renderCardEditor(col3Top, '3A. Center Top', 'Horizontal card')}
-                        {renderCardEditor(col3Bottom, '3B. Center Bottom', 'Horizontal card')}
-                    </div>
-
-                    {/* Column 4: Medium Card */}
-                    <div className="space-y-3">
-                        {renderCardEditor(col4, '4. Mid-Right Card', 'Medium-tall media')}
-                    </div>
-
-                    {/* Column 5: Tall Card */}
-                    <div className="space-y-3">
-                        {renderCardEditor(col5, '5. Right Tall Card', 'Tall portrait media')}
-                    </div>
+                    {/* Row 2 */}
+                    {renderCardEditor(col3Bottom, '3B. Center Bottom Card', 'Homepage center stack (Lower card)')}
+                    {renderCardEditor(col4, '4. Mid-Right Column', 'Homepage mid-right medium-tall card')}
+                    {renderCardEditor(col5, '5. Right Tall Column', 'Homepage rightmost tall portrait card')}
                 </div>
             </div>
 
