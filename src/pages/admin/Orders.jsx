@@ -5,11 +5,199 @@ import { useToast } from '../../context/ToastContext';
 import { 
     Trash2, ExternalLink, Filter, Search, MoreVertical, X, Package, 
     User, Mail, Phone, MapPin, CreditCard, ChevronRight, Bell, Eye, 
-    Copy, Check, Truck, Image as ImageIcon 
+    Copy, Check, Truck, Image as ImageIcon, Clock, Tag, ZoomIn, Calendar,
+    Palette, Maximize2 
 } from 'lucide-react';
 import { testTelegramNotification } from '../../lib/telegramNotifier';
 import { testNtfyNotification, getNtfyTopic } from '../../lib/ntfyNotifier';
 import { supabase } from '../../lib/supabaseClient';
+
+// Helper to format full order date and time
+const formatOrderDateTime = (dateStr) => {
+    if (!dateStr) return 'N/A';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return String(dateStr);
+    return date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    });
+};
+
+// Helper for relative time (e.g. 5m ago, 2h ago)
+const getRelativeTime = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '';
+    const diffMs = Date.now() - date.getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHr = Math.floor(diffMin / 60);
+    const diffDays = Math.floor(diffHr / 24);
+
+    if (diffSec < 60) return 'Just now';
+    if (diffMin < 60) return `${diffMin}m ago`;
+    if (diffHr < 24) return `${diffHr}h ago`;
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 30) return `${diffDays}d ago`;
+    return '';
+};
+
+// Known eyewear frame shapes/styles (distinguished from color/size variants)
+const FRAME_SHAPES = new Set([
+    'round', 'square', 'aviator', 'wayfarer', 'cat eye', 'cat-eye',
+    'rectangle', 'oval', 'clubmaster', 'browline', 'geometric',
+    'shield', 'rimless', 'half rim', 'half-rim', 'oversized', 'pilot',
+    'hexagonal', 'octagonal', 'round metal', 'square metal', 'aviator metal',
+    'wrap', 'butterfly', 'semi-rimless', 'horn-rimmed', 'teashades', 'pantoscopic'
+]);
+
+// Color hex mappings for subtle visual indicator dots
+const COLOR_HEX_MAP = {
+    silver: '#94a3b8',
+    gold: '#eab308',
+    golden: '#eab308',
+    black: '#18181b',
+    ash: '#64748b',
+    grey: '#64748b',
+    gray: '#64748b',
+    gunmetal: '#475569',
+    brown: '#78350f',
+    tortoise: '#92400e',
+    bronze: '#b45309',
+    copper: '#b45309',
+    blue: '#2563eb',
+    red: '#dc2626',
+    green: '#16a34a',
+    rose: '#f43f5e',
+    pink: '#ec4899',
+    purple: '#9333ea',
+    white: '#f8fafc',
+    transparent: '#cbd5e1',
+    clear: '#cbd5e1'
+};
+
+const getVariantColorDot = (colorName = '') => {
+    if (!colorName) return '#94a3b8';
+    const lower = colorName.toLowerCase();
+    for (const [key, hex] of Object.entries(COLOR_HEX_MAP)) {
+        if (lower.includes(key)) return hex;
+    }
+    return '#94a3b8';
+};
+
+// Intelligently extracts Color and Size from item, variant, and product metadata
+const extractPurchasedVariant = (item, orderNotes = '') => {
+    if (!item) return { color: 'Standard', size: 'Standard', frameStyle: '', displayText: 'Color: Standard • Size: Standard' };
+
+    let color = item.selected_color || '';
+    let size = item.selected_size || '';
+    let frameStyle = item.products?.style || '';
+
+    // 1. Raw style string from order_items table (e.g. "Black, medium" or "Round | Lens: ...")
+    const rawStyle = (item.style || '').split('|')[0].trim();
+    const isDefaultOrEmpty = !rawStyle || rawStyle.toLowerCase() === 'default';
+
+    // 2. Parse rawStyle
+    if (!isDefaultOrEmpty && rawStyle.includes(',')) {
+        const parts = rawStyle.split(',').map(p => p.trim()).filter(Boolean);
+        if (parts.length >= 2) {
+            color = color || parts[0];
+            size = size || parts[1];
+        } else if (parts.length === 1) {
+            color = color || parts[0];
+        }
+    } else if (!isDefaultOrEmpty) {
+        const lower = rawStyle.toLowerCase();
+        const isFrameShape = FRAME_SHAPES.has(lower) || 
+            (item.products?.style && item.products.style.toLowerCase() === lower);
+
+        if (isFrameShape) {
+            frameStyle = frameStyle || rawStyle;
+        } else {
+            // Check if matches variant color/size
+            let variants = item.products?.variants;
+            if (typeof variants === 'string') {
+                try { variants = JSON.parse(variants); } catch (e) { variants = []; }
+            }
+            if (Array.isArray(variants)) {
+                const matched = variants.find(v => 
+                    (v.color && v.color.trim().toLowerCase() === lower) ||
+                    (v.size && v.size.trim().toLowerCase() === lower)
+                );
+                if (matched) {
+                    if (matched.color && matched.color.trim().toLowerCase() === lower) {
+                        color = color || matched.color;
+                        size = size || matched.size;
+                    } else if (matched.size && matched.size.trim().toLowerCase() === lower) {
+                        size = size || matched.size;
+                    }
+                } else {
+                    color = color || rawStyle;
+                }
+            } else {
+                color = color || rawStyle;
+            }
+        }
+    }
+
+    // 3. Fallback to product's base color
+    if (!color && item.products?.color) {
+        color = item.products.color;
+    }
+
+    // 4. Infer from product name if still missing (e.g. "Cat_2_MJ-98295_Silver" -> "Silver")
+    if (!color && item.products?.name) {
+        const nameParts = item.products.name.split(/[_\-\s]+/);
+        const lastPart = nameParts[nameParts.length - 1];
+        if (lastPart && !/^\d+$/.test(lastPart) && lastPart.length > 2) {
+            color = lastPart;
+        }
+    }
+
+    // 5. Fallback to order shipping address notes
+    if (!color && orderNotes) {
+        const cleanNotes = orderNotes.trim();
+        if (cleanNotes.length < 25 && !cleanNotes.includes('\n')) {
+            color = cleanNotes;
+        }
+    }
+
+    // 6. Size fallback
+    if (!size) {
+        let variants = item.products?.variants;
+        if (typeof variants === 'string') {
+            try { variants = JSON.parse(variants); } catch (e) { variants = []; }
+        }
+        if (Array.isArray(variants) && variants.length > 0) {
+            const matchedByColor = color ? variants.find(v => v.color && v.color.trim().toLowerCase() === color.trim().toLowerCase()) : null;
+            if (matchedByColor && matchedByColor.size) {
+                size = matchedByColor.size;
+            } else if (variants[0].size) {
+                size = variants[0].size;
+            } else {
+                size = 'Standard';
+            }
+        } else {
+            size = 'Standard';
+        }
+    }
+
+    if (!color) {
+        color = 'Standard';
+    }
+
+    return {
+        color: color.trim(),
+        size: size.trim(),
+        frameStyle: frameStyle.trim(),
+        displayText: `Color: ${color.trim()} • Size: ${size.trim()}`
+    };
+};
 
 // Reusable CopyButton with instant feedback and animated checkmark
 const CopyButton = ({ 
@@ -88,9 +276,61 @@ const formatCourierText = (order) => {
                    order.payment_method?.toLowerCase() !== 'cash on delivery' && 
                    Boolean(order.payment_details?.transaction_id);
     const codAmount = isPaid ? 0 : (order.total_amount || 0);
-    const items = (order.order_items || []).map(i => `${i.products?.name || 'Product'} (x${i.quantity})`).join(', ');
 
-    return `Name: ${name}\nPhone: ${phone}\nAddress: ${address}\nAmount: ৳${codAmount}\nNote: Order #${order.id?.slice(0, 8)} (${items})`;
+    const orderItems = order.order_items || [];
+    const isSingleItem = orderItems.length === 1;
+
+    let itemsDetails = '';
+    const itemsNoteList = [];
+
+    orderItems.forEach((i, idx) => {
+        const vInfo = extractPurchasedVariant(i, addr.notes);
+        const lensMatch = i.style?.match(/Lens:\s*([^|(\[]+)/);
+        const lensName = lensMatch ? lensMatch[1].trim() : '';
+        const rxPowerMatch = i.style?.match(/\[Rx:\s*([^\]]+)\]/);
+        const rxPower = rxPowerMatch ? rxPowerMatch[1].trim() : '';
+        const prodName = i.products?.name || 'Product';
+
+        // Summary for Note line (e.g. "Cat_2_MJ-98295_Silver (Color: Silver, Size: Medium) x1")
+        let noteItemStr = `${prodName} (Color: ${vInfo.color}, Size: ${vInfo.size}) x${i.quantity}`;
+        if (vInfo.frameStyle) noteItemStr += ` [Shape: ${vInfo.frameStyle}]`;
+        if (lensName) noteItemStr += ` [Lens: ${lensName}]`;
+        if (rxPower) noteItemStr += ` [Rx: ${rxPower}]`;
+        itemsNoteList.push(noteItemStr);
+
+        // Explicit fields for courier copy
+        if (isSingleItem) {
+            itemsDetails += `Product: ${prodName}\n`;
+            itemsDetails += `Color: ${vInfo.color}\n`;
+            itemsDetails += `Size: ${vInfo.size}\n`;
+            if (vInfo.frameStyle) itemsDetails += `Shape: ${vInfo.frameStyle}\n`;
+            if (lensName) itemsDetails += `Lens: ${lensName}\n`;
+            if (rxPower) itemsDetails += `Rx Power: ${rxPower}\n`;
+            itemsDetails += `Quantity: ${i.quantity}\n`;
+        } else {
+            itemsDetails += `Product ${idx + 1}: ${prodName}\n`;
+            itemsDetails += `  Color: ${vInfo.color}\n`;
+            itemsDetails += `  Size: ${vInfo.size}\n`;
+            if (vInfo.frameStyle) itemsDetails += `  Shape: ${vInfo.frameStyle}\n`;
+            if (lensName) itemsDetails += `  Lens: ${lensName}\n`;
+            if (rxPower) itemsDetails += `  Rx Power: ${rxPower}\n`;
+            itemsDetails += `  Quantity: ${i.quantity}\n`;
+        }
+    });
+
+    let res = `Name: ${name}\n`;
+    res += `Phone: ${phone}\n`;
+    res += `Address: ${address}\n`;
+    res += `Amount: ৳${codAmount}\n`;
+    if (itemsDetails) {
+        res += itemsDetails;
+    }
+    res += `Note: Order #${order.id?.slice(0, 8)} | ${itemsNoteList.join(' | ')}`;
+    if (addr.notes && addr.notes.trim()) {
+        res += `\nCustomer Note: ${addr.notes.trim()}`;
+    }
+
+    return res;
 };
 
 // Generate Full Order Text
@@ -108,7 +348,7 @@ const generateFullOrderText = (order, getItemImgFn) => {
     text += `===============================\n`;
     text += `Order ID: #${order.id}\n`;
     text += `Status: ${(order.status || '').toUpperCase()}\n`;
-    text += `Date: ${new Date(order.created_at || Date.now()).toLocaleString()}\n\n`;
+    text += `Order Placed: ${formatOrderDateTime(order.created_at)}\n\n`;
 
     text += `👤 CUSTOMER INFORMATION:\n`;
     text += `Name: ${name}\n`;
@@ -131,6 +371,7 @@ const generateFullOrderText = (order, getItemImgFn) => {
     text += `🛍️ ORDER ITEMS (${(order.order_items || []).length}):\n`;
     (order.order_items || []).forEach((item, idx) => {
         const itemImg = getItemImgFn ? getItemImgFn(item) : (item.products?.image_url || '');
+        const vInfo = extractPurchasedVariant(item, addr.notes);
         const lensMatch = item.style?.match(/Lens:\s*([^|(\[]+)/);
         const lensName = lensMatch ? lensMatch[1].trim() : '';
         const rxPowerMatch = item.style?.match(/\[Rx:\s*([^\]]+)\]/);
@@ -139,7 +380,10 @@ const generateFullOrderText = (order, getItemImgFn) => {
         const rxUrl = urlMatch ? urlMatch[1].trim() : '';
 
         text += `${idx + 1}. ${item.products?.name || 'Product'}\n`;
-        text += `   - Config: ${item.style?.split('|')[0]?.trim() || 'Default'}\n`;
+        text += `   - Variant: Color: ${vInfo.color}, Size: ${vInfo.size}\n`;
+        if (vInfo.frameStyle) {
+            text += `   - Frame Shape: ${vInfo.frameStyle}\n`;
+        }
         if (lensName) text += `   - Lens: ${lensName}\n`;
         if (rxPower) text += `   - Rx Power: ${rxPower}\n`;
         if (rxUrl) text += `   - Doctor Slip: ${rxUrl}\n`;
@@ -169,6 +413,7 @@ const generateFullOrderHtml = (order, getItemImgFn) => {
 
     const itemsRowsHtml = (order.order_items || []).map((item) => {
         const itemImg = getItemImgFn ? getItemImgFn(item) : (item.products?.image_url || '');
+        const vInfo = extractPurchasedVariant(item, addr.notes);
         const lensMatch = item.style?.match(/Lens:\s*([^|(\[]+)/);
         const lensName = lensMatch ? lensMatch[1].trim() : '';
         const rxPowerMatch = item.style?.match(/\[Rx:\s*([^\]]+)\]/);
@@ -178,18 +423,19 @@ const generateFullOrderHtml = (order, getItemImgFn) => {
 
         return `
         <tr style="border-bottom: 1px solid #e2e8f0;">
-          <td style="padding: 10px; width: 70px; vertical-align: top;">
-            ${itemImg ? `<img src="${itemImg}" alt="${item.products?.name || ''}" width="65" height="65" style="object-fit: contain; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff;" />` : '<div style="width:65px;height:65px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#94a3b8;">No Image</div>'}
+          <td style="padding: 12px; width: 90px; vertical-align: top;">
+            ${itemImg ? `<img src="${itemImg}" alt="${item.products?.name || ''}" width="85" height="85" style="object-fit: contain; border-radius: 10px; border: 1px solid #e2e8f0; background: #fff;" />` : '<div style="width:85px;height:85px;background:#f1f5f9;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#94a3b8;">No Image</div>'}
           </td>
-          <td style="padding: 10px; vertical-align: top;">
+          <td style="padding: 12px; vertical-align: top;">
             <div style="font-weight: bold; font-size: 14px; color: #0f172a; margin-bottom: 4px;">${item.products?.name || 'Product'}</div>
-            <div style="font-size: 12px; color: #64748b;">${item.style?.split('|')[0]?.trim() || 'Default'}</div>
+            <div style="display: inline-block; background: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin: 3px 0;">🏷️ Color: ${vInfo.color} &bull; Size: ${vInfo.size}</div>
+            ${vInfo.frameStyle ? `<div style="font-size: 11px; color: #64748b; margin-top: 2px;">Frame Shape: ${vInfo.frameStyle}</div>` : ''}
             ${lensName ? `<div style="font-size: 11px; color: #0284c7; font-weight: bold; margin-top: 3px;">👓 Lens: ${lensName}</div>` : ''}
             ${rxPower ? `<div style="font-size: 11px; font-family: monospace; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 3px;">Rx: ${rxPower}</div>` : ''}
             ${rxUrl ? `<div style="font-size: 11px; margin-top: 3px;"><a href="${rxUrl}" target="_blank" style="color: #2563eb; text-decoration: underline;">View Doctor Slip</a></div>` : ''}
           </td>
-          <td style="padding: 10px; text-align: center; vertical-align: top; font-weight: bold; font-size: 14px;">${item.quantity}</td>
-          <td style="padding: 10px; text-align: right; vertical-align: top; font-weight: bold; font-size: 14px; color: #0f172a;">৳${Number(item.unit_price || 0).toLocaleString()}</td>
+          <td style="padding: 12px; text-align: center; vertical-align: top; font-weight: bold; font-size: 14px;">${item.quantity}</td>
+          <td style="padding: 12px; text-align: right; vertical-align: top; font-weight: bold; font-size: 14px; color: #0f172a;">৳${Number(item.unit_price || 0).toLocaleString()}</td>
         </tr>
         `;
     }).join('');
@@ -199,7 +445,7 @@ const generateFullOrderHtml = (order, getItemImgFn) => {
       <div style="border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: baseline;">
         <div>
           <h2 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 800; color: #0f172a;">CHOSHMA ZONE ORDER</h2>
-          <p style="margin: 0; font-size: 12px; font-family: monospace; color: #64748b;">Order ID: #${order.id}</p>
+          <p style="margin: 0; font-size: 12px; font-family: monospace; color: #64748b;">Order ID: #${order.id} &bull; Placed: ${formatOrderDateTime(order.created_at)}</p>
         </div>
         <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 9999px;">
           ${order.status}
@@ -410,18 +656,32 @@ const AdminOrders = () => {
     );
 
     const getItemImage = (item) => {
-        if (item.style && item.style !== 'Default' && item.products?.variants) {
-            const variant = item.products.variants.find(v => {
-                const parts = [];
-                if (v.color) parts.push(v.color);
-                if (v.size) parts.push(v.size);
-                return parts.join(', ') === item.style;
-            });
-            if (variant && variant.image_url) {
-                return variant.image_url;
-            }
+        if (!item) return '';
+        const vInfo = extractPurchasedVariant(item, selectedOrder?.shipping_address?.notes);
+        let variants = item.products?.variants;
+        if (typeof variants === 'string') {
+            try { variants = JSON.parse(variants); } catch (e) { variants = []; }
         }
-        return item.products?.image_url;
+
+        if (Array.isArray(variants) && variants.length > 0) {
+            const targetColor = (vInfo.color || '').toLowerCase();
+            const targetSize = (vInfo.size || '').toLowerCase();
+
+            // 1. Match both color and size
+            const exactVariant = variants.find(v => 
+                v.color && String(v.color).trim().toLowerCase() === targetColor &&
+                v.size && String(v.size).trim().toLowerCase() === targetSize
+            );
+            if (exactVariant?.image_url) return exactVariant.image_url;
+
+            // 2. Match color
+            const colorVariant = variants.find(v => 
+                v.color && String(v.color).trim().toLowerCase() === targetColor
+            );
+            if (colorVariant?.image_url) return colorVariant.image_url;
+        }
+
+        return item.products?.image_url || '';
     };
 
     const copyImageDirectly = async (imageUrl, productName = 'Product') => {
@@ -548,7 +808,7 @@ const AdminOrders = () => {
         try {
             const courierText = formatCourierText(order);
             await navigator.clipboard.writeText(courierText);
-            showToast('Courier booking details copied! (Name, Phone, Address, COD)', 'success');
+            showToast('Courier booking details copied! (Includes Color, Size & Full Order Info)', 'success');
         } catch (err) {
             showToast('Failed to copy courier details', 'error');
         }
@@ -753,12 +1013,26 @@ const AdminOrders = () => {
                                         </select>
                                     </td>
                                     <td className="px-6 py-5">
-                                        <span className="text-sm text-text-main font-outfit">
-                                            {new Date(order.created_at).toLocaleDateString(undefined, { dateStyle: 'medium' })}
-                                        </span>
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-semibold text-text-main font-outfit whitespace-nowrap">
+                                                {new Date(order.created_at).toLocaleDateString(undefined, { dateStyle: 'medium' })}
+                                            </span>
+                                            <span className="text-xs text-text-muted font-outfit whitespace-nowrap flex items-center gap-1 mt-0.5">
+                                                <Clock size={11} className="text-primary/70 shrink-0" />
+                                                {new Date(order.created_at).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true })}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td className="px-6 py-5 text-right" onClick={(e) => e.stopPropagation()}>
                                         <div className="flex items-center justify-end gap-2">
+                                            <button
+                                                onClick={() => handleCopyCourier(order)}
+                                                className="flex items-center gap-1 px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200/80 rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-all shadow-xs"
+                                                title="Copy Courier Booking Info (with Color, Size, Address & COD)"
+                                            >
+                                                <Truck size={13} className="text-amber-700" />
+                                                <span className="hidden xl:inline">Courier</span>
+                                            </button>
                                             <button
                                                 onClick={() => openOrderDetails(order)}
                                                 className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-all shadow-xs group/btn"
@@ -791,25 +1065,39 @@ const AdminOrders = () => {
                         onClick={closeOrderDetails}
                     ></div>
 
-                    <div className="relative bg-white w-full max-w-5xl max-h-[90vh] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 slide-in-from-bottom-8 duration-500">
+                    <div className="relative bg-white w-full max-w-6xl xl:max-w-7xl max-h-[92vh] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 slide-in-from-bottom-8 duration-500">
                         {/* Modal Header */}
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between px-8 py-6 border-b border-border/50 gap-4">
                             <div>
-                                <div className="flex items-center gap-3 mb-1 flex-wrap">
+                                <div className="flex items-center gap-3 mb-1.5 flex-wrap">
                                     <h2 className="text-2xl font-bold text-text-main font-outfit uppercase tracking-tight">Order Details</h2>
                                     <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${getStatusStyles(selectedOrder.status)}`}>
                                         {selectedOrder.status}
                                     </span>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <p className="text-sm font-mono text-text-muted">Order ID: #{selectedOrder.id}</p>
-                                    <CopyButton
-                                        text={selectedOrder.id}
-                                        title="Copy Full Order ID"
-                                        iconSize={13}
-                                        className="p-1 hover:bg-gray-100 rounded-md text-text-muted hover:text-primary transition-colors"
-                                        onCopySuccess={() => showToast('Order ID copied!', 'success')}
-                                    />
+                                <div className="flex items-center gap-3 flex-wrap">
+                                    <div className="flex items-center gap-1.5">
+                                        <p className="text-sm font-mono text-text-muted">Order ID: #{selectedOrder.id}</p>
+                                        <CopyButton
+                                            text={selectedOrder.id}
+                                            title="Copy Full Order ID"
+                                            iconSize={13}
+                                            className="p-1 hover:bg-gray-100 rounded-md text-text-muted hover:text-primary transition-colors"
+                                            onCopySuccess={() => showToast('Order ID copied!', 'success')}
+                                        />
+                                    </div>
+                                    <div className="inline-flex items-center gap-1.5 text-xs font-outfit bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-xl shadow-2xs font-semibold">
+                                        <Clock size={13} className="text-primary shrink-0" />
+                                        <span>Order Time:</span>
+                                        <span className="font-extrabold text-text-main">
+                                            {formatOrderDateTime(selectedOrder.created_at)}
+                                        </span>
+                                        {getRelativeTime(selectedOrder.created_at) && (
+                                            <span className="text-[10px] font-medium text-text-muted">
+                                                ({getRelativeTime(selectedOrder.created_at)})
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -1010,14 +1298,15 @@ const AdminOrders = () => {
                                         <table className="w-full text-left border-collapse">
                                             <thead className="bg-gray-50/50">
                                                 <tr>
-                                                    <th className="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest font-outfit">Product</th>
-                                                    <th className="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest font-outfit">Configuration / Lenses</th>
-                                                    <th className="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest font-outfit text-center">Qty</th>
-                                                    <th className="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest font-outfit text-right">Price</th>
+                                                    <th className="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest font-outfit min-w-[240px]">Product</th>
+                                                    <th className="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest font-outfit min-w-[240px]">Variant & Lens Config</th>
+                                                    <th className="px-4 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest font-outfit text-center w-16">Qty</th>
+                                                    <th className="px-6 py-4 text-[10px] font-bold text-text-muted uppercase tracking-widest font-outfit text-right w-24">Price</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-border/30">
                                                 {selectedOrder.order_items?.map((item) => {
+                                                    const vInfo = extractPurchasedVariant(item, selectedOrder.shipping_address?.notes);
                                                     const urlMatch = item.style?.match(/\[URL:\s*([^\]]+)\]/);
                                                     const rxUrl = urlMatch ? urlMatch[1].trim() : '';
                                                     const isWhatsApp = item.style?.includes('WhatsApp Follow-up');
@@ -1029,16 +1318,16 @@ const AdminOrders = () => {
 
                                                     return (
                                                     <tr key={item.id} className="group hover:bg-gray-50/50 transition-colors">
-                                                        <td className="px-6 py-4">
-                                                            <div className="flex items-center gap-3">
-                                                                {/* Image with direct copy button */}
+                                                        <td className="px-6 py-5">
+                                                            <div className="flex items-center gap-4">
+                                                                {/* Bigger, clear Product Image */}
                                                                 <div className="relative group/thumb shrink-0">
                                                                     <button
                                                                         type="button"
                                                                         onClick={() => {
                                                                             if (itemImg) setPreviewImage(itemImg);
                                                                         }}
-                                                                        className="w-14 h-14 bg-white rounded-xl border border-border/50 flex items-center justify-center p-1.5 shadow-sm hover:scale-105 hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden group/img"
+                                                                        className="w-24 h-24 sm:w-28 sm:h-28 bg-white rounded-2xl border-2 border-border/70 flex items-center justify-center p-2 shadow-sm hover:scale-105 hover:shadow-lg hover:border-primary/50 transition-all duration-300 cursor-pointer overflow-hidden group/img relative"
                                                                         title="Click to zoom image"
                                                                     >
                                                                         {itemImg ? (
@@ -1048,7 +1337,13 @@ const AdminOrders = () => {
                                                                                 className="w-full h-full object-contain mix-blend-multiply group-hover/img:scale-110 transition-transform duration-500"
                                                                             />
                                                                         ) : (
-                                                                            <Package size={20} className="text-gray-300" />
+                                                                            <Package size={28} className="text-gray-300" />
+                                                                        )}
+                                                                        {itemImg && (
+                                                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[10px] font-bold gap-1 rounded-2xl pointer-events-none backdrop-blur-[1px]">
+                                                                                <ZoomIn size={16} />
+                                                                                <span>Zoom</span>
+                                                                            </div>
                                                                         )}
                                                                     </button>
                                                                     {itemImg && (
@@ -1059,48 +1354,99 @@ const AdminOrders = () => {
                                                                                 copyImageDirectly(itemImg, item.products?.name);
                                                                             }}
                                                                             title="Copy product image to clipboard"
-                                                                            className="absolute -bottom-1 -right-1 p-1 bg-white hover:bg-primary hover:text-white text-text-muted rounded-md shadow-md border border-border/60 transition-all hover:scale-110 cursor-pointer"
+                                                                            className="absolute -bottom-1 -right-1 p-1.5 bg-white hover:bg-primary hover:text-white text-text-muted rounded-lg shadow-md border border-border/70 transition-all hover:scale-110 cursor-pointer z-10"
                                                                         >
-                                                                            <ImageIcon size={11} />
+                                                                            <ImageIcon size={12} />
                                                                         </button>
                                                                     )}
                                                                 </div>
-                                                                <div className="flex flex-col">
-                                                                    <div className="flex items-center gap-1.5">
-                                                                        <span className="text-sm font-bold text-text-main font-outfit max-w-[150px] line-clamp-2">
+                                                                <div className="flex flex-col min-w-0">
+                                                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                                                        <span className="text-sm font-bold text-text-main font-outfit max-w-[180px] sm:max-w-[220px] line-clamp-2">
                                                                             {item.products?.name || <span className="text-text-muted italic">Deleted Product</span>}
                                                                         </span>
                                                                         <CopyButton
-                                                                            text={`${item.products?.name || 'Product'} (${item.style?.split('|')[0]?.trim() || 'Default'}) - Qty: ${item.quantity} - ৳${item.unit_price}${itemImg ? ` - Image: ${itemImg}` : ''}`}
+                                                                            text={`${item.products?.name || 'Product'} (Color: ${vInfo.color}, Size: ${vInfo.size}) - Qty: ${item.quantity} - ৳${item.unit_price}${itemImg ? ` - Image: ${itemImg}` : ''}`}
                                                                             title="Copy Product Details"
                                                                             iconSize={12}
                                                                             className="p-1 text-text-muted hover:text-primary rounded hover:bg-gray-100 transition-colors"
                                                                             onCopySuccess={() => showToast('Product info copied!', 'success')}
                                                                         />
                                                                     </div>
+
+                                                                    {/* Color and Size badges under product name */}
+                                                                    <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-amber-500/10 text-amber-900 border border-amber-500/25 text-xs font-bold font-outfit shadow-2xs">
+                                                                            <span className="w-2 h-2 rounded-full border border-black/15 shrink-0" style={{ backgroundColor: getVariantColorDot(vInfo.color) }}></span>
+                                                                            <span>Color: <strong className="font-extrabold text-amber-950">{vInfo.color}</strong></span>
+                                                                        </span>
+                                                                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-zinc-100 text-zinc-800 border border-zinc-200 text-xs font-bold font-outfit shadow-2xs">
+                                                                            <Maximize2 size={10} className="text-zinc-500" />
+                                                                            <span>Size: <strong className="font-extrabold text-zinc-950">{vInfo.size}</strong></span>
+                                                                        </span>
+                                                                    </div>
+
                                                                     {itemImg && (
                                                                         <button
                                                                             type="button"
                                                                             onClick={() => copyImageDirectly(itemImg, item.products?.name)}
-                                                                            className="text-[10px] text-primary/80 hover:text-primary text-left font-outfit flex items-center gap-1 mt-0.5 cursor-pointer"
+                                                                            className="text-[11px] text-primary/80 hover:text-primary text-left font-outfit flex items-center gap-1 mt-1 cursor-pointer font-medium"
                                                                         >
-                                                                            <Copy size={9} /> Copy Image
+                                                                            <Copy size={11} /> Copy Image
                                                                         </button>
                                                                     )}
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-4">
-                                                            <div className="space-y-1.5 font-outfit max-w-xs">
-                                                                <div className="text-xs text-text-muted">
-                                                                    {item.style?.split('|')[0]?.trim() || 'Default'}
+                                                        <td className="px-6 py-5">
+                                                            <div className="space-y-2.5 font-outfit min-w-[220px]">
+                                                                {/* Purchased Variant: Color & Size */}
+                                                                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/60 border border-amber-200/90 shadow-2xs space-y-2.5">
+                                                                    <div className="flex items-center justify-between gap-1 flex-wrap">
+                                                                        <span className="text-[10px] uppercase tracking-wider font-extrabold text-amber-900 flex items-center gap-1.5">
+                                                                            <Tag size={13} className="text-amber-700 shrink-0" />
+                                                                            Purchased Variant
+                                                                        </span>
+                                                                        {vInfo.frameStyle && (
+                                                                            <span className="text-[10px] text-amber-900 font-bold bg-amber-200/70 px-2 py-0.5 rounded-md border border-amber-300/60 whitespace-nowrap" title="Frame Shape / Style">
+                                                                                Shape: {vInfo.frameStyle}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                    <div className="flex flex-col gap-1.5">
+                                                                        <div className="flex items-center justify-between bg-white/95 px-3 py-2 rounded-xl border border-amber-200/70 shadow-2xs">
+                                                                            <span className="text-[10px] uppercase tracking-widest text-text-muted font-bold">Color</span>
+                                                                            <div className="flex items-center gap-1.5">
+                                                                                <span className="w-2.5 h-2.5 rounded-full border border-black/15 shrink-0" style={{ backgroundColor: getVariantColorDot(vInfo.color) }}></span>
+                                                                                <span className="text-xs font-black text-amber-950 font-outfit">
+                                                                                    {vInfo.color}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="flex items-center justify-between bg-white/95 px-3 py-2 rounded-xl border border-amber-200/70 shadow-2xs">
+                                                                            <span className="text-[10px] uppercase tracking-widest text-text-muted font-bold">Size</span>
+                                                                            <div className="flex items-center gap-1">
+                                                                                <Maximize2 size={11} className="text-amber-700 shrink-0" />
+                                                                                <span className="text-xs font-black text-amber-950 font-outfit">
+                                                                                    {vInfo.size}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
 
+                                                                {/* Lens Configuration (if any) */}
                                                                 {lensName && (
-                                                                    <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                                                                        <span className="text-[10px] font-bold px-2 py-0.5 bg-primary/10 text-primary rounded-md border border-primary/20">
-                                                                            👓 {lensName}
-                                                                        </span>
+                                                                    <div className="flex items-center gap-2 p-2.5 rounded-2xl bg-blue-50/90 border border-blue-200/80 shadow-2xs">
+                                                                        <span className="text-base">👓</span>
+                                                                        <div className="flex flex-col min-w-0">
+                                                                            <span className="text-[10px] uppercase tracking-wider font-extrabold text-blue-700">
+                                                                                Lens Configuration
+                                                                            </span>
+                                                                            <span className="text-xs font-bold text-blue-950 font-outfit">
+                                                                                {lensName}
+                                                                            </span>
+                                                                        </div>
                                                                     </div>
                                                                 )}
 
@@ -1109,7 +1455,7 @@ const AdminOrders = () => {
                                                                         <button
                                                                             type="button"
                                                                             onClick={() => setPreviewImage(rxUrl)}
-                                                                            className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 px-2 py-1 rounded-lg transition-colors cursor-pointer"
+                                                                            className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 px-2.5 py-1 rounded-lg transition-colors cursor-pointer shadow-2xs"
                                                                         >
                                                                             <span>🔍 View Doctor Slip</span>
                                                                         </button>
@@ -1124,7 +1470,8 @@ const AdminOrders = () => {
                                                                 )}
 
                                                                 {rxPower && (
-                                                                    <div className="text-[10px] font-mono bg-gray-100 p-1.5 rounded-md border border-gray-200 text-gray-800 leading-tight">
+                                                                    <div className="text-[10px] font-mono bg-gray-100 p-2 rounded-lg border border-gray-200 text-gray-800 leading-snug">
+                                                                        <span className="font-bold text-gray-600 block mb-0.5">Rx Power:</span>
                                                                         {rxPower}
                                                                     </div>
                                                                 )}
@@ -1134,7 +1481,7 @@ const AdminOrders = () => {
                                                                         href={`https://wa.me/88${selectedOrder.shipping_address.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi ${selectedOrder.shipping_address?.first_name || 'there'}, regarding your Choshma Zone order #${selectedOrder.id.slice(0, 8)}, please send your prescription slip photo.`)}`}
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
-                                                                        className="inline-flex items-center gap-1 text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 hover:bg-green-100 px-2 py-1 rounded-lg transition-colors"
+                                                                        className="inline-flex items-center gap-1 text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 hover:bg-green-100 px-2.5 py-1 rounded-lg transition-colors shadow-2xs"
                                                                     >
                                                                         <span>💬 Chat on WhatsApp for Rx</span>
                                                                     </a>

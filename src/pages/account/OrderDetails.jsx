@@ -83,18 +83,29 @@ const OrderDetails = () => {
         : (order.status === 'completed' ? 3 : 0);
 
     const getItemImage = (item) => {
-        if (item.style && item.style !== 'Default' && item.products?.variants) {
-            const variant = item.products.variants.find(v => {
+        if (!item) return '';
+        const rawStyle = item.style ? item.style.split('|')[0].trim() : '';
+        let variants = item.products?.variants;
+        if (typeof variants === 'string') {
+            try { variants = JSON.parse(variants); } catch (e) { variants = []; }
+        }
+
+        if (rawStyle && rawStyle !== 'Default' && Array.isArray(variants) && variants.length > 0) {
+            const cleanRaw = rawStyle.toLowerCase();
+            const variant = variants.find(v => {
                 const parts = [];
-                if (v.color) parts.push(v.color);
-                if (v.size) parts.push(v.size);
-                return parts.join(', ') === item.style;
+                if (v.color) parts.push(String(v.color).trim());
+                if (v.size) parts.push(String(v.size).trim());
+                const combined = parts.join(', ').toLowerCase();
+                return combined === cleanRaw || 
+                       (v.color && String(v.color).trim().toLowerCase() === cleanRaw) ||
+                       (v.size && String(v.size).trim().toLowerCase() === cleanRaw);
             });
             if (variant && variant.image_url) {
                 return variant.image_url;
             }
         }
-        return item.products?.image_url;
+        return item.products?.image_url || '';
     };
 
     return (

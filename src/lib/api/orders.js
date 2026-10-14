@@ -48,12 +48,19 @@ export const orderParams = {
                 styleStr = styleStr ? `${styleStr} | ${lensDetail}` : lensDetail;
             }
 
+            const selectedColor = item.selected_color || item.variant?.color || item.color || null;
+            const selectedSize = item.selected_size || item.variant?.size || item.size || null;
+            const variantId = item.variant_id || item.variant?.id || null;
+
             return {
                 order_id: order.id,
                 product_id: isUUID ? item.id : null,
                 quantity: item.quantity,
                 unit_price: item.price,
-                style: styleStr || 'Default'
+                style: styleStr || 'Default',
+                selected_color: selectedColor,
+                selected_size: selectedSize,
+                variant_id: variantId
             };
         });
 
@@ -148,7 +155,7 @@ export const orderParams = {
                 profiles (full_name, role),
                 order_items (
                     *,
-                    products (name, image_url, variants)
+                    products (name, image_url, variants, color, style)
                 )
             `)
             .order('created_at', { ascending: false });
@@ -166,7 +173,7 @@ export const orderParams = {
                 profiles (full_name, role),
                 order_items (
                     *,
-                    products (name, image_url, variants)
+                    products (name, image_url, variants, color, style)
                 )
             `)
             .eq('id', id)

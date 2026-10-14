@@ -235,13 +235,23 @@ const ProductDetails = () => {
         
         let variantId = 'base';
         let variantTitleSuffix = '';
+        const color = selectedColor || product?.color || '';
+        const size = selectedSize || (product?.variants?.[0]?.size) || 'Standard';
+
         if (currentVariant) {
             item.variant = currentVariant;
+            item.selected_color = currentVariant.color || color;
+            item.selected_size = currentVariant.size || size;
             variantId = currentVariant.id;
             variantTitleSuffix = `${selectedColor ? ` - ${selectedColor}` : ''}${selectedSize ? ` - ${selectedSize}` : ''}`;
             if (currentVariant.image_url) {
                 item.image = currentVariant.image_url;
             }
+        } else {
+            item.selected_color = color;
+            item.selected_size = size;
+            item.variant = { color, size };
+            variantTitleSuffix = `${color ? ` - ${color}` : ''}${size && size !== 'Standard' ? ` - ${size}` : ''}`;
         }
 
         item.title = `${product.title}${variantTitleSuffix}`;
