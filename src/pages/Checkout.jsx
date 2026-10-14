@@ -341,8 +341,8 @@ const Checkout = () => {
                         matchedVariant = variantsList.find(v => String(v.id) === String(itemVariantId));
                     }
 
-                    // 2. Match by exact color and size
-                    if (!matchedVariant && variantsList.length > 0) {
+                    // 2. Match by exact color and size (only if not explicitly base product)
+                    if (!matchedVariant && itemVariantId !== 'base' && variantsList.length > 0) {
                         const itemColor = (item.selected_color || item.variant?.color || '').trim().toLowerCase();
                         const itemSize = (item.selected_size || item.variant?.size || '').trim().toLowerCase();
 

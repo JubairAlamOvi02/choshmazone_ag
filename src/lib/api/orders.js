@@ -50,7 +50,9 @@ export const orderParams = {
 
             const selectedColor = item.selected_color || item.variant?.color || item.color || null;
             const selectedSize = item.selected_size || item.variant?.size || item.size || null;
-            const variantId = item.variant_id || item.variant?.id || null;
+            const rawVariantId = item.variant_id || item.variant?.id || null;
+            const isVariantUUID = rawVariantId && rawVariantId !== 'base' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(rawVariantId));
+            const variantId = isVariantUUID ? String(rawVariantId) : null;
 
             return {
                 order_id: order.id,
@@ -60,7 +62,9 @@ export const orderParams = {
                 style: styleStr || 'Default',
                 selected_color: selectedColor,
                 selected_size: selectedSize,
-                variant_id: variantId
+                variant_id: variantId,
+                selected_sku: rawVariantId && rawVariantId !== 'base' ? String(rawVariantId) : null,
+                variant_info: item.variant ? item.variant : null
             };
         });
 

@@ -176,9 +176,17 @@ const ProductDetails = () => {
     useEffect(() => {
         if (product && (product.color || (product.variants && product.variants.length > 0))) {
             if (!selectedColor && !selectedSize) {
-                // Default to main product color if exists, else first available variant
-                setSelectedColor(product.color || (product.variants && product.variants.length > 0 ? product.variants[0].color : ''));
-                setSelectedSize(product.variants && product.variants.length > 0 ? product.variants[0].size : '');
+                // Prioritize in-stock variant or base product color
+                const inStockVariant = (product.variants || []).find(v => Number(v.stock_quantity) > 0);
+                const defaultVariant = inStockVariant || (product.variants && product.variants.length > 0 ? product.variants[0] : null);
+
+                const defaultColor = (product.color && Number(product.stock_quantity) > 0)
+                    ? product.color
+                    : (defaultVariant?.color || product.color || '');
+                const defaultSize = defaultVariant?.size || (product.variants && product.variants.length > 0 ? product.variants[0].size : '');
+
+                setSelectedColor(defaultColor);
+                setSelectedSize(defaultSize);
             }
             
             const variant = (product.variants || []).find(v => 
