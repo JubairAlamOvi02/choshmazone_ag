@@ -1,0 +1,66 @@
+# Project Brief: Sunglasses Ecommerce Website
+
+## 1. Project Overview
+We are building a robust, stylish ecommerce website dedicated to selling sunglasses. The platform will serve as a digital storefront, allowing users to browse styles and make purchases, while providing administrators with a powerful dashboard to manage products and orders. The solution leverages **Supabase** for a secure, scalable backend.
+
+## 2. Objectives
+- **Brand Presence**: Create a visually appealing site that establishes a strong brand identity.
+- **User Experience**: Ensure a smooth, intuitive browsing and checkout process.
+- **Dynamic Management**: Enable real-time product and order management via a secure Admin Panel.
+- **Sales Conversion**: Optimize product display and call-to-actions to drive sales.
+
+## 3. Target Audience
+- **Fashion-forward individuals**: Looking for the latest trends.
+- **Practical buyers**: Seeking UV protection and durable eyewear.
+- **Gift shoppers**: Looking for accessories for others.
+
+## 4. Functional Requirements
+### Core Features
+- **Homepage**: Hero banner, featured collections, New Arrivals product grid, promotional highlights, and dynamic **Recently Purchased** showcase (privacy-guaranteed displaying latest purchased products without customer details).
+- **Product Catalog**: Advanced Grid view with "Premium Tag" filtering (Frame Style, Category, Price) and dynamic active filter chips for effortless navigation.
+- **Product Details Page**: High-resolution interactive image gallery with thumbnail support, floating navigation arrows, detailed rich text descriptions, specifications, custom Prescription Lens selection modal, and "Add to Bag" / "Buy Now" controls.
+- **Optical Prescription Flow**: Dedicated lens package selection (Single Vision, Blue Cut, Photochromic, Progressive) with 3 prescription submission flows (Slip Upload, Manual SPH/CYL/AXIS/PD matrix, WhatsApp Later).
+- **Shopping Cart**: Review selected items, adjust quantities, view lens package details, and dynamic subtotal calculation.
+- **Checkout Flow**: Dynamic guest/user checkout with configurable required/optional fields, strict 11-digit Bangladesh phone number validation (`013`–`019`) with live character counter, complete nationwide coverage across all **64 districts** and **500+ thanas/upazilas** aligned with Steadfast Courier (with `Other / অন্যান্য` fallback), district-based delivery charges (৳70 for Dhaka, ৳120 for outside Dhaka & sub-urban), item removal directly from order summary, optional Order Notes, and payment integration (Support for **bKash** and **Cash on Delivery**).
+- **User Portal**:
+    - Registration and Login system.
+    - View Order History and Profile.
+    - **Secure Order Tracking**: Phone-number based order lookup with mandatory Email OTP (One-Time Password) verification for guests and users.
+    - **Session Intelligence**: "Session Active" choice screen for already logged-in users to navigate between Shop, Profile, and Admin areas.
+- **Admin Panel (WordPress-like)**:
+    - Secure Login for Admins.
+    - **Dashboard**: Overview of orders, customers, and system status with **Live Sales Analytics (Recharts)**.
+    - **Product Management**: Full CRUD operations + One-Click Product Duplication, Advanced Multi-Image Upload, and **Unified Drag-and-Drop Gallery** management.
+    - **Rich Text Editing**: Full HTML description support with professional formatting controls.
+    - **Shopify-Style Variants**: Efficient variant management table with combined option views (Color / Size).
+    - **Lens Packages Management**: Full CRUD, pricing, feature list, active toggle, and reordering for optical lens packages at `/admin/lenses`.
+    - **Checkout Form Settings**: Full control at `/admin/settings` to toggle Required vs Optional and Shown vs Hidden for every checkout field (`name`, `phone`, `email`, `address`, `district`, `thana`, `city`, `zip`, `notes`), plus custom label/placeholder management.
+    - **Order Management**: Monitor sales, update statuses, administrative deletion, view attached prescription slips/details, clickable rows for direct detail viewing, and Comprehensive Order Details Modal.
+    - **Real-Time Order Alerting Suite**: 
+        - **Cash Register Audio Chime**: Web Audio API tone synthesis and audio playback (`/sounds/cha-ching.mp3`) producing an authentic "Cha-Ching!" sound and device vibration on new orders.
+        - **Live Floating Admin Banner**: Supabase Realtime PostgreSQL subscription displaying animated order popups and unread counter badge.
+        - **ntfy.sh Mobile Push Alerts**: Zero-cost, zero-setup push alerts to Android & iOS with interactive `View Order` and `Call Customer` action buttons.
+        - **Telegram Bot**: Instant Markdown notifications with interactive inline keyboard buttons for immediate response.
+    - **Media & Content Manager (CMS)**: Manage global assets, customize Homepage Hero Banner (headline typography, gold accent highlight, subtext, background photography, and button design dropdown selectors for color/shape/size/icon) with Live Homepage Preview, edit Promotional Banner copy/imagery, customize Collections hero banner, configure category collection artwork, and customize the **Contact Us Page** (Heading, Subtitle, Showroom Address, Email Support, Hotline) with live interactive preview.
+    - **Facebook Catalog Feed**: Automated XML feed (`api/catalog.js`) compliant with Meta Commerce Manager for dynamic product catalog syncing and Facebook/Instagram Shop integration.
+    - **Category & Collection Control**: Manage dynamic store categories with active/deactivation state toggles (`Active` vs `Deactivated`) to temporarily hide categories without deleting, instant "Featured" toggling (★ / ☆), and live category status tab filters.
+    - **Customer Management**: View registered user list and roles.
+    - **Web Log & Funnel Analytics**: Dedicated real-time dashboard at `/admin/web-logs` tracking unique visitors, page views, conversion funnel milestones (Product View $\rightarrow$ Add to Cart $\rightarrow$ Checkout $\rightarrow$ Purchase) with drop-off percentages, Recharts area trends, device breakdown, high-demand cart items, and live event log table with JSON metadata inspector.
+    - **Inventory Control**: Manage stock levels and dynamic "Active/Inactive" visibility toggle.
+    - **Automated WebP Image Optimizer**: Native client-side WebP compression module automatically optimizing all uploaded imagery (products, variants, site banners, and customer prescription slips) to under ~100 KB with real-time UI indicators, reducing Supabase Storage egress by 95-98%.
+    - **Database Visibility**: Access to schemas and tables for debugging.
+
+
+## 5. Non-Functional Requirements
+- **Responsive Design**: Mobile-first approach with optimized tap targets and fixed mobile product card layouts.
+- **Performance & Bandwidth Optimization**: Fast loading times via route splitting, lazy loading, API response caching, and client-side WebP compression (<100 KB) with 1-year public cache-control headers ensuring Supabase Free Plan egress stays well within limits.
+- **Resilience**: Global Error Boundary protection and high-latency Auth strategies (15s timeouts).
+- **Accessibility**: Adherence to basic web accessibility standards (WCAG).
+
+## 6. Chosen Tech Stack
+- **Frontend**: React (Vite), Lucide Icons, Tailwind CSS v4.
+- **Backend/Data**: **Supabase** (PostgreSQL, Realtime, Auth, Storage).
+- **Redundancy & Email**: Google Sheets Integration for order backups + Google Apps Script for transactional emails.
+- **Mobile Notification & Audio Alerts**: ntfy.sh push notification protocol, Web Audio API Cha-Ching synthesizer, and Telegram Bot API with inline keyboards.
+
+

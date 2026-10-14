@@ -1,0 +1,644 @@
+# Project Task List: Sunglasses Ecommerce
+
+## Phase 1: Setup & Initialization
+- [x] **Project Setup**
+  - [x] Initialize git repository
+  - [x] Set up project structure (folders for assets, styles, scripts)
+  - [x] Select and install tech stack (e.g., Vite + React or Vanilla JS)
+- [x] **Asset Preparation**
+  - [x] Collect high-resolution product images (sunglasses)
+  - [x] Create/download logo and branding assets
+
+## Phase 2: Design System & UI Architecture
+- [x] **Global Styling**
+  - [x] Define color palette (Main, Accent, Neutral, Error/Success)
+  - [x] Set up typography (Headings, Body text)
+  - [x] Create `index.css` with CSS variables/Tailwind config
+  - [x] Implement responsive grid/layout container
+- [x] **UI Components**
+  - [x] Button component (Primary, Secondary, Ghost)
+  - [x] Product Card (Image, Title, Price, Add to Cart)
+  - [x] Navbar (Logo, Navigation Links, Cart Icon)
+  - [x] Footer (Links, Socials, Copyright)
+  - [x] Form Inputs (Text, Email, Checkbox, Radio)
+
+## Phase 3: Core Features Implementation
+- [x] **Homepage**
+  - [x] functionality for Hero Banner (Slider or Static Hero)
+  - [x] "Featured Collections" section
+  - [x] Promotional banner/highlight section
+- [x] **Product Catalog**
+  - [x] Product Grid Layout
+  - [x] Sidebar/Modal for Filters (Frame Style, Lens Color, Brand)
+  - [x] Sorting functionality (Price: Low-High, Newest)
+- [x] **Product Details Page (PDP)**
+  - [x] Image Gallery (Main image + thumbnails)
+  - [x] Product Info (Title, Description, Specifications)
+  - [x] "Add to Cart" Logic (UI only)
+- [x] **Shopping Cart**
+  - [x] Cart Drawer or Dedicated Page
+  - [x] Update Quantity logic
+  - [x] Remove Item logic
+  - [x] Subtotal calculation
+
+## Phase 4: Checkout & Payments
+- [x] **Checkout Form**
+  - [x] Guest User Details (Name, Email, Phone)
+  - [x] Shipping Address Inputs
+- [x] **Payment Integration**
+  - [x] **bKash Integration**
+    - [x] UI for bKash number input/instruction
+    - [x] Logic to handle bKash verification (mock or API)
+  - [x] **Cash on Delivery (COD)**
+    - [x] Option selection logic
+    - [x] Order confirmation triggers
+  - [x] **Google Sheets Integration**
+    - [x] Send order data to Google Sheets via Apps Script
+    - [x] Clear cart on successful order
+- [x] **Order Success**
+  - [x] "Thank You" page with Order Summary
+
+## Phase 5: Admin Panel & Backend Integration (Supabase)
+- [x] **Backend Setup (Supabase)**
+  - [x] Initialize Supabase project
+  - [x] **Database Schema**: Create tables (`profiles`, `products`, `orders`, `order_items`)
+  - [x] **Security**: Configure RLS (Row Level Security) policies
+  - [x] **Storage**: Create bucket for product images
+- [x] **Authentication**
+  - [x] Integrate Supabase Auth (Sign Up, Sign In, Sign Out)
+  - [x] Implement Role-Based Access Control (Admin vs Customer)
+  - [x] Create `ProtectedRoutes` for Admin pages
+- [x] **Admin Dashboard**
+  - [x] Create Admin Layout (Sidebar, Navigation)
+  - [x] **Product Management**: CRUD operations with Storage integration
+  - [x] **Orders Management**: Live list and status updates
+  - [x] **Customers Management**: List registered users and view roles
+  - [x] **Dynamic Stats**: Sales, Order counts, and Customer counts
+
+## Phase 6: Customer Portal
+- [x] **Account Management**
+  - [x] Created "My Profile" page
+  - [x] Created "My Orders" history page
+- [x] **Site Navigation Refinement**
+  - [x] Role-based Navbar (Login/Logout/Dashboard)
+  - [x] Logout redirection to Home
+- [x] **Supporting Pages**
+  - [x] Collections Page (category-based filtering)
+  - [x] About Page (branded story)
+  - [x] Contact Page (lead generation form)
+
+## Phase 7: UI/UX Synchronization & Quality
+- [x] **Data Integrity**
+  - [x] Sync PDP and Shop with Supabase
+  - [x] Automated Cart Validation (remove deleted items)
+- [x] **Error Handling**
+  - [x] UUID validation for guest orders
+  - [x] RLS policy fixes for multi-table inserts (Orders/Items)
+- [x] **Final QA**
+  - [x] Mobile Responsiveness Audit
+  - [x] Performance Optimization (WebP assets)
+  - [x] Server cleanup (port management)
+- [x] **Advanced Features (Post-Launch Refinements)**
+  - [x] Multi-image Gallery support (PDP and Shop hover)
+  - [x] Product activation/deactivation system
+  - [x] Administrative Order deletion with cascading cleanup
+  - [x] Performance: Fixed Blocking UI (INP) via memoization and transitions.
+  - [x] Storage: Fixed filename collision (409 Conflict) with random suffixes.
+  - [x] **Mobile Refresh (Task Id: 33)**: Implemented full mobile responsiveness across all pages.
+  - [x] **Mobile UX (Task Id: 167)**: Resolved specific icon visibility and tap target issues on high-end OnePlus/narrow mobile devices.
+
+## Phase 8: Design Modernization (Tailwind v4)
+- [x] Integrated Tailwind CSS v4 and configured `@theme` tokens.
+- [x] Migrated all Admin Panel pages (Inventory, Orders, Members, Dashboard).
+- [x] Migrated all Storefront pages (Home, Shop, PDP, Checkout).
+- [x] Removed 21+ legacy `.css` files and cleaned up global styles.
+- [x] Optimized Dashboard Overview with explicit Tailwind iconography classes.
+
+## Phase 9: Shop Experience Premium Upgrade
+- [x] **Advanced Filtering (Task Id: 442)**: Implemented "Premium Tag" filtering system with rounded pills and gold active indicators.
+- [x] **Active State Feedback**: Added dynamic active filter chips with quick-clear functionality.
+- [x] **Dynamic Context**: Implemented dynamic SEO-friendly page titles based on selected categories.
+
+## Phase 10: Product Details Enhancement & UI Refinements
+- [x] **Product Details Page Redesign (Task Id: 512)**:
+  - [x] Breadcrumb navigation for improved site hierarchy
+  - [x] Quantity selector with increment/decrement controls
+  - [x] Star rating display (4.8/5.0) for social proof
+  - [x] Collapsible accordion sections (Product Highlights, Specifications, Shipping)
+  - [x] Trust badges section (Free Shipping, UV400 Protection, 7-Day Returns)
+  - [x] Enhanced image gallery with zoom indicator and smooth thumbnail transitions
+  - [x] Premium "Add to Shopping Bag" button with icon, shadows, and hover effects
+- [x] **Cart Functionality Fix (Task Id: 513)**: 
+  - [x] Fixed addToCart function to properly handle quantity selection
+  - [x] Cart now correctly adds the selected quantity instead of always adding 1
+- [x] **Navigation Enhancement (Task Id: 514)**:
+  - [x] Updated navbar to 50% transparency with backdrop blur for glassmorphism effect
+
+## Phase 11: District-Based Delivery System
+- [x] **Location Data Structure (Task Id: 515)**:
+  - [x] Created comprehensive Bangladesh locations data file
+  - [x] Included all major districts with their respective thanas
+  - [x] Implemented helper functions for district/thana retrieval
+- [x] **Checkout Form Enhancement (Task Id: 516)**:
+  - [x] Added District dropdown with all Bangladesh districts
+  - [x] Implemented dependent Thana dropdown (updates based on selected district)
+  - [x] Added proper validation and disabled states
+- [x] **Dynamic Delivery Charge (Task Id: 517)**:
+  - [x] Implemented district-based delivery charge calculation
+  - [x] Dhaka district: ৳60 delivery charge
+  - [x] All other districts: ৳120 delivery charge
+  - [x] Real-time charge updates when district changes
+- [x] **Order Processing Update (Task Id: 518)**:
+  - [x] Updated Supabase order submission to include district and thana
+  - [x] Modified Google Sheets integration to include delivery charge
+  - [x] Updated total calculation to include delivery charge
+  - [x] Enhanced order summary UI to show delivery charge with district name
+
+## Phase 12: Resilience & Performance Optimization
+- [x] **Blank Page Issue Fix (Task Id: 519)**:
+  - [x] Fixed AuthContext rendering nothing during auth initialization (caused blank screens).
+  - [x] Added 10-second timeout protection to prevent permanent blank screens when Supabase is slow.
+  - [x] Created ErrorBoundary component to catch JavaScript errors gracefully.
+  - [x] Wrapped entire application in ErrorBoundary for comprehensive error handling.
+- [x] **Core Performance Suite (Task Id: 520)**:
+  - [x] Implemented route-based code splitting using `React.lazy()` and `Suspense`.
+  - [x] Added dynamic `PageLoader` component for smooth page transitions.
+  - [x] Optimized Hero banner rendering with high-priority image loading for improved LCP.
+  - [x] Enhanced build configuration with manual chunks for vendor libraries (React, Router).
+  - [x] Integrated Terser minification for maximum bundle size reduction.
+  - [x] Added `loading="lazy"` and `decoding="async"` to product card images.
+
+## Phase 13: UI/UX Premium Features & Search
+- [x] **Global Notification System (Task Id: 521)**:
+  - [x] Implemented ToastContext and ToastProvider for real-time feedback.
+  - [x] Integrated notifications for login, registration, and cart actions.
+- [x] **Product Search Engine (Task Id: 522)**:
+  - [x] Developed debounced real-time search with live product suggestions.
+  - [x] Integrated search with Shop catalogue for persistent query filtering.
+- [x] **Premium Visual Overhaul (Task Id: 523)**:
+  - [x] Redesigned Hero section with cinematic assets and high-contrast typography.
+  - [x] Implemented Ken Burns (slow-zoom) effects and staggered entry animations.
+  
+## Phase 14: Advanced Performance & PWA Suite
+- [x] **PWA Integration (Task Id: 524)**:
+  - [x] Implemented Web App Manifest (`manifest.json`) for standalone installation.
+  - [x] Registered Service Worker (`sw.js`) for offline asset caching.
+- [x] **Performance Core (Task Id: 525)**:
+  - [x] **Client-Side Caching**: Implemented `cacheManager` for API response persistence (TTL support).
+  - [x] **Advanced Lazy Loading**: Created `OptimizedImage` component using IntersectionObserver.
+  - [x] **API Optimization**: Integrated caching layer into Supabase calls to reduce network load.
+
+## Phase 15: Mobile Experience Optimization
+- [x] **Mobile Product Card Refinement (Task Id: 526)**:
+  - [x] Increased mobile button height to 44px (h-11) for better tap targets
+  - [x] Enhanced button text size and legibility (text-[11px])
+  - [x] Disabled image hover transitions and scaling on mobile for stability
+  - [x] Cleaned up legacy "Buy Now" button logic and styling
+- [x] **SEO & Marketing (Task Id: 527)**:
+  - [x] Implemented JSON-LD Structured Data in PDP for enhanced search result previews
+- [x] **Recently Viewed History (Task Id: 528)**:
+  - [x] Developed RecentlyViewedContext with LocalStorage persistence
+  - [x] Integrated history tracking on product views
+  - [x] Added responsive "Recently Viewed" display section to Home and PDP
+- [x] **Smart Recommendations (Task Id: 529)**:
+  - [x] Implemented category-based "You May Also Like" logic on PDP
+  - [x] Created `fetchByCategory` API helper with exclusion filters
+- [x] **Product Reviews & Ratings (Task Id: 530)**:
+  - [x] Created `ReviewSection` component for the Product Details Page
+  - [x] Implemented Review submission and listing API logic with smart merge fallback
+  - [x] Integrated star rating display and community feedback UI
+- [x] **Extended Product Metadata (Task Id: 531)**:
+  - [x] Added admin fields for Highlights, Technical Specs, and Shipping info
+  - [x] Updated PDP to dynamically render extended meta-data
+  - [x] Implemented professional fallbacks for legacy products
+- [x] **Review Section UI Overhaul (Task Id: 532)**:
+  - [x] Redesigned ratings summary with premium dark card and glassmorphism
+  - [x] Implemented dynamic user avatars and verified purchase badges
+  - [x] Refined "Join the Conversation" layout for better balance
+- [x] **Product Trust Badge Refinement (Task Id: 533)**:
+  - [x] Updated marketing text for all trust badges
+  - [x] Updated iconography for "Premium Hard Case" (Package icon)
+- [x] **Admin Image Upload UX (Task Id: 534)**:
+  - [x] Implemented immediate visual previews for Main Cover and Gallery
+  - [x] Added visual cues ("New Selection" / "New" badges) for unsaved changes
+  - [x] Added proper memory cleanup for object URLs
+
+## Phase 16: Admin Order Intelligence & Customer Portal Stability
+- [x] **Admin Order Details Experience (Task Id: 535)**:
+  - [x] Developed comprehensive Order Details modal with glassmorphism design.
+  - [x] Integrated product thumbnails and "Items Ordered" breakdown.
+  - [x] Added customer info (email, phone) and granular shipping data (Thana, District).
+  - [x] Implemented dynamic delivery charge display based on order data.
+- [x] **Product Image Lightbox (Task Id: 536)**:
+  - [x] Created interactive image preview system for admins.
+  - [x] Added zoom-in popup with backdrop-blur support for detailed product inspection.
+- [x] **Customer Portal Reliability (Task Id: 537)**:
+  - [x] Fixed `TypeError: Invalid option : timeStyle` in OrderDetails.jsx.
+  - [x] Resolved "N/A Products" display bug in customer order listings.
+  - [x] Standardized Supabase field mappings (`unit_price`, `products` object).
+- [x] **High-Latency Auth Strategy (Task Id: 538)**:
+  - [x] Extended Auth initialization timeout to 15s for slower networks.
+  - [x] Decoupled user role fetching from initial session detection to prevent startup hangs.
+  - [x] Implemented defensive loading states in protected order routes.
+  
+## Phase 17: Admin UX Refinement & Chart Stability
+- [x] **Dashboard Graphics Stability (Task Id: 539)**:
+  - [x] Resolved Recharts rendering warnings in Admin Dashboard.
+  - [x] Implemented `isMounted` state tracking for client-side chart hydration.
+  - [x] Added `ResponsiveContainer` debouncing for fluid resizing without errors.
+- [x] **Admin Authentication Flow (Task Id: 540)**:
+  - [x] Implemented "Already Logged In" choice screen for the Login page.
+  - [x] Added "Back up to Site" link for admins on the login screen.
+  - [x] Refined Logout UI to be more subtle and professional.
+
+## Phase 18: Premium Content & Social Proof
+- [x] **Review System Overhaul (Task Id: 541)**:
+  - [x] Implemented high-contrast dark-mode summary cards for product reviews.
+  - [x] Added dynamic user avatars with auto-initials.
+  - [x] Integrated "Verified Purchase" badges and improved typography.
+- [x] **Mobile Product Interface (Task Id: 542)**:
+  - [x] Fixed mobile product images to prevent unwanted scale/hover effects.
+  - [x] Ensured "Add to Bag" and "Buy Now" buttons are always visible on small screens.
+  - [x] Optimized button sizing for 44px tap targets.
+
+## Phase 19: Navigation Smoothness & Portal Access
+- [x] **Sign-out UX Optimization (Task Id: 543)**:
+  - [x] Removed disruptive `window.location.href` refresh during logout.
+  - [x] Integrated `useNavigate` for seamless home page redirection.
+- [x] **Admin Portal Choice Restoration (Task Id: 544)**:
+  - [x] Disabled automatic login redirection in `AdminLogin.jsx`.
+  - [x] Re-enabled the post-login choice screen (Dashboard vs Site).
+  - [x] Admins can now choose between "Open Dashboard" and "Back to Site" after logging in.
+ 
+## Phase 20: Data Integrity & Admin Stability
+- [x] **Product Deletion Logic Fix (Task Id: 545)**:
+  - [x] Resolved `409 Conflict` errors by updating database foreign key constraints.
+  - [x] Changed `order_items` constraint to `ON DELETE SET NULL` to preserve order history after product deletion.
+  - [x] Enhanced `Products.jsx` with robust error parsing and user-friendly alerts.
+- [x] **Dashboard Chart Reliability (Task Id: 546)**:
+  - [x] Fixed `Recharts` console warnings (`width(-1)`) by simplifying container logic.
+  - [x] Implemented fixed-height container and conditional rendering for stability.
+- [x] **Legacy Data Handling (Task Id: 547)**:
+  - [x] Updated `AdminOrders.jsx` to gracefully handle "Deleted Products" in historical orders.
+  - [x] Added fallback UI (Package icon, "Deleted Product" text) for null product references.
+
+## Phase 21: Deployment Documentation
+- [x] **Deployment Guide Creation (Task Id: 548)**:
+  - [x] Comprehensive `deployment_guide.md` for modern hosting (Vercel/Netlify).
+  - [x] Specialized `cpanel_deployment.md` for shared cPanel/Apache hosting.
+  - [x] Documented the `.htaccess` fix for React Client-Side Routing.
+  - [x] Migrated deployment files to `Memory Bank` directory for centralized access.
+- [x] **Hybrid Architecture Documentation**:
+  - [x] Explicitly documented the "Supabase Cloud + cPanel Host" strategy as the recommended approach for maintaining backend functionality.
+
+## Phase 22: Order Visibility & OTP Security
+- [x] **Secure Order Tracking (Task Id: 549)**:
+  - [x] Implemented phone-number based order discovery.
+  - [x] Created secure OTP verification flow via Email.
+  - [x] Integrated Google Apps Script as a transactional email provider.
+  - [x] Added persistent verification state for viewing order history.
+- [x] **Customer Confirmation Emails (Task Id: 550)**:
+  - [x] Automated confirmation emails for new orders via Google Script.
+
+## Phase 23: Global UX Refinements
+- [x] **Global Route Scrolling (Task Id: 551)**:
+  - [x] Implemented `ScrollToTop` component to reset viewport on navigation.
+- [x] **Environment Abstraction (Task Id: 552)**:
+  - [x] Centralized Google Script and Supabase keys in `.env` for production readiness.
+
+## Phase 24: Maintenance & Updates
+- [x] **Google Sheet Integration Update (Task Id: 553)**:
+  - [x] Updated `GoogleAppsScript_Reference.js` to target the new spreadsheet ID.
+  - [x] Updated `.env` with the new Google Apps Script web app URL.
+  - [x] **Fix**: Resolved CORS 403 error by implementing `mode: 'no-cors'` in client-side fetch and creating `GOOGLE_FIX.md` with strict deployment instructions (Access: "Anyone").
+
+## Phase 25: Checkout UX & Order Flexibility
+- [x] **Checkout Quantity Selection (Task Id: 554)**:
+  - [x] Integrated quantity counter (Plus/Minus) in the Checkout summary.
+  - [x] Implemented real-time subtotal and total updates during checkout.
+- [x] **State Persistence (Task Id: 555)**:
+  - [x] Added `resetQuantities` logic to maintain predictable cart state during transitions.
+ 
+## Phase 26: Admin Order Intelligence Upgrade
+- [x] **Bulk Operations (Task Id: 556)**:
+  - [x] Developed multi-select checkbox system for the Admin Orders table.
+  - [x] Implemented bulk status updates (Multi-status transitions).
+  - [x] Implemented bulk permanent deletion with processing states.
+  - [x] Added visual selection toolbar and active counter.
+
+## Phase 27: Advanced Inventory Management & UI Polish
+- [x] **Real-Time Stock Validation (Task Id: 557)**:
+  - [x] Check latest product availability on Supabase before committing checkout.
+  - [x] Trigger an intuitive "Out of Stock" modal with quick removing actions.
+- [x] **Responsive Mobile Experience (Task Id: 558)**:
+  - [x] Fixed "squished" button ratios on Mobile Product Details page.
+  - [x] Hide inline duplicated action buttons on mobile, emphasizing the sticky bottom bar.
+  - [x] Switched mobile image gallery to relative scrolling.
+- [x] **Out of Stock Display UI (Task Id: 559)**:
+  - [x] Display striking watermark banners for empty-stock entities on main grids.
+  - [x] Auto-disable standard order flows for empty inventory assets.
+- [x] **Variants Saving Fix & Chart Polish (Task Id: 560)**:
+  - [x] Resolved 400 Bad Request error from admin updates on product traits.
+  - [x] Finalized Recharts dimensional responsiveness on Dashboard entries.
+
+## Phase 28: Elite Inventory & Media Experience
+- [x] **Unified Media Gallery (Task Id: 561)**:
+  - [x] Implemented drag-and-drop reordering for product images.
+  - [x] Configured automatic primary image selection based on grid position (1st image).
+  - [x] Optimized media handling with immediate local previews and memory cleanup.
+- [x] **Shopify-Style Variant Management (Task Id: 562)**:
+  - [x] Redesigned variant table to display options (Color / Size) in a single unified line.
+  - [x] Improved table density and readability for complex inventory.
+- [x] **Rich Text Description Integration (Task Id: 563)**:
+  - [x] Swapped `react-quill` for `react-quill-new` to ensure React 19 compatibility.
+  - [x] Enabled full HTML/Rich-Text formatting for product descriptions.
+- [x] **UX Simplification (Task Id: 564)**:
+  - [x] Removed "Product Highlights" section from Storefront and Admin to reduce cognitive load.
+  - [x] Cleaned up backend payloads and frontend state for better performance.
+- [x] **Admin Infrastructure Resilience (Task Id: 565)**:
+  - [x] Implemented Vite cache clearing protocols to resolve internal dependency conflicts after major package swaps.
+
+## Phase 29: Dynamic Categories & Default Variants
+- [x] **Dynamic Category Management (Task Id: 566)**:
+  - [x] Implemented `categories` table in Supabase.
+  - [x] Created `Categories.jsx` admin page for creating, updating, and deleting categories dynamically.
+  - [x] Refactored `ProductForm.jsx` and `FilterSidebar.jsx` to fetch and use dynamic categories instead of hardcoded lists.
+- [x] **Default Product Variant / Color (Task Id: 567)**:
+  - [x] Added `color` column to the `products` table schema for default variant mapping.
+  - [x] Added a "Default Color" field to the Pricing & Inventory section of `ProductForm.jsx`.
+  - [x] Updated `ProductDetails.jsx` to dynamically merge the default `product.color` with the `variants` array and correctly update the UI.
+
+## Phase 30: Real-Time Mobile Order Notifications
+- [x] **Telegram Bot Alert System (Task Id: 568)**:
+  - [x] Implemented `telegramNotifier.js` utility using Telegram Bot API for instant sound alerts on phone.
+  - [x] Connected order notifications to `Checkout.jsx` sending customer details, address, ordered items with variants/styles, payment methods (bKash/COD + TrxID), and total amount.
+  - [x] Centralized `VITE_TELEGRAM_BOT_TOKEN` and `VITE_TELEGRAM_CHAT_ID` in `.env` and `.env.example`.
+- [x] **Admin Notification Testing Suite (Task Id: 569)**:
+  - [x] Added interactive "Test Phone Alert" button in Admin Order Management header (`Orders.jsx`).
+  - [x] Verified live bot connectivity and test message delivery.
+
+## Phase 31: Dynamic Storefront Content & Global Site Settings
+- [x] **Promotional Banner Background & Text Engine (Task Id: 570)**:
+  - [x] Generated and integrated cinematic luxury banner image (`promo_banner.jpg`) as the primary default.
+  - [x] Transformed `PromotionalBanner.jsx` to dynamically load background image, badge, title, description, button text, and link from `site_settings`.
+  - [x] Implemented luxury dark/warm gradient overlay to maintain high-contrast readability across all screens.
+- [x] **Admin Media & Content Manager Overhaul (Task Id: 571)**:
+  - [x] Extended `MediaManager.jsx` with full text controls for the homepage Promotional Banner.
+  - [x] Built interactive Live Homepage Preview right inside the Admin panel for real-time visual feedback.
+  - [x] Added unified "Save & Publish" flow linking to `site_settings`.
+
+## Phase 32: Category Expansion & Dual-Level Collections Architecture
+- [x] **Dynamic Featured Collections Component (Task Id: 572)**:
+  - [x] Eliminated the hardcoded 3-category limit (`Men`, `Women`, `Unisex`) in `FeaturedCollections.jsx`.
+  - [x] Connected component to live Supabase categories, supporting any number of dynamic categories (`Eye Glasses`, `Kids`, `Men`, `Unisex`, `Women`, etc.).
+  - [x] Implemented responsive adaptive grid layouts (1 to 5+ columns).
+- [x] **Admin Category Management & Featured Toggle (Task Id: 573)**:
+  - [x] Enhanced `Categories.jsx` with instant "Featured" toggling (★ / ☆) for each category.
+  - [x] Added direct image upload and thumbnail preview for all categories in `Categories.jsx` and `MediaManager.jsx`.
+  - [x] Enabled setting "Show in Featured Collections" directly during category creation.
+- [x] **Dual-Level Collections Page Layout (Task Id: 574)**:
+  - [x] Overhauled `Collections.jsx` to feature **All Collections** on the upper half with catalog browsing cards.
+  - [x] Structured **Featured Collections** on the lower half showcasing curated highlights.
+
+## Phase 33: Collections Page Hero Header Customization
+- [x] **Collections Hero Visual Background Engine (Task Id: 575)**:
+  - [x] Converted the plain static header in `Collections.jsx` into a hero banner with background image support.
+  - [x] Added high-contrast dark gradient overlay ensuring readability on light or dark imagery.
+  - [x] Dynamically integrated `collections_hero_bg`, `collections_hero_badge`, `collections_hero_title`, and `collections_hero_description` with `site_settings`.
+- [x] **Admin Collections Hero Customizer (Task Id: 576)**:
+  - [x] Added a dedicated "Collections Page Hero Header" management block inside `MediaManager.jsx`.
+  - [x] Included image uploader, asset library picker, badge tagline input, main title input, and description textarea.
+  - [x] Implemented a real-time live interactive preview card replicating the Collections page layout.
+
+## Phase 34: Homepage Hero Banner Customization & Button Design Controls
+- [x] **Hero Banner Dynamic Engine (Task Id: 577)**:
+  - [x] Connected frontend `Hero.jsx` component to Supabase `site_settings`.
+  - [x] Made background image, badge, two-part heading with gold accent word, and description fully dynamic.
+  - [x] Integrated dynamic button design generator supporting custom styles, shapes, sizes, and icons with seamless fallbacks.
+- [x] **Admin Hero Banner Customizer & Button Design Dropdowns (Task Id: 578)**:
+  - [x] Added dedicated "Hero Banner (Home Page)" section in `MediaManager.jsx` matching the Promotional Banner card layout.
+  - [x] Implemented dropdown selectors for Button Color/Style (*Dark Luxury, Golden Accent, Crisp White, Gold Outline, White Outline, Glassmorphism, Royal Gold Gradient*).
+  - [x] Implemented dropdown selectors for Button Corner Shape (*Square, Soft Square, Rounded, Pill/Capsule*).
+  - [x] Implemented dropdown selectors for Button Size (*Medium, Large, Extra Large*).
+  - [x] Implemented dropdown selectors for Button Icon (*None, Arrow, Sparkle, Shopping Bag*).
+  - [x] Built a real-time Live Homepage Preview sticky panel with instant visual feedback.
+
+## Phase 35: Prescription Lens Engine & Customizer
+- [x] **Lens Selection Modal & Optical Packages (Task Id: 579)**:
+  - [x] Built `LensCustomizerModal.jsx` with optical lens tiers (Frame Only, Single Vision, Blue Cut, Photochromic, Progressive).
+  - [x] Added multi-tab prescription submission flow: Upload Slip with image preview, Manual OD/OS power inputs (SPH, CYL, AXIS, PD), and Send via WhatsApp Later option.
+  - [x] Dynamically integrated lens prices into cart subtotal and checkout calculations across the entire order lifecycle.
+  - [x] Stored prescription file URLs and manual power details in order metadata.
+
+## Phase 36: Admin Optical Lens Packages Management
+- [x] **Lens Packages CRUD Interface (Task Id: 580)**:
+  - [x] Created `/admin/lenses` (`LensPackages.jsx`) admin module with package creation, editing, deletion, and active status toggling.
+  - [x] Added reordering controls (Move Up / Move Down) and "Reset to Defaults" recovery tool.
+  - [x] Connected directly to Supabase `site_settings` table (`lens_packages_settings`) for real-time customer storefront synchronization.
+  - [x] Added "Lens Packages" navigation link with `Glasses` icon to `AdminLayout.jsx`.
+
+## Phase 37: Checkout UX & Order Summary Improvements
+- [x] **Item Removal from Checkout Sidebar (Task Id: 581)**:
+  - [x] Added individual `X` cancel buttons on order summary items in `Checkout.jsx`.
+  - [x] Connected removal handler to `CartContext` (`removeFromCart`) with dynamic recalculation of cart totals and delivery charges.
+
+## Phase 38: Product Details UX & Image Gallery Navigation
+- [x] **Product Details Layout & Image Gallery Refinement (Task Id: 582)**:
+  - [x] Re-architected PDP to ensure full container containment without text overflow (`break-words`, `quill-content` CSS).
+  - [x] Designed sleek, self-contained compact Lens Selector pill badge (`self-start`) with tactile action button.
+  - [x] Restored large square aspect ratio for primary product image and increased thumbnail dimensions (`w-16 h-16 md:w-20 md:h-20`).
+  - [x] Added floating previous and next navigation arrows (`ChevronLeft` / `ChevronRight`) directly on the main product image for effortless multi-image browsing.
+
+## Phase 39: Strict Default Lens State Enforcement
+- [x] **Zero-Fee Initial State Logic (Task Id: 583)**:
+  - [x] Refactored `ProductDetails.jsx` to prevent background settings loaders from auto-selecting paid optical tiers (`Zero Power Blue-Cut +৳500`).
+  - [x] Ensured strict initial selection to `Frame Only / Demo Lens` (৳0).
+  - [x] Added product ID change listener to reset lens customization state when switching between products.
+
+## Phase 40: Product Details Typography & Bullet Point Sanitization
+- [x] **Text Wrapping & Bullet Point Polish (Task Id: 584)**:
+  - [x] Resolved mid-word hyphenation breaks by applying `word-break: normal;` and `hyphens: none;` across rich-text elements.
+  - [x] Created `sanitizeQuillHtml` helper to eliminate empty bullet points (`<li><br></li>`) and orphan lists.
+  - [x] Normalized line-height and paragraph spacing for optimal readability.
+
+## Phase 41: React Context Render-Phase State Update Resolution
+- [x] **Decouple Side-Effects from State Updaters (Task Id: 585)**:
+  - [x] Fixed React warning in `CartContext.jsx` by moving `showToast` notification outside of the synchronous `setCartItems` callback.
+  - [x] Hardened `ToastContext.jsx` with asynchronous micro/macrotask scheduling (`setTimeout(..., 0)`) to ensure clean execution from any component or hook.
+
+## Phase 42: Dynamic Checkout Fields & 11-Digit Phone Number Validation
+- [x] **Admin Checkout Form Settings (Task Id: 586)**:
+  - [x] Created `CheckoutSettings.jsx` at `/admin/settings` with Required/Optional and Shown/Hidden toggles for all fields (`name`, `phone`, `email`, `address`, `district`, `thana`, `city`, `zip`, `notes`).
+  - [x] Added custom label and placeholder editing for every checkout input.
+  - [x] Added "Reset to Defaults" button and integrated with Supabase `site_settings` under key `checkout_field_settings`.
+  - [x] Added "Checkout Form" navigation item in `AdminLayout.jsx`.
+- [x] **Strict 11-Digit Phone Validation & Dynamic Checkout Frontend (Task Id: 587)**:
+  - [x] Implemented phone number normalization and strict 11-digit regex validation (`^01[3-9]\d{8}$`) in `Checkout.jsx`.
+  - [x] Added real-time character count badge (`X/11 digits ✓`) and dynamic inline error feedback.
+  - [x] Integrated dynamic field rendering in `Checkout.jsx` displaying subtle `(Optional)` tags on non-mandatory fields.
+  - [x] Updated order creation and Telegram notifications to capture optional Order Notes.
+
+## Phase 43: Admin Order Management UX & Direct Details Access
+- [x] **Clickable Order Rows & Direct Details Action (Task Id: 588)**:
+  - [x] Made entire order table rows in `Orders.jsx` clickable to instantly open the Order Details modal without extra navigation.
+  - [x] Replaced ambiguous 3-dot dropdown menu with an explicit, styled `👁 Details` action button.
+  - [x] Enhanced interactive hover states, pointer cursors, and protected control cells (checkbox, status dropdown, delete button).
+  - [x] Linked recent orders in `Dashboard.jsx` directly to the orders management module.
+
+## Phase 44: Category Activation & Deactivation System
+- [x] **Admin Category Active Status Controls (Task Id: 589)**:
+  - [x] Built category activation/deactivation support in `Categories.jsx` allowing store owners to hide temporary categories without deleting.
+  - [x] Added one-click toggle button (`Active` / `Deactivated`) with real-time feedback and toast notifications.
+  - [x] Implemented status badges (`● Active` vs `Inactive`), tab filters (`All`, `Active`, `Inactive`), and live category count stats.
+  - [x] Added "Active Status" checkbox in the "Add New Category" form (default: active).
+  - [x] Filtered out inactive categories across customer-facing pages (`FeaturedCollections.jsx`, `Collections.jsx`, and `FilterSidebar.jsx`).
+  - [x] Added `(Inactive)` label in admin `ProductForm.jsx` category select dropdown.
+  - [x] Created database migration script `add_is_active_to_categories.sql`.
+
+## Phase 45: Web Log & Conversion Funnel Analytics System
+- [x] **Web Log & Funnel Analytics Suite (Task Id: 590)**:
+  - [x] Created `visitor_sessions` and `web_events` database tables with RLS and high-speed indexes in `create_web_logs_schema.sql`.
+  - [x] Built client-side non-blocking tracker library in `src/lib/tracker.js` managing persistent `visitor_id`, `session_id`, device/OS/browser detection, and async dispatching.
+  - [x] Automated event tracking for `page_view` (`PageMonitor.jsx`), `view_product` (`ProductDetails.jsx`), `add_to_cart` / `remove_from_cart` (`CartContext.jsx`), and `initiate_checkout` / `purchase` (`Checkout.jsx`).
+  - [x] Built comprehensive Admin Web Logs & Funnel Analytics Dashboard (`src/pages/admin/WebLogs.jsx`) with 6 KPI scorecards, interactive conversion funnel with drop-off metrics, Recharts area trend charts, hardware breakdown, high-demand cart items, and live event log table with JSON metadata inspector.
+  - [x] Added "Web Logs & Funnel" navigation link in `AdminLayout.jsx` and registered `/admin/web-logs` route in `App.jsx`.
+
+## Phase 46: Public Phone-Based Order Tracking & Verification Flow
+- [x] **Phone Order Tracking & Verification (Task Id: 591)**:
+  - [x] Implemented dedicated `/track-order` lookup page (`src/pages/TrackOrder.jsx`).
+  - [x] Integrated phone-number querying with mock SMS OTP verification simulation for safe, frictionless access without requiring customer accounts.
+  - [x] Rendered interactive order timeline with detailed status flags, items overview, payment methods, and shipping summaries.
+  - [x] Added navigation entry points in header and footer.
+
+## Phase 47: Google Search SEO Favicon & Metadata Enhancements
+- [x] **Google Search Branding Assets (Task Id: 592)**:
+  - [x] Added standard Google search favicons and high-resolution web app icons in `index.html`.
+  - [x] Configured structured Open Graph and Twitter card image headers for search result crawlers and social link sharing.
+
+## Phase 48: Recharts Container Hardening & Layout Dimension Fix
+- [x] **Recharts -1 Dimensions Warning Resolution (Task Id: 593)**:
+  - [x] Resolved console warnings (`width(-1) and height(-1) of chart should be greater than 0`) in `WebLogs.jsx` and `Dashboard.jsx`.
+  - [x] Added client-side mounting guard (`isMounted`) to prevent pre-layout render attempts.
+  - [x] Configured `min-w-0` and explicit container height styles (`min-h-[16rem]`) on chart wrappers.
+  - [x] Passed `minWidth={0}`, `minHeight={0}`, and `debounce={50}` to `<ResponsiveContainer>`.
+
+## Phase 49: Admin Product Duplication Feature
+- [x] **One-Click Product Duplication Engine (Task Id: 594)**:
+  - [x] Added Copy button in the Actions column of the Inventory table in `Products.jsx` linking to `/admin/products/duplicate/:id`.
+  - [x] Registered `/admin/products/duplicate/:id` route in `App.jsx` reusing `ProductForm.jsx`.
+  - [x] Implemented `isDuplicateMode` detection and `loadProductForDuplication(id)` in `ProductForm.jsx`.
+  - [x] Cloned all existing product data (name, description, price, stock, category, style, color, shipping info, and image media gallery).
+  - [x] Appended `(Copy)` suffix to product name for clear differentiation.
+  - [x] Stripped original database IDs and timestamp properties to ensure insertion of a clean new record.
+  - [x] Regenerated unique IDs for all variants to eliminate key collision issues.
+  - [x] Displayed tailored "Duplicate Product" header and persisted as a newly created product on submit.
+
+## Phase 50: Service Worker Resiliency & Dev-Mode Isolation
+- [x] **Service Worker Hardening & Dev Cleanup (Task Id: 595)**:
+  - [x] Resolved `Uncaught (in promise) TypeError: Failed to fetch at sw.js:37:32` by wrapping resource fetches with safe `.catch()` returning synthetic 408 responses.
+  - [x] Added non-`GET` HTTP method bypass (`POST`, `PUT`, `DELETE`).
+  - [x] Filtered out Vite dev server requests (`/@vite/`, `/@fs/`, `/__vite_ping`, `node_modules`, `hot-update`, WebSockets).
+  - [x] Added `self.skipWaiting()` and `self.clients.claim()` with cache version bump (`choshmazone-v2`) in `public/sw.js`.
+  - [x] Restricted service worker registration to production builds (`import.meta.env.PROD`) in `src/main.jsx`.
+  - [x] Added automatic service worker deregistration and cache purging in development mode (`import.meta.env.DEV`).
+
+## Phase 51: Resource & Image Request Guarding
+- [x] **Image Source Validation & Fallback Handling (Task Id: 596)**:
+  - [x] Added `hasValidSrc` validation in `OptimizedImage.jsx` to prevent empty or undefined `src` attributes from generating requests to the current page path (`/shop`).
+  - [x] Added `onError` fallback handling so failed image loads do not hang the component state.
+  - [x] Added missing-image fallback handling in `CartItem.jsx`.
+
+## Phase 52: Meta Pixel HTML Syntax & Tag Validation
+- [x] **HTML5 Markup & Script Tag Rectification (Task Id: 597)**:
+  - [x] Moved Meta Pixel `<noscript>` block from `<head>` into `<body>` in `index.html` to comply with HTML5 specifications and avoid Vite parse errors.
+  - [x] Fixed missing closing `</script>` tag for Meta Pixel code, eliminating `Uncaught SyntaxError: Unexpected token '<'`.
+  - [x] Validated production build (`npm run build`) completing with code 0.
+
+## Phase 53: Recently Purchased Items Section & Visitor Geo Map Analytics
+- [x] **Public Recently Purchased Showcase (Task Id: 598)**:
+  - [x] Created `orderParams.fetchRecentPurchased` in `src/lib/api/orders.js` fetching recent purchases from `order_items` and joined `products`.
+  - [x] Enforced complete privacy protection: Customer names, phone numbers, delivery addresses, and user profiles are strictly excluded from queries and state.
+  - [x] Added product de-duplication and 3-minute client-side caching with automatic cache invalidation upon new order placement.
+  - [x] Built `src/components/RecentlyPurchased.jsx` replicating the signature "NEW ARRIVALS" section design with centered uppercase title, gold underline bar (`bg-secondary`), and 4-column responsive grid with `ProductCard`.
+  - [x] Integrated `<RecentlyPurchased />` into `src/pages/Home.jsx` below the Promotional Banner.
+- [x] **Visitor Geo Map & Regional Analytics (Task Id: 599)**:
+  - [x] Added `ip_address`, `city`, `region`, `country`, and `isp` columns to `visitor_sessions` with city indexing (`add_geo_to_sessions.sql`).
+  - [x] Created `VisitorGeoMap.jsx` inside `src/components/admin/` and integrated map visualization in `src/pages/admin/WebLogs.jsx`.
+
+## Phase 54: Client-Side WebP Compression & Supabase Free Plan Egress Optimization
+- [x] **Client-Side WebP Image Compressor (Task Id: 600)**:
+  - [x] Created `src/lib/imageCompressor.js` implementing zero-dependency browser-native HTML5 Canvas and WebP compression (`compressImage`, `compressImages`).
+  - [x] Automatically converts `.jpg`, `.jpeg`, `.png`, `.jfif`, `.HEIC` to `.webp` with iterative quality optimization targeting `< 100 KB` file size.
+  - [x] Resizes photos exceeding `1200px` (or `1920px` for wide hero banners) while preserving original aspect ratios.
+  - [x] Preserves PNG alpha transparency and safely passes through SVGs and animated GIFs without modification.
+- [x] **Core API Upload Interceptor & Aggressive Browser Caching (Task Id: 601)**:
+  - [x] Updated `uploadImage` in `src/lib/api/products.js` to automatically compress all product images before uploading to Supabase Storage.
+  - [x] Added `cacheControl: '31536000, public'` (1 year) header to all Supabase storage uploads, preventing repeated downloads from draining monthly egress.
+  - [x] Updated `uploadAsset` in `src/lib/api/settings.js` to compress site assets, logos, and banners before uploading.
+  - [x] Updated `Checkout.jsx` to compress customer prescription camera uploads (< 120 KB) before uploading.
+- [x] **Admin Upload UX & Real-Time Feedback (Task Id: 602)**:
+  - [x] Updated `ProductForm.jsx` to run background WebP compression on file selection.
+  - [x] Added visual indicator badge: `Auto-compressing to WebP < 100 KB` in the Media section header.
+  - [x] Added real-time file size badges on media thumbnails (e.g., `⚡ 74 KB WebP`).
+  - [x] Auto-compressed variant images to WebP (< 90 KB).
+
+## Phase 55: WooCommerce Bulk Product Exporter & WordPress Catalog Sync
+- [x] **WooCommerce Standard Product Exporter (Task Id: 603)**:
+  - [x] Built `src/lib/woocommerceExporter.js` generating standard, fully compliant WooCommerce CSV files according to RFC 4180 with UTF-8 BOM encoding.
+  - [x] Structured complete product data mapping including title, SKU, published status, regular/sale price, categories, tags, and stock quantities.
+  - [x] Formatted product specifications into descriptions (brand, style, frame/lens material, lens technology, face shape, dimensions, and shipping policy).
+  - [x] Consolidated all public cloud-hosted image URLs (`image_url`, gallery array, and variant images) into comma-separated strings for automated WordPress media downloading.
+  - [x] Provided dual export architectures:
+    - **Variable & Simple**: Parent variable rows linked with child variations for Color/Size options and individual stock/prices.
+    - **Standalone Simple**: Converts all variants into standalone individual simple products.
+- [x] **Admin Inventory UI Integration (Task Id: 604)**:
+  - [x] Created `src/components/admin/ExportWooCommerceModal.jsx` offering scope selection (All vs Selected), mode toggle (Variable vs Standalone), inactive product filtering, live CSV row calculation, and 3-step WordPress import guide.
+  - [x] Added "Export for WooCommerce" button in header and "Export Selected" button in the bulk action bar in `src/pages/admin/Products.jsx`.
+- [x] **CLI Script & Initial Export (Task Id: 605)**:
+  - [x] Created standalone CLI script `export_woocommerce.js` and added `npm run export:woocommerce` script in `package.json`.
+  - [x] Generated ready-to-import CSV file `choshmazone_woocommerce_export_2026-10-01.csv` containing all 25 catalog products (49 rows).
+
+## Phase 56: Nationwide Bangladesh Coverage (64 Districts & Steadfast Thana Engine)
+- [x] **Complete 64 Districts Geocoding Database (Task Id: 606)**:
+  - [x] Replaced the previous 23-district subset in `src/data/bangladeshLocations.js` with the comprehensive all-64 administrative districts database of Bangladesh + Dhaka Sub-Urban.
+  - [x] Included 500+ thanas and upazilas covering all Steadfast Courier delivery locations across Bangladesh.
+  - [x] Merged metropolitan police stations for major city divisions (Dhaka, Chattogram, Rajshahi, Khulna, Sylhet, Barishal, Rangpur, Mymensingh) with rural administrative upazilas.
+  - [x] Added dual transliteration aliases (`Chattogram` ↔ `Chittagong`, `Bogura` ↔ `Bogra`, `Jashore` ↔ `Jessore`, `Cumilla` ↔ `Comilla`, `Barishal` ↔ `Barisal`, `Coxsbazar` ↔ `Cox's Bazar`, `Jhalakathi` ↔ `Jhalokati`).
+- [x] **Checkout Safety Fallback & Courier Alignment (Task Id: 607)**:
+  - [x] Added `Other / অন্যান্য` option to the Thana dropdown in `src/pages/Checkout.jsx` to prevent any form submission blockage for remote or newly created zones.
+  - [x] Preserved Dhaka vs Outside Dhaka delivery charge logic (৳70 inside Dhaka, ৳120 outside Dhaka & sub-urban).
+  - [x] Verified compatibility with courier booking format in `Orders.jsx` matching Steadfast, Pathao, and RedX standards.
+
+## Phase 57: Facebook Catalog Feed Hardening & XML Validation
+- [x] **Meta Catalog XML Serialization & URL Escaping (Task Id: 608)**:
+  - [x] Cleaned up RSS/Atom XML product feed in `api/catalog.js` by converting reserved characters (`&`, `<`, `>`, `"`, `'`) to compliant XML entities.
+  - [x] Sanitized product destination links and high-res image URLs to eliminate Meta Commerce Manager ingestion rejections.
+  - [x] Confirmed XML tag validity for `<g:id>`, `<g:title>`, `<g:description>`, `<g:link>`, `<g:image_link>`, `<g:availability>`, `<g:price>`, `<g:brand>`, `<g:condition>`.
+
+## Phase 58: Supabase Real-Time Order Stream & Cash Register Sound Engine
+- [x] **PostgreSQL Realtime Subscription & Live Audio Alerts (Task Id: 609)**:
+  - [x] Configured Supabase `postgres_changes` listener in `AdminLayout.jsx` for instant order detection without manual page refresh.
+  - [x] Built `src/lib/orderSoundNotifier.js` utilizing Web Audio API sound synthesis and `/sounds/cha-ching.mp3` for audible "Cha-Ching!" cash register notifications.
+  - [x] Integrated mobile hardware vibration (`navigator.vibrate`) and system/browser notification toasts (`notifyNewOrder`).
+  - [x] Designed persistent floating new-order banner with quick navigation to order details and volume mute toggle.
+
+## Phase 59: ntfy.sh Instant Mobile Push Notification Engine
+- [x] **Zero-Cost Phone Push Notification Engine (Task Id: 610)**:
+  - [x] Implemented `src/lib/ntfyNotifier.js` utilizing the open-source ntfy.sh protocol for real-time mobile push notifications to store managers.
+  - [x] Integrated high-priority sound alerts, emoji tags, and dual interactive action buttons: `View Order` (opens admin) and `Call Customer` (dials phone).
+  - [x] Embedded automated dispatch inside `src/pages/Checkout.jsx` and added an interactive test diagnostic trigger in `src/pages/admin/Orders.jsx`.
+  - [x] Configured `VITE_NTFY_TOPIC` environment variable with zero-cost setup.
+
+## Phase 60: Telegram Inline Keyboard Action Buttons
+- [x] **Telegram Interactive Order Actions (Task Id: 611)**:
+  - [x] Upgraded `src/lib/telegramNotifier.js` to dispatch interactive inline keyboard buttons (`inline_keyboard`).
+  - [x] Enabled one-tap order inspection (`👁 View Order`) and direct customer call action (`📞 Call Customer`).
+  - [x] Formatted order line items, bKash/COD payment method, and complete shipping address for instant notification readability.
+
+## Phase 61: Dynamic Contact Page CMS & Media Manager Overhaul
+- [x] **Dynamic Contact Page & Admin Live Customizer (Task Id: 612)**:
+  - [x] Made all sections on `/contact` (`Contact.jsx`) dynamic: Main Heading, Subtitle, Showroom Title & Multi-line Address, Email Support Title & Address, Hotline Title & Phone Number.
+  - [x] Built **Section 6: Contact & Support Details** in `src/pages/admin/MediaManager.jsx` with a real-time live preview panel mirroring the contact card.
+  - [x] Added quick-jump pill navigation in Media & Content Manager and cross-linked from `CheckoutSettings.jsx`.
+  - [x] Formatted clickable `mailto:` and `tel:` links on the public storefront.
+

@@ -1,0 +1,353 @@
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { productParams } from '../../lib/api/products';
+import { Plus, Edit3, Trash2, Copy, Power, PowerOff, Glasses, Search, Filter, FileSpreadsheet } from 'lucide-react';
+import ExportWooCommerceModal from '../../components/admin/ExportWooCommerceModal';
+
+const AdminProducts = () => {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [selectedProducts, setSelectedProducts] = useState([]);
+    const [isProcessingBulk, setIsProcessingBulk] = useState(false);
+    const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const fetchProducts = async () => {
+        try {
+            const data = await productParams.fetchAll();
+            setProducts(data);
+        } catch (err) {
+            setError('Failed to fetch products');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this product?')) return;
+
+        console.log('Initiating delete for product ID:', id);
+        try {
+            await productParams.delete(id);
+            setProducts(products.filter(p => p.id !== id));
+        } catch (err) {
+            console.error('Delete error details:', err); // Log the object directly
+            console.error('Delete error JSON:', JSON.stringify(err, null, 2)); // improved logging
+
+            let message = 'Failed to delete product.';
+            let isFKViolation = false;
+
+            // Check for Foreign Key Violation (Postgres code 23503 or HTTP 409 Conflict)
+            if (err.code === '23503' || err.status === 409) {
+                isFKViolation = true;
+            } else if (err.message && err.message.toLowerCase().includes('violates foreign key constraint')) {
+                isFKViolation = true;
+            }
+
+            if (isFKViolation) {
+                message = '⚠️ Cannot Delete Product\n\nThis product is part of existing customer orders. Deleting it would corrupt your order history.\n\nSolution: Click the "Active/Inactive" status button to hide it from the shop instead.';
+            } else if (err.status === 404) {
+                message = 'Product not found. It may have already been deleted.';
+            } else if (err.message) {
+                message = `Failed to delete product: ${err.message}`;
+            }
+
+            alert(message);
+        }
+    };
+
+    const handleToggleStatus = async (product) => {
+        try {
+            const newStatus = !product.is_active;
+            await productParams.update(product.id, { is_active: newStatus });
+            setProducts(products.map(p => p.id === product.id ? { ...p, is_active: newStatus } : p));
+        } catch (err) {
+            console.error('Toggle error:', err);
+            alert('Failed to update product status');
+        }
+    };
+
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            setSelectedProducts(products.map(p => p.id));
+        } else {
+            setSelectedProducts([]);
+        }
+    };
+
+    const handleSelectProduct = (productId) => {
+        setSelectedProducts(prev =>
+            prev.includes(productId)
+                ? prev.filter(id => id !== productId)
+                : [...prev, productId]
+        );
+    };
+
+    const handleBulkStatusChange = async (newStatus) => {
+        const isActivating = newStatus === 'active';
+        if (!window.confirm(`Are you sure you want to change the status of ${selectedProducts.length} products to '${isActivating ? 'Active' : 'Inactive'}'?`)) return;
+
+        setIsProcessingBulk(true);
+        try {
+            await Promise.all(selectedProducts.map(id => productParams.update(id, { is_active: isActivating })));
+            setProducts(products.map(p => selectedProducts.includes(p.id) ? { ...p, is_active: isActivating } : p));
+            setSelectedProducts([]);
+        } catch (err) {
+            alert('Failed to update statuses of some products.');
+            fetchProducts();
+        } finally {
+            setIsProcessingBulk(false);
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (!window.confirm(`Are you sure you want to delete ${selectedProducts.length} products?`)) return;
+
+        setIsProcessingBulk(true);
+        try {
+            const errors = [];
+            for (const id of selectedProducts) {
+                try {
+                    await productParams.delete(id);
+                } catch (err) {
+                    errors.push(err);
+                }
+            }
+
+            if (errors.length > 0) {
+                alert(`Failed to delete ${errors.length} products (likely because they are part of existing orders). Other products were deleted successfully.`);
+                fetchProducts();
+            } else {
+                setProducts(products.filter(p => !selectedProducts.includes(p.id)));
+            }
+            setSelectedProducts([]);
+        } catch (err) {
+            console.error('Bulk delete error:', err);
+            alert('Failed to delete some products.');
+            fetchProducts();
+        } finally {
+            setIsProcessingBulk(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
+
+    if (error) return (
+        <div className="p-8 bg-red-50 text-red-600 rounded-2xl border border-red-100 font-outfit text-center">
+            {error}
+        </div>
+    );
+
+    return (
+        <div className="animate-in fade-in duration-700">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                <div>
+                    <h1 className="text-3xl font-bold text-text-main font-outfit uppercase tracking-tight">Inventory</h1>
+                    <p className="text-text-muted font-outfit">Manage your product catalog and availability.</p>
+                </div>
+                <div className="flex items-center gap-4">
+                    <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-white border border-border rounded-xl">
+                        <Search size={18} className="text-text-muted" />
+                        <input
+                            type="text"
+                            placeholder="Search products..."
+                            className="bg-transparent border-none outline-none text-sm font-outfit w-40"
+                        />
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setIsExportModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-3 bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 font-bold rounded-xl transition-all shadow-sm font-outfit text-sm"
+                        title="Export products to WooCommerce CSV format"
+                    >
+                        <FileSpreadsheet size={18} />
+                        <span>Export for WooCommerce</span>
+                    </button>
+                    <Link to="/admin/products/new" className="flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/95 transition-all shadow-lg shadow-primary/20 font-outfit uppercase tracking-widest text-sm">
+                        <Plus size={18} />
+                        New Product
+                    </Link>
+                </div>
+            </div>
+
+            {selectedProducts.length > 0 && (
+                <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 mb-6 flex flex-wrap items-center justify-between gap-4 animate-in slide-in-from-top-4">
+                    <span className="text-sm font-bold text-primary font-outfit">
+                        {isProcessingBulk ? 'Processing...' : `${selectedProducts.length} product(s) selected`}
+                    </span>
+                    <div className="flex items-center gap-3">
+                        <select
+                            onChange={(e) => {
+                                if (e.target.value) {
+                                    handleBulkStatusChange(e.target.value);
+                                    e.target.value = '';
+                                }
+                            }}
+                            disabled={isProcessingBulk}
+                            className="bg-white border border-border rounded-lg px-3 py-2 text-sm font-outfit outline-none focus:border-primary disabled:opacity-50"
+                        >
+                            <option value="">Change Status...</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <button
+                            type="button"
+                            onClick={() => setIsExportModalOpen(true)}
+                            className="flex items-center gap-2 px-3 py-2 bg-white border border-purple-200 text-purple-700 hover:bg-purple-50 rounded-lg text-sm font-bold font-outfit transition-colors shadow-sm"
+                        >
+                            <FileSpreadsheet size={16} />
+                            Export Selected ({selectedProducts.length})
+                        </button>
+                        <button
+                            onClick={handleBulkDelete}
+                            disabled={isProcessingBulk}
+                            className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm font-bold font-outfit disabled:opacity-50"
+                        >
+                            {isProcessingBulk ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-red-600"></div>
+                            ) : (
+                                <Trash2 size={16} />
+                            )}
+                            Delete Selected
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            <div className="bg-white rounded-3xl border border-border/50 shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-gray-50/50 border-b border-border/50">
+                                <th className="pl-6 py-5 w-10">
+                                    <input
+                                        type="checkbox"
+                                        className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                                        onChange={handleSelectAll}
+                                        checked={products.length > 0 && selectedProducts.length === products.length}
+                                    />
+                                </th>
+                                <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Product</th>
+                                <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Price</th>
+                                <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Stock</th>
+                                <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Category</th>
+                                <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Status</th>
+                                <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/30">
+                            {products.length === 0 ? (
+                                <tr>
+                                    <td colSpan="7" className="px-6 py-20 text-center">
+                                        <div className="flex flex-col items-center justify-center text-text-muted">
+                                            <Glasses size={48} className="mb-4 opacity-20" />
+                                            <p className="font-outfit">No products found. Start adding your collection!</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : (
+                                products.map(product => (
+                                    <tr key={product.id} className={`transition-colors group ${selectedProducts.includes(product.id) ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-gray-50/30'}`}>
+                                        <td className="pl-6 py-5">
+                                            <input
+                                                type="checkbox"
+                                                className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                                                checked={selectedProducts.includes(product.id)}
+                                                onChange={() => handleSelectProduct(product.id)}
+                                            />
+                                        </td>
+                                        <td className="px-6 py-5">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-lg bg-gray-50 border border-border/50 overflow-hidden flex items-center justify-center">
+                                                    {product.image_url ? (
+                                                        <img src={product.image_url} alt={product.name} className="w-full h-full object-contain mix-blend-multiply" />
+                                                    ) : (
+                                                        <Glasses size={20} className="text-gray-300" />
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-bold text-text-main font-outfit leading-tight mb-1">{product.name}</span>
+                                                    <span className="text-[10px] text-text-muted font-bold uppercase tracking-widest">{product.brand || 'No Brand'}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-5">
+                                            <span className="text-sm font-bold text-text-main font-outfit">৳{product.price.toLocaleString()}</span>
+                                        </td>
+                                        <td className="px-6 py-5">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-2 h-2 rounded-full ${product.stock_quantity > 10 ? 'bg-green-500' : 'bg-amber-500'}`}></div>
+                                                <span className="text-sm font-bold text-text-main font-outfit">{product.stock_quantity} units</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-5">
+                                            <span className="text-xs font-bold text-text-muted uppercase tracking-widest font-outfit italic">{product.category}</span>
+                                        </td>
+                                        <td className="px-6 py-5">
+                                            <button
+                                                onClick={() => handleToggleStatus(product)}
+                                                className={`
+                                                    text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full transition-all
+                                                    ${product.is_active !== false
+                                                        ? 'bg-green-50 text-green-600 hover:bg-green-100'
+                                                        : 'bg-red-50 text-red-600 hover:bg-red-100'}
+                                                `}
+                                            >
+                                                {product.is_active !== false ? 'Active' : 'Inactive'}
+                                            </button>
+                                        </td>
+                                        <td className="px-6 py-5 text-right">
+                                            <div className="flex items-center justify-end gap-2">
+                                                <Link
+                                                    to={`/admin/products/duplicate/${product.id}`}
+                                                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                                    title="Duplicate Product"
+                                                >
+                                                    <Copy size={18} />
+                                                </Link>
+                                                <Link
+                                                    to={`/admin/products/edit/${product.id}`}
+                                                    className="p-2 text-gray-400 hover:text-text-main hover:bg-gray-100 rounded-lg transition-all"
+                                                    title="Edit Product"
+                                                >
+                                                    <Edit3 size={18} />
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleDelete(product.id)}
+                                                    className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                                    title="Delete Product"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <ExportWooCommerceModal
+                isOpen={isExportModalOpen}
+                onClose={() => setIsExportModalOpen(false)}
+                allProducts={products}
+                selectedProductIds={selectedProducts}
+            />
+        </div>
+    );
+};
+
+export default AdminProducts;

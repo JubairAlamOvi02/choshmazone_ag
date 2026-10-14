@@ -1,0 +1,209 @@
+
+import { supabase } from '../supabaseClient';
+import { cacheManager } from '../cache';
+
+export const orderParams = {
+    // Create a new order with its items
+    create: async (orderData, items) => {
+        // 1. Insert into 'orders' table
+        const { data: order, error: orderError } = await supabase
+            .from('orders')
+            .insert([orderData])
+            .select()
+            .single();
+
+        if (orderError) throw orderError;
+
+        // 2. Insert items into 'order_items' table
+        const orderItems = items.map(item => {
+            // Check if item.id is a valid UUID to avoid database errors with legacy mock data (IDs like 1, 2, 3)
+            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
+
+            let styleStr = item.style || '';
+            if (item.variant) {
+                const parts = [];
+                if (item.variant.color) parts.push(item.variant.color);
+                if (item.variant.size) parts.push(item.variant.size);
+                if (parts.length > 0) {
+                    styleStr = parts.join(', ');
+                }
+            }
+
+            if (item.lensOption && item.lensOption.id !== 'frame_only') {
+                let lensDetail = `Lens: ${item.lensOption.name}`;
+                if (item.lensOption.isPrescription) {
+                    if (item.lensOption.method === 'upload') {
+                        const urlInfo = item.uploadedPrescriptionUrl ? ` [URL: ${item.uploadedPrescriptionUrl}]` : '';
+                        lensDetail += ` (Prescription Slip Attached${urlInfo})`;
+                    } else if (item.lensOption.method === 'manual' && item.lensOption.manualPower) {
+                        const p = item.lensOption.manualPower;
+                        lensDetail += ` [Rx: R(Sph:${p.odSph || '0'}, Cyl:${p.odCyl || '0'}, Ax:${p.odAxis || '-'}, Add:${p.odAdd || '-'}) L(Sph:${p.osSph || '0'}, Cyl:${p.osCyl || '0'}, Ax:${p.osAxis || '-'}, Add:${p.osAdd || '-'}) PD:${p.pd || '62'}]`;
+                    } else if (item.lensOption.method === 'whatsapp') {
+                        lensDetail += ' (WhatsApp Follow-up)';
+                    }
+                }
+                if (item.lensOption.notes) {
+                    lensDetail += ` (Note: ${item.lensOption.notes})`;
+                }
+                styleStr = styleStr ? `${styleStr} | ${lensDetail}` : lensDetail;
+            }
+
+            const selectedColor = item.selected_color || item.variant?.color || item.color || null;
+            const selectedSize = item.selected_size || item.variant?.size || item.size || null;
+            const variantId = item.variant_id || item.variant?.id || null;
+
+            return {
+                order_id: order.id,
+                product_id: isUUID ? item.id : null,
+                quantity: item.quantity,
+                unit_price: item.price,
+                style: styleStr || 'Default',
+                selected_color: selectedColor,
+                selected_size: selectedSize,
+                variant_id: variantId
+            };
+        });
+
+        const { error: itemsError } = await supabase
+            .from('order_items')
+            .insert(orderItems);
+
+        if (itemsError) throw itemsError;
+
+        // Invalidate recent purchased cache so fresh purchases show up
+        cacheManager.invalidatePattern('recent_purchased_');
+
+        return order;
+    },
+
+    // Fetch recently purchased items (Public-safe: NO customer details whatsoever)
+    fetchRecentPurchased: async (limit = 4) => {
+        const cacheKey = `recent_purchased_${limit}`;
+        const cached = cacheManager.get(cacheKey);
+        if (cached) return cached;
+
+        try {
+            const { data, error } = await supabase
+                .from('order_items')
+                .select(`
+                    id,
+                    created_at,
+                    products (
+                        id,
+                        name,
+                        price,
+                        image_url,
+                        images,
+                        stock_quantity,
+                        category,
+                        is_active,
+                        variants
+                    ),
+                    orders (
+                        status
+                    )
+                `)
+                .order('created_at', { ascending: false })
+                .limit(limit * 4);
+
+            if (error) throw error;
+            if (!data || data.length === 0) return [];
+
+            const seenProductIds = new Set();
+            const recentProducts = [];
+
+            for (const item of data) {
+                // Ensure product exists and is active
+                if (!item.products || !item.products.id || item.products.is_active === false) {
+                    continue;
+                }
+                // Skip cancelled orders if status is available
+                if (item.orders && item.orders.status === 'cancelled') {
+                    continue;
+                }
+                // De-duplicate products so unique items are displayed
+                if (!seenProductIds.has(item.products.id)) {
+                    seenProductIds.add(item.products.id);
+                    recentProducts.push({
+                        ...item.products,
+                        title: item.products.name,
+                        image: item.products.image_url,
+                        images: item.products.images || [],
+                        purchased_at: item.created_at
+                    });
+                }
+                if (recentProducts.length >= limit) {
+                    break;
+                }
+            }
+
+            // Cache for 3 minutes for high responsiveness
+            cacheManager.set(cacheKey, recentProducts, 1000 * 60 * 3);
+            return recentProducts;
+        } catch (err) {
+            console.error('Error fetching recently purchased products:', err);
+            return [];
+        }
+    },
+
+    // Fetch all orders (Admin)
+    fetchAll: async () => {
+        const { data, error } = await supabase
+            .from('orders')
+            .select(`
+                *,
+                profiles (full_name, role),
+                order_items (
+                    *,
+                    products (name, image_url, variants, color, style)
+                )
+            `)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data;
+    },
+
+    // Fetch order by ID
+    fetchById: async (id) => {
+        const { data, error } = await supabase
+            .from('orders')
+            .select(`
+                *,
+                profiles (full_name, role),
+                order_items (
+                    *,
+                    products (name, image_url, variants, color, style)
+                )
+            `)
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+        return data;
+    },
+
+    // Update order status (Admin)
+    updateStatus: async (id, status) => {
+        const { data, error } = await supabase
+            .from('orders')
+            .update({ status })
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
+    },
+
+    // Delete order (Admin)
+    delete: async (id) => {
+        const { error } = await supabase
+            .from('orders')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+        return true;
+    }
+};

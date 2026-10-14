@@ -1,0 +1,210 @@
+@import "tailwindcss";
+
+@theme {
+  /* Dynamic Design System */
+  --color-primary: #0a0a0a;
+  --color-secondary: #d4af37;
+  --color-background-alt: #f9f9f9;
+  --color-surface: #ffffff;
+  --color-text-main: #333333;
+  --color-text-muted: #666666;
+  --color-border: #e0e0e0;
+
+  --color-success: #2e7d32;
+  --color-error: #d32f2f;
+
+  --font-outfit: "Outfit", sans-serif;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+}
+
+@layer base {
+  body {
+    @apply font-outfit antialiased bg-white text-text-main;
+  }
+}
+
+/* Global Typography */
+@layer utilities {
+  .h1 {
+    @apply text-4xl font-bold leading-tight md:text-5xl;
+  }
+
+  .h2 {
+    @apply text-3xl font-semibold leading-tight md:text-4xl;
+  }
+
+  .h3 {
+    @apply text-2xl font-medium leading-tight md:text-3xl;
+  }
+
+  .section-padding {
+    @apply py-12 md:py-16;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  ::selection {
+    @apply bg-secondary/30 text-primary;
+  }
+}
+
+/* Premium Animations */
+@layer utilities {
+  @keyframes slow-zoom {
+    from {
+      transform: scale(1);
+    }
+
+    to {
+      transform: scale(1.1);
+    }
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slow-zoom {
+    animation: slow-zoom 20s ease-in-out infinite alternate;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-background-alt;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-text-muted rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-text-main;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  @apply bg-text-muted;
+}
+
+/* Quill Editor Overrides */
+.ql-toolbar.ql-snow {
+  border: none !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  background-color: #f9fafb !important;
+  padding: 8px 12px !important;
+  font-family: inherit !important;
+}
+
+.ql-container.ql-snow {
+  border: none !important;
+  font-family: inherit !important;
+  font-size: 16px !important;
+}
+
+.ql-editor {
+  min-height: 200px;
+}
+
+/* Frontend display for quill content */
+.quill-content {
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
+  -webkit-hyphens: none;
+  text-align: left;
+  max-width: 100%;
+}
+.quill-content p {
+  margin-bottom: 0.75em;
+  line-height: 1.65;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
+  -webkit-hyphens: none;
+}
+.quill-content strong {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+.quill-content em {
+  font-style: italic;
+}
+.quill-content u {
+  text-decoration: underline;
+}
+.quill-content h1, .quill-content h2, .quill-content h3 {
+  font-weight: 700;
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+  color: var(--color-primary);
+  line-height: 1.3;
+}
+.quill-content ol {
+  list-style-type: decimal;
+  padding-left: 1.25em;
+  margin-bottom: 0.75em;
+}
+.quill-content ul {
+  list-style-type: disc;
+  padding-left: 1.25em;
+  margin-bottom: 0.75em;
+}
+.quill-content li {
+  margin-bottom: 0.4em;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
+  -webkit-hyphens: none;
+}
+/* Hide empty list items and orphan bullets */
+.quill-content li:empty,
+.quill-content li:has(> br:only-child) {
+  display: none !important;
+}
+.quill-content a {
+  color: var(--color-secondary);
+  text-decoration: underline;
+}

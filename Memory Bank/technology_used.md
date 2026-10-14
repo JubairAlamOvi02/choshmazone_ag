@@ -1,0 +1,146 @@
+# Technology Stack: Choshmazone
+
+This document outlines the core technologies and tools used in the Choshmazone e-commerce project.
+
+## Project Overview Summary
+Choshmazone is a modern e-commerce platform built with a robust and scalable technology stack:
+*   **Frontend**: React 19, Vite, and Tailwind CSS v4.
+*   **Backend**: Supabase (PostgreSQL, Auth, Storage, and RLS).
+*   **Integrations**: Google Sheets for order tracking and bKash/COD for payments.
+*   **Architecture**: Role-based access and Tailwind-powered responsive design.
+
+---
+
+## 1. Frontend
+*   **Framework**: [React 19](https://react.dev/) - A JavaScript library for building user interfaces.
+*   **Build Tool**: [Vite](https://vitejs.dev/) - A fast development environment and bundler.
+*   **Routing**: [React Router 7](https://reactrouter.com/) - For client-side navigation and protected admin/user routes.
+*   **State Management**: **React Context API** - Used for managing the Shopping Cart and Authentication state.
+*   **Styling**: **Tailwind CSS v4** - A utility-first CSS framework for rapid UI development and high-performance designs.
+*   **Icons**: [Lucide React](https://lucide.dev/) - A library of beautiful, consistent icons.
+
+## 2. Backend & Database (Supabase)
+The project utilizes [Supabase](https://supabase.com/) as a Comprehensive Backend-as-a-Service (BaaS).
+*   **Database**: **PostgreSQL** - Relational database for storing Products, Orders, User Profiles, and Categories.
+*   **Authentication**: **Supabase Auth** - Secure, production-ready authentication (Email/Password).
+*   **Row Level Security (RLS)**: PostgreSQL policies ensuring that users can only access their own data and only admins can manage inventory.
+*   **Storage**: **Supabase Storage** - Hosting and serving product images.
+
+## 3. External Integrations
+*   **Real-Time Mobile Notifications**: **Telegram Bot API** - Instant sound push alerts delivered to the store owner's phone on new orders with full customer, item, and payment breakdown.
+*   **Order Management & Backup**: **Google Sheets API** - Orders are automatically synced to a Google Sheet via a custom **Google Apps Script** for business tracking.
+*   **Payments**: 
+    *   **bKash**: Digital payment integration for mobile banking.
+    *   **Cash on Delivery (COD)**: Support for offline payments.
+*   **Transactional Email**: Google Apps Script acting as a lightweight mail gateway for OTP verification and automated order confirmations.
+*   **Analytics**: **Facebook Pixel / Meta Pixel** with standard event tracking (PageView, ViewContent, AddToCart, InitiateCheckout, Purchase).
+*   **WordPress & WooCommerce Integration**: Standardized CSV export engine adhering to native WooCommerce product importer specifications for bulk catalog migration and automated media library downloading.
+
+## 4. Key Architectural Features
+*   **Role-Based Access Control (RBAC)**: Distinct permissions for 'Admin' and 'Customer' users.
+*   **Responsive Design**: Mobile-first approach ensuring compatibility across all device sizes.
+*   **SEO Optimized**: Semantic HTML structure and meta-tag management.
+## 5. Mobile Design System
+The application utilizes a **Mobile-First Responsive Strategy**:
+- **Dynamic Drawers**: Custom-built side-drawer navigation for both public and admin interfaces.
+- **Responsive Flex/Grid**: Intelligent layout stacking (e.g., PD gallery and Checkout flows).
+- **Narrow-Device Optimization**: Explicit `flex-shrink` and `min-width` management for high-density, narrow mobile displays (e.g., OnePlus, iPhone Pro models).
+- **Touch-First Elements**: Optimized tap targets (min 40x40px).
+- **Premium Filter System**: Modern "Premium Tag" filtering with pulsing active indicators and dynamic chips for a fluid mobile-first and desktop exploration experience.
+- **Glassmorphism Navigation**: Semi-transparent navbar (50% opacity) with backdrop blur for a modern, layered visual effect.
+- **Enhanced Product Details**: Premium PDP featuring breadcrumbs, quantity selectors, star ratings, collapsible information sections, trust badges, and interactive image galleries with zoom indicators.
+- **Premium CTAs**: Redesigned action buttons with icons, shadow effects, and smooth hover transitions for improved conversion rates.
+- **Smart Delivery System & Nationwide Coverage**: Complete geographic geocoding database (`src/data/bangladeshLocations.js`) covering all 64 districts + Dhaka Sub-Urban and 500+ thanas/upazilas matching Steadfast Courier parcel delivery standards. Includes dual-spelling aliases (`Chattogram` ↔ `Chittagong`, etc.), dependent location dropdowns (District → Thana), an `Other / অন্যান্য` fallback option, and district-based delivery charges (৳70 inside Dhaka, ৳120 outside Dhaka & sub-urban).
+- **Progressive Web App (PWA) & Resilient Service Worker**: Full manifest support (`manifest.json`) and hardened service worker (`public/sw.js`, version `choshmazone-v2`) with safe error handling on fetch events, non-GET bypassing, dev-server filtering, and environment-aware registration (production-only with automatic dev unregistration and cache purging).
+- **Client-Side Caching**: Custom `cacheManager` utilizing LocalStorage with TTL for optimized API performance.
+- **Advanced UX System**: Global toast notification system and real-time product search with debounced filtering.
+- **Elite Performance & Analytics**: 
+    - **Recharts Integration**: Professional-grade data visualization for sales and order trends in the admin panel.
+    - **Order Timeline**: Created visual progress tracker and order details page (`OrderDetails.jsx`).
+    - **Fulfillment Tracking**: Dynamic visual timeline for customer order status (Placed → Processing → Shipped → Delivered).
+    - **Media Manager**: High-performance local preview system using browser Blob URLs to provide zero-latency visual feedback for admin uploads.
+    - **Resilience**: Comprehensive Error Boundaries and Auth timeout protection to prevent blank screens.
+- **Session Intelligence**: Dedicated "Session Active" choice screen for authenticated users to navigate efficiently between Shop, Profile, and Admin zones.
+- **Dynamic Graphics**: Recharts-based sales analytics with specialized mount-tracking to eliminate hydration warnings and ensure stable, fluid rendering across different screen sizes.
+- **Secure Order Tracking**: Multi-step verification flow using phone lookup and OTP authentication.
+- **Email Gateway**: Leverages **Google Apps Script** as a cost-free transactional email service for OTP codes and order confirmations.
+- **Navigation UX**: Integrated `ScrollToTop` logic to maintain consistent viewport positioning on route changes.
+- **Advanced Social Proof**: Premium dark-mode review system with glassmorphic aesthetics, user-initial avatars, and verified purchase indicators.
+- **Fixed Mobile Experience**: Enhanced product cards on small screens with frozen images and permanently visible, high-accessibility "Add to Bag" and "Buy Now" buttons.
+- **Elite Performance**: 
+    - **Route-Based Splitting**: Uses `React.lazy` and `Suspense` for on-demand chunk loading, reducing initial payload.
+    - **Build Optimization**: Custom `manualChunks` in Vite for vendor library caching.
+    - **Minification**: Integrated Terser for aggressive code reduction.
+    - **LCP Tuning**: Optimized critical path images with `fetchpriority="high"` and eager loading.
+    - **Lazy Rendering**: Asynchronous decoding and lazy loading for off-screen product assets.
+- **Rich Text Management**:
+    - **React Quill New**: Integrated `react-quill-new` for full HTML product descriptions, ensuring compatibility with React 19's `findDOMNode` deprecation.
+- **Advanced Inventory Management**:
+    - **Product Duplication System**: Instant one-click cloning from the admin inventory list with auto `(Copy)` naming, ID sanitization, variant ID regeneration, and asset reuse.
+    - **Unified Media Gallery**: Drag-and-drop image reordering system in Admin with automatic primary image selection.
+    - **Shopify-Style Variant Table**: Combined option display (Color / Size) for a professional inventory management experience.
+    - **WooCommerce Bulk Product Exporter**: Integrated export suite (`src/lib/woocommerceExporter.js`, `ExportWooCommerceModal.jsx`, `export_woocommerce.js`) generating RFC 4180 / UTF-8 BOM CSV files. Maps Variable/Variation structures or Standalone Simple products, packs rich technical specifications into HTML descriptions, and consolidates public Supabase image URLs for automated downloading by WordPress.
+- **Dynamic CMS & Site Settings Engine**:
+    - **Global Site Settings (`site_settings`)**: PostgreSQL key-value persistence layer for promotional banners, brand visual assets, optical lens packages, and storefront text.
+    - **Homepage Hero Banner Customizer**: Complete customizer for background imagery, badge text, split title with gold accent highlight, multiline description, and live real-time sticky preview.
+    - **Button Design Dropdown Selector Engine**: Selectable styling tokens for CTA buttons (Colors: Dark Luxury, Gold Accent, Crisp White, Outlines, Glassmorphic blur, Gold Gradient; Shapes: Square, Soft Square, Rounded, Pill; Sizes: Medium, Large, Extra Large; Icons: Arrow, Sparkle, Shopping Bag).
+    - **Live Content Preview**: Admin module with real-time homepage banner preview as admins edit copy and upload photography.
+    - **Category & Collection Architecture**: Dynamic database-driven category collections with active/deactivation state toggles (`is_active`), instant featured toggling, live status filtering, and dual-level Collections page layout (All Collections + Featured Highlights).
+    - **Collections Hero Customizer**: Real-time admin customizer for background images, badge, title, and description for the Collections page header.
+- **Optical Prescription & Customization Suite**:
+    - **Interactive Lens Customizer**: Modal (`LensCustomizerModal.jsx`) allowing buyers to select optical lens packages (Single Vision, Anti-Reflective, Blue Cut, Photochromic, Progressive).
+    - **Multi-Method Prescription Submission**: Supports instant prescription slip upload, manual SPH/CYL/AXIS/PD entry, or "Send via WhatsApp Later" ordering flow.
+    - **Admin Lens Package Management (`/admin/lenses`)**: Complete CRUD, pricing, feature list, active toggle, and reordering interface synced to Supabase `site_settings`.
+    - **Dynamic Price Matrix**: Automatic composite calculation of Frame price + Lens package price in real time across PDP, Cart, Checkout, and Order Confirmation.
+- **Checkout & Purchasing UX**:
+    - **Item-Level Order Cancellation**: Individual item removal direct from the Checkout summary sidebar without navigating back to the cart.
+    - **Dynamic Checkout Form Engine**: Admin customizer at `/admin/settings` controlling Required/Optional status and Shown/Hidden visibility for each checkout field (`name`, `phone`, `email`, `address`, `district`, `thana`, `city`, `zip`, `notes`).
+    - **11-Digit Phone Validation Subsystem**: Strict Bangladesh mobile number normalization and regex verification (`^01[3-9]\d{8}$`) with real-time character count badge (`X/11 digits ✓`).
+    - **Admin Orders Interactive UX**: Clickable table rows and explicit `👁 Details` action button in `/admin/orders` for immediate order inspection.
+    - **Interactive Image Navigation**: Full-scale product presentation with floating prev/next navigation arrows and high-res thumbnail selection.
+- **Web Log & Conversion Funnel Analytics Engine**:
+    - **Real-Time Client Tracker (`src/lib/tracker.js`)**: Non-blocking visitor session management (`visitor_id` in localStorage, `session_id` in sessionStorage), device/browser detection, and milestone updating (`has_viewed_product`, `has_added_to_cart`, `has_initiated_checkout`, `has_purchased`).
+    - **Automated Event Hooks**: Route-level tracking on Page Views (`PageMonitor.jsx`), Product Views (`ProductDetails.jsx`), Cart Changes (`CartContext.jsx`), and Checkout/Purchase conversions (`Checkout.jsx`).
+    - **Admin Analytics Dashboard (`/admin/web-logs`)**: 6 KPI cards, interactive step-by-step conversion funnel with drop-off analytics, Recharts Area Charts for traffic and sales trends, hardware breakdown (Mobile vs Desktop vs Tablet), high-demand cart items, and a searchable live activity log with JSON metadata inspection.
+- **Public Phone-Based Order Tracking & Verification**:
+    - **Frictionless Tracking (`/track-order`)**: Phone-number discovery system coupled with mock OTP SMS verification simulation, providing customers immediate access to fulfillment updates, item lists, and delivery addresses without account login.
+    - **Visual Order Timeline**: Milestone stepper highlighting active order stage (Placed → Processing → Shipped → Delivered).
+- **Search Engine Branding & Metadata**:
+    - **Google Search Favicons**: Configured dedicated high-resolution favicon links and manifest icons for optimal search engine display and home screen shortcuts.
+- **Data Visualization & Chart Resilience**:
+    - **Recharts Container Hardening**: Client-side hydration tracking (`isMounted`), flex/grid `min-w-0` layout safeguards, and `<ResponsiveContainer>` debouncing preventing `-1` dimension calculation warnings.
+- **Recently Purchased Social Proof Engine**:
+    - **Privacy-Guaranteed Showcase (`RecentlyPurchased.jsx`)**: Displays recently bought eyewear on the homepage mirroring the New Arrivals 4-column layout and gold accent bar styling (`bg-secondary`), using `ProductCard`.
+    - **Secure Data Pipeline (`orderParams.fetchRecentPurchased`)**: Queries only product line items from `order_items`, strictly excluding all customer personal details (names, phone numbers, addresses, emails, user IDs).
+    - **De-Duplication & Cache Management**: Automatic distinct product filtering and 3-minute local caching with instant cache invalidation upon new order placement.
+- **Visitor Geo-Location & Map Analytics**:
+    - **Geographic Data Layer**: Session-level capture of `ip_address`, `city`, `region`, `country`, and `isp` in `visitor_sessions` with city indexing.
+    - **Interactive Map Intelligence (`VisitorGeoMap.jsx`)**: Regional map view in `/admin/web-logs` visualizing visitor geography across Bangladesh and global regions.
+- **Client-Side Image Compression & Free Plan Storage Egress Optimization**:
+    - **Browser-Native WebP Compression (`src/lib/imageCompressor.js`)**: Zero-dependency image compressor using HTML5 canvas and WebP encoder.
+    - **Sub-100KB Target Budget**: Iterative quality reduction algorithm ensuring uploaded images stay under ~100 KB with 1200px max dimensions (1920px for wide banners) while preserving aspect ratio and PNG alpha transparency.
+    - **Unified Upload Interceptors**: Auto-compresses images across `productParams.uploadImage`, `settingsParams.uploadAsset`, `ProductForm.jsx`, `MediaManager.jsx`, `Categories.jsx`, and `Checkout.jsx` (prescription uploads).
+    - **Long-Lived Edge & Browser Caching**: Standardized `cacheControl: '31536000, public'` (1 year) headers across all Supabase Storage uploads, reducing Supabase Cached Egress by 95-98% and fitting easily within the 5 GB/month free tier.
+- **Real-Time Order Sound & Web Audio Engine**:
+    - **Cash Register Chime (`src/lib/orderSoundNotifier.js`)**: Web Audio API tone synthesis and audio playback (`/sounds/cha-ching.mp3`) producing an authentic "Cha-Ching!" sound whenever an order is submitted.
+    - **Browser Autoplay Bypass (`unlockAudio`)**: AudioContext unlock event listeners on initial user click to guarantee audible alerts without browser autoplay blocks.
+    - **Mobile Hardware Vibration (`vibratePhone`)**: Triggers multi-burst vibration on supported smartphones (`navigator.vibrate([200, 100, 200, 100, 400])`).
+    - **Live Floating Order Banner (`AdminLayout.jsx`)**: Supabase Realtime channel subscription with animated banner, customer name, total amount, and volume mute toggle.
+- **ntfy.sh Mobile Push Notification Protocol**:
+    - **Zero-Cost Instant Push Service (`src/lib/ntfyNotifier.js`)**: Delivers real-time notifications to store owners via the free open-source ntfy mobile app on Android & iOS without requiring paid Apple Developer accounts or Firebase credentials.
+    - **Interactive Action Buttons**: Directly embeds `View Order` (opens admin order details) and `Call Customer` (`tel:` direct phone dialer) action buttons into the phone's notification shade.
+- **Telegram Bot API with Interactive Inline Keyboards**:
+    - **Instant Order Dispatch (`src/lib/telegramNotifier.js`)**: Dispatches detailed Markdown order summaries with customer info, payment method, and itemized lists to Telegram.
+    - **Inline Keyboard Markup (`inline_keyboard`)**: Interactive tap-to-act buttons for one-tap admin order review and instant customer phone calling.
+- **Dynamic Contact Page CMS & Media Manager Suite**:
+    - **Database-Driven Contact Us (`src/pages/Contact.jsx`)**: Synchronously cached and dynamically fetched heading, subtitle, showroom title & multi-line address, email support, and hotline number from Supabase `site_settings`.
+    - **Admin Live Preview Customizer (`src/pages/admin/MediaManager.jsx`)**: Section 6 in Media & Content Manager providing a live side-by-side preview panel that updates in real-time as the administrator types.
+    - **Quick Jump Pill Navigation**: Anchor bar in Media Manager enabling rapid navigation to Hero Banner, Promo Banner, Collections Header, Logos, Categories, and Contact Info.
+- **Facebook Catalog Feed XML Engine**:
+    - **Compliant RSS/Atom Generator (`api/catalog.js`)**: Serverless function serving Meta Commerce Manager with XML-safe character entity sanitization and RFC-compliant URL escaping.
+
+
+
+
+
+
