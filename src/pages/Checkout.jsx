@@ -293,6 +293,21 @@ const Checkout = () => {
 
                 if (productsError) throw productsError;
 
+                // Sum requested quantities per product and per variant key to prevent overselling
+                const requestedVariantQty = {};
+                const requestedProductQty = {};
+                for (const item of cartItems) {
+                    const qty = Math.max(1, Number(item.quantity) || 1);
+                    const pId = String(item.id);
+                    requestedProductQty[pId] = (requestedProductQty[pId] || 0) + qty;
+                    
+                    const vId = item.variant?.id || item.variant_id;
+                    if (vId && vId !== 'base') {
+                        const vKey = `${pId}_${vId}`;
+                        requestedVariantQty[vKey] = (requestedVariantQty[vKey] || 0) + qty;
+                    }
+                }
+
                 const outOfStock = [];
                 for (const item of cartItems) {
                     const dbProduct = latestProducts?.find(p => String(p.id) === String(item.id));
@@ -318,24 +333,42 @@ const Checkout = () => {
                         }
                     }
 
+                    const itemVariantId = item.variant?.id || item.variant_id;
                     let matchedVariant = null;
-                    if (variantsList.length > 0) {
-                        const itemVariantId = item.variant?.id || item.variant_id;
-                        if (itemVariantId && itemVariantId !== 'base') {
-                            matchedVariant = variantsList.find(v => String(v.id) === String(itemVariantId));
+
+                    // 1. Direct match by variant ID if present and not 'base'
+                    if (itemVariantId && itemVariantId !== 'base' && variantsList.length > 0) {
+                        matchedVariant = variantsList.find(v => String(v.id) === String(itemVariantId));
+                    }
+
+                    // 2. Match by exact color and size
+                    if (!matchedVariant && variantsList.length > 0) {
+                        const itemColor = (item.selected_color || item.variant?.color || '').trim().toLowerCase();
+                        const itemSize = (item.selected_size || item.variant?.size || '').trim().toLowerCase();
+
+                        if (itemColor && itemSize) {
+                            matchedVariant = variantsList.find(v => {
+                                const vColor = (v.color || '').trim().toLowerCase();
+                                const vSize = (v.size || '').trim().toLowerCase();
+                                return vColor === itemColor && vSize === itemSize;
+                            });
                         }
 
-                        if (!matchedVariant) {
-                            const itemColor = (item.selected_color || item.variant?.color || '').trim().toLowerCase();
-                            const itemSize = (item.selected_size || item.variant?.size || '').trim().toLowerCase();
-                            if (itemColor || itemSize) {
+                        // 3. Match by color alone if color is specified
+                        if (!matchedVariant && itemColor) {
+                            matchedVariant = variantsList.find(v => {
+                                const vColor = (v.color || '').trim().toLowerCase();
+                                return vColor === itemColor;
+                            });
+                        }
+
+                        // 4. Only match by size if variants have no distinct colors defined (size-only variants)
+                        if (!matchedVariant && itemSize && !itemColor) {
+                            const hasVariantColors = variantsList.some(v => Boolean(v.color && v.color.trim()));
+                            if (!hasVariantColors) {
                                 matchedVariant = variantsList.find(v => {
-                                    const vColor = (v.color || '').trim().toLowerCase();
                                     const vSize = (v.size || '').trim().toLowerCase();
-                                    if (itemColor && itemSize) return vColor === itemColor && vSize === itemSize;
-                                    if (itemColor) return vColor === itemColor;
-                                    if (itemSize) return vSize === itemSize;
-                                    return false;
+                                    return vSize === itemSize;
                                 });
                             }
                         }
@@ -345,31 +378,45 @@ const Checkout = () => {
 
                     // Check variant stock if a specific variant was matched
                     if (matchedVariant) {
-                        const vStock = (matchedVariant.stock_quantity !== undefined && matchedVariant.stock_quantity !== null)
+                        const vKey = `${dbProduct.id}_${matchedVariant.id}`;
+                        const totalReq = requestedVariantQty[vKey] || reqQty;
+                        const vStock = (matchedVariant.stock_quantity !== undefined && matchedVariant.stock_quantity !== null && matchedVariant.stock_quantity !== '')
                             ? Number(matchedVariant.stock_quantity)
                             : null;
 
                         if (vStock !== null) {
                             if (vStock <= 0) {
                                 outOfStock.push({ ...item, stockReason: 'Out of Stock' });
-                            } else if (reqQty > vStock) {
-                                outOfStock.push({ ...item, stockReason: `Only ${vStock} available (in cart: ${reqQty})` });
+                                continue;
+                            } else if (totalReq > vStock) {
+                                outOfStock.push({ ...item, stockReason: `Only ${vStock} available (in cart: ${totalReq})` });
+                                continue;
                             }
+                            // Valid variant stock, proceed
                             continue;
                         }
                     }
 
-                    // Otherwise fall back to base product stock (buying base product or variant with no separate stock)
-                    const baseStock = (dbProduct.stock_quantity !== undefined && dbProduct.stock_quantity !== null)
+                    // Fall back to base product stock (buying base product or base color)
+                    const baseStockNum = (dbProduct.stock_quantity !== undefined && dbProduct.stock_quantity !== null && dbProduct.stock_quantity !== '')
                         ? Number(dbProduct.stock_quantity)
                         : null;
 
-                    if (baseStock !== null) {
-                        if (baseStock <= 0) {
-                            outOfStock.push({ ...item, stockReason: 'Out of Stock' });
-                        } else if (reqQty > baseStock) {
-                            outOfStock.push({ ...item, stockReason: `Only ${baseStock} available (in cart: ${reqQty})` });
-                        }
+                    // If baseStock is 0/null but variants exist, total available is sum of all variants
+                    const totalVariantsStock = variantsList.length > 0
+                        ? variantsList.reduce((acc, v) => acc + (Math.max(0, Number(v.stock_quantity)) || 0), 0)
+                        : 0;
+
+                    const effectiveStock = (baseStockNum !== null && baseStockNum > 0)
+                        ? baseStockNum
+                        : (totalVariantsStock > 0 ? totalVariantsStock : (baseStockNum !== null ? baseStockNum : 0));
+
+                    const totalReq = requestedProductQty[String(dbProduct.id)] || reqQty;
+
+                    if (effectiveStock <= 0) {
+                        outOfStock.push({ ...item, stockReason: 'Out of Stock' });
+                    } else if (totalReq > effectiveStock) {
+                        outOfStock.push({ ...item, stockReason: `Only ${effectiveStock} available (in cart: ${totalReq})` });
                     }
                 }
 

@@ -14,17 +14,25 @@ const ProductCard = ({ product }) => {
     const { isInWishlist, toggleWishlist } = useWishlist();
     const isWishlisted = isInWishlist(id);
 
+    const totalVariantStock = Array.isArray(product.variants) && product.variants.length > 0
+        ? product.variants.reduce((sum, v) => sum + (Math.max(0, Number(v.stock_quantity)) || 0), 0)
+        : null;
+    const availableStock = totalVariantStock !== null && totalVariantStock > 0
+        ? totalVariantStock
+        : (Number(product.stock_quantity) || 0);
+    const isOutOfStock = availableStock <= 0;
+
     const handleAddToCart = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (product.stock_quantity <= 0) return;
+        if (isOutOfStock) return;
         addToCart(product);
     };
 
     const handleBuyNow = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (product.stock_quantity <= 0) return;
+        if (isOutOfStock) return;
         addToCart(product, false);
         navigate('/checkout');
     };
@@ -69,7 +77,7 @@ const ProductCard = ({ product }) => {
                     </button>
 
                     {/* Out of Stock Banner */}
-                    {product.stock_quantity <= 0 && (
+                    {isOutOfStock && (
                         <div className="absolute top-1/2 left-0 w-full transform -translate-y-1/2 bg-black/70 text-white text-center py-2 z-30 font-outfit uppercase tracking-widest text-xs font-bold backdrop-blur-sm">
                             Out of Stock
                         </div>
@@ -79,17 +87,17 @@ const ProductCard = ({ product }) => {
                     <div className="absolute inset-0 bg-black/15 flex flex-col items-center justify-center gap-2.5 opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-20 hidden md:flex p-4">
                         <button
                             className={`w-36 py-2 px-3 rounded font-semibold text-xs uppercase tracking-wider shadow-md transition-all duration-200 flex items-center justify-center gap-1.5 hover:scale-105 active:scale-95 ${
-                                product.stock_quantity <= 0
+                                isOutOfStock
                                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     : 'bg-white text-primary hover:bg-primary hover:text-white'
                             }`}
                             onClick={handleAddToCart}
-                            disabled={product.stock_quantity <= 0}
+                            disabled={isOutOfStock}
                         >
                             <ShoppingBag size={14} />
-                            {product.stock_quantity <= 0 ? 'Out of Stock' : 'Add to Cart'}
+                            {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
                         </button>
-                        {product.stock_quantity > 0 && (
+                        {!isOutOfStock && (
                             <button
                                 className="w-36 py-2 px-3 rounded font-semibold text-xs uppercase tracking-wider shadow-md transition-all duration-200 bg-primary text-white hover:bg-secondary hover:text-primary flex items-center justify-center gap-1.5 hover:scale-105 active:scale-95"
                                 onClick={handleBuyNow}
@@ -108,17 +116,17 @@ const ProductCard = ({ product }) => {
                     {/* Mobile Quick Actions */}
                     <div className="flex flex-col gap-2 md:hidden">
                         <button
-                            className={`w-full h-11 font-bold text-[11px] uppercase tracking-widest rounded-md flex items-center justify-center gap-2 shadow-sm transition-transform ${product.stock_quantity <= 0 ? 'bg-gray-300 text-gray-500 cursor-not-allowed bg-opacity-50' : 'bg-primary text-white active:scale-[0.98]'}`}
+                            className={`w-full h-11 font-bold text-[11px] uppercase tracking-widest rounded-md flex items-center justify-center gap-2 shadow-sm transition-transform ${isOutOfStock ? 'bg-gray-300 text-gray-500 cursor-not-allowed bg-opacity-50' : 'bg-primary text-white active:scale-[0.98]'}`}
                             onClick={handleAddToCart}
-                            disabled={product.stock_quantity <= 0}
+                            disabled={isOutOfStock}
                         >
                             <ShoppingBag size={14} />
-                            {product.stock_quantity <= 0 ? 'Out of Stock' : 'Add to Bag'}
+                            {isOutOfStock ? 'Out of Stock' : 'Add to Bag'}
                         </button>
                         <button
-                            className={`w-full h-11 font-bold text-[11px] uppercase tracking-widest rounded-md shadow-sm transition-transform ${product.stock_quantity <= 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed hidden' : 'bg-secondary text-primary active:scale-[0.98]'}`}
+                            className={`w-full h-11 font-bold text-[11px] uppercase tracking-widest rounded-md shadow-sm transition-transform ${isOutOfStock ? 'bg-gray-200 text-gray-400 cursor-not-allowed hidden' : 'bg-secondary text-primary active:scale-[0.98]'}`}
                             onClick={handleBuyNow}
-                            disabled={product.stock_quantity <= 0}
+                            disabled={isOutOfStock}
                         >
                             Buy Now
                         </button>

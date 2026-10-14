@@ -203,9 +203,13 @@ const ProductDetails = () => {
         }
     }, [selectedColor, selectedSize, product]);
 
-    const displayStock = product?.variants?.length > 0 && currentVariant 
-        ? currentVariant.stock_quantity 
-        : product?.stock_quantity;
+    const displayStock = currentVariant 
+        ? Number(currentVariant.stock_quantity ?? 0)
+        : (Number(product?.stock_quantity) > 0
+            ? Number(product.stock_quantity)
+            : (Array.isArray(product?.variants) && product.variants.length > 0
+                ? product.variants.reduce((sum, v) => sum + (Math.max(0, Number(v.stock_quantity)) || 0), 0)
+                : Number(product?.stock_quantity || 0)));
         
     const basePrice = product?.variants?.length > 0 && currentVariant && currentVariant.price
         ? currentVariant.price 
@@ -250,7 +254,7 @@ const ProductDetails = () => {
         } else {
             item.selected_color = color;
             item.selected_size = size;
-            item.variant = { color, size };
+            item.variant = { id: 'base', color, size, stock_quantity: displayStock };
             variantTitleSuffix = `${color ? ` - ${color}` : ''}${size && size !== 'Standard' ? ` - ${size}` : ''}`;
         }
 
