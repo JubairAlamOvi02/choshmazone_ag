@@ -5,6 +5,7 @@ import FeaturedCollections from '../components/FeaturedCollections';
 import ProductCard from '../components/ProductCard';
 import PromotionalBanner from '../components/PromotionalBanner';
 import RecentlyPurchased from '../components/RecentlyPurchased';
+import ChoshmaZoneSpotlight from '../components/ChoshmaZoneSpotlight';
 import RecentlyViewed from '../components/RecentlyViewed';
 import Footer from '../components/Footer';
 
@@ -66,8 +67,9 @@ const Home = () => {
                     )}
                 </section>
 
-                <PromotionalBanner />
+                <ChoshmaZoneSpotlight />
                 <RecentlyPurchased />
+                <PromotionalBanner />
                 <RecentlyViewed />
             </main>
 

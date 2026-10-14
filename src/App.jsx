@@ -56,6 +56,7 @@ const FacebookCatalog = lazy(() => import('./pages/admin/FacebookCatalog'));
 const AdminLensPackages = lazy(() => import('./pages/admin/LensPackages'));
 const AdminCheckoutSettings = lazy(() => import('./pages/admin/CheckoutSettings'));
 const AdminWebLogs = lazy(() => import('./pages/admin/WebLogs'));
+const AdminSpotlight = lazy(() => import('./pages/admin/SpotlightManager'));
 
 
 function App() {
@@ -125,6 +126,7 @@ function App() {
                           <Route path="customers" element={<AdminCustomers />} />
                           <Route path="lenses" element={<AdminLensPackages />} />
                           <Route path="media" element={<AdminMedia />} />
+                          <Route path="spotlight" element={<AdminSpotlight />} />
                           <Route path="facebook-catalog" element={<FacebookCatalog />} />
                           <Route path="settings" element={<AdminCheckoutSettings />} />
                         </Route>

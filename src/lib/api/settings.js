@@ -109,6 +109,69 @@ export const DEFAULT_CONTACT_SETTINGS = {
     contact_phone: '+880 1234 567890'
 };
 
+export const DEFAULT_CHOSHMAZONE_SECTION = {
+    badge: 'choshmazone.com',
+    title: 'The Details Define Your Vision',
+    description: 'From your first boardroom pitch to unforgettable weekend celebrations, Choshma Zone equips you with the finishing touches that turn dressed into distinguished.',
+    enabled: true,
+    items: [
+        {
+            id: 'col-1',
+            type: 'image',
+            url: 'https://images.unsplash.com/photo-1591076482161-42ce6da69f67?auto=format&fit=crop&w=800&q=80',
+            title: 'Precision Craft',
+            caption: 'Handcrafted luxury frames',
+            product_id: '',
+            custom_link: ''
+        },
+        {
+            id: 'col-2',
+            type: 'image',
+            url: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=80',
+            title: 'Signature Silhouette',
+            caption: 'Titanium & acetate',
+            product_id: '',
+            custom_link: ''
+        },
+        {
+            id: 'col-3-top',
+            type: 'image',
+            url: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=800&q=80',
+            title: 'Refined Optics',
+            caption: 'Ultra-clear Blue Cut lenses',
+            product_id: '',
+            custom_link: ''
+        },
+        {
+            id: 'col-3-bottom',
+            type: 'image',
+            url: 'https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=800&q=80',
+            title: 'Tailored Fit',
+            caption: 'Ergonomic comfort',
+            product_id: '',
+            custom_link: ''
+        },
+        {
+            id: 'col-4',
+            type: 'image',
+            url: 'https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=800&q=80',
+            title: 'Timeless Aesthetic',
+            caption: 'Architectural lines',
+            product_id: '',
+            custom_link: ''
+        },
+        {
+            id: 'col-5',
+            type: 'image',
+            url: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?auto=format&fit=crop&w=800&q=80',
+            title: 'Distinguished Expression',
+            caption: 'Elevated every day',
+            product_id: '',
+            custom_link: ''
+        }
+    ]
+};
+
 export const settingsParams = {
     getCachedAll: () => settingsCache || [],
 
@@ -227,22 +290,65 @@ export const settingsParams = {
         return await Promise.all(promises);
     },
 
-    uploadAsset: async (file, path = 'site-assets') => {
-        // Automatically compress image before uploading
-        const isBanner = path.includes('banner') || (file.name && file.name.toLowerCase().includes('banner'));
-        const compressedFile = await compressImage(file, {
-            maxWidth: isBanner ? 1920 : 1200,
-            maxHeight: isBanner ? 1080 : 1200,
-            maxSizeBytes: isBanner ? 150 * 1024 : 100 * 1024
-        });
+    getChoshmazoneSection: async () => {
+        try {
+            const raw = await settingsParams.get('choshmazone_section');
+            if (!raw) return DEFAULT_CHOSHMAZONE_SECTION;
+            const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            const rawItems = Array.isArray(parsed.items) && parsed.items.length > 0 ? parsed.items : DEFAULT_CHOSHMAZONE_SECTION.items;
+            const items = rawItems.map(savedItem => {
+                const def = DEFAULT_CHOSHMAZONE_SECTION.items.find(d => d.id === savedItem.id) || {};
+                return {
+                    product_id: '',
+                    custom_link: '',
+                    ...def,
+                    ...savedItem
+                };
+            });
 
-        const fileName = `${Date.now()}-${compressedFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+            return {
+                ...DEFAULT_CHOSHMAZONE_SECTION,
+                ...parsed,
+                items
+            };
+        } catch (e) {
+            console.warn('[Settings] Failed to fetch choshmazone_section:', e);
+            return DEFAULT_CHOSHMAZONE_SECTION;
+        }
+    },
+
+    saveChoshmazoneSection: async (sectionData) => {
+        return await settingsParams.set('choshmazone_section', sectionData);
+    },
+
+    uploadAsset: async (file, path = 'site-assets') => {
+        let uploadFile = file;
+        const isVideo = file.type && (file.type.startsWith('video/') || /\.(mp4|webm|mov|ogg)$/i.test(file.name));
+
+        if (!isVideo && file.type && file.type.startsWith('image/')) {
+            try {
+                const isBanner = path.includes('banner') || (file.name && file.name.toLowerCase().includes('banner'));
+                uploadFile = await compressImage(file, {
+                    maxWidth: isBanner ? 1920 : 1200,
+                    maxHeight: isBanner ? 1080 : 1200,
+                    maxSizeBytes: isBanner ? 150 * 1024 : 100 * 1024
+                });
+            } catch (err) {
+                console.warn('Image compression skipped, using original file:', err);
+                uploadFile = file;
+            }
+        }
+
+        const cleanName = (uploadFile.name || 'media').replace(/[^a-zA-Z0-9.]/g, '_');
+        const fileName = `${Date.now()}-${cleanName}`;
         const filePath = `${path}/${fileName}`;
+
+        const contentType = uploadFile.type || (isVideo ? 'video/mp4' : 'image/webp');
 
         const { data, error } = await supabase.storage
             .from('products') // Use the existing 'products' bucket
-            .upload(filePath, compressedFile, {
-                contentType: compressedFile.type || 'image/webp',
+            .upload(filePath, uploadFile, {
+                contentType,
                 cacheControl: '31536000, public',
                 upsert: false
             });

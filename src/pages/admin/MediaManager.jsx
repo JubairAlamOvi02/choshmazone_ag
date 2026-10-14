@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { settingsParams, DEFAULT_CONTACT_SETTINGS } from '../../lib/api/settings';
 import { productParams } from '../../lib/api/products';
 import { categoryParams } from '../../lib/api/categories';
@@ -347,6 +347,10 @@ USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'a
                         <a href="#categories-section" className="px-3 py-1.5 bg-gray-50 hover:bg-primary hover:text-white rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-all">
                             Categories
                         </a>
+                        <Link to="/admin/spotlight" className="px-3.5 py-1.5 bg-amber-500/10 hover:bg-amber-500 hover:text-white text-amber-900 border border-amber-500/30 rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-all flex items-center gap-1.5">
+                            <Sparkles size={13} className="text-amber-700" />
+                            choshmazone.com Section
+                        </Link>
                         <a href="#contact-support-section" className="px-3 py-1.5 bg-primary/10 hover:bg-primary hover:text-white text-primary rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-all flex items-center gap-1.5">
                             <Headphones size={13} />
                             Contact & Support Info
