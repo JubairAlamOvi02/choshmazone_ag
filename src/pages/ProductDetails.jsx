@@ -240,6 +240,7 @@ const ProductDetails = () => {
 
         if (currentVariant) {
             item.variant = currentVariant;
+            item.variant_id = currentVariant.id;
             item.selected_color = currentVariant.color || color;
             item.selected_size = currentVariant.size || size;
             variantId = currentVariant.id;
@@ -248,6 +249,7 @@ const ProductDetails = () => {
                 item.image = currentVariant.image_url;
             }
         } else {
+            item.variant_id = null;
             item.selected_color = color;
             item.selected_size = size;
             item.variant = { color, size };

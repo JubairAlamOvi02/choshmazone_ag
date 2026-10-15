@@ -284,27 +284,66 @@ const Checkout = () => {
         setIsSubmitting(true);
 
         try {
-            const itemIds = cartItems.map(item => item.id);
+            const itemIds = cartItems.map(item => item.id).filter(Boolean);
             if (itemIds.length > 0) {
                 const { data: latestProducts, error: productsError } = await supabase
                     .from('products')
-                    .select('id, name, stock_quantity, variants')
+                    .select('id, name, stock_quantity, variants, is_active')
                     .in('id', itemIds);
 
                 if (productsError) throw productsError;
 
-                const outOfStock = cartItems.filter(item => {
-                    const dbProduct = latestProducts.find(p => p.id === item.id);
-                    if (!dbProduct) return true;
-                    
-                    if (item.variant) {
-                        const dbVariant = dbProduct.variants?.find(v => v.id === item.variant.id);
-                        if (!dbVariant || dbVariant.stock_quantity <= 0) return true;
-                    } else {
-                        if (dbProduct.stock_quantity <= 0) return true;
+                const outOfStock = [];
+
+                for (const item of cartItems) {
+                    const dbProduct = latestProducts?.find(p => String(p.id) === String(item.id));
+
+                    // If product doesn't exist in DB or was deactivated
+                    if (!dbProduct || dbProduct.is_active === false) {
+                        outOfStock.push({
+                            ...item,
+                            currentStock: 0
+                        });
+                        continue;
                     }
-                    return false;
-                });
+
+                    let dbVariant = null;
+                    const variantId = item.variant_id || item.variant?.id;
+
+                    // 1. Try finding variant by ID if a specific variant ID exists
+                    if (variantId && variantId !== 'base' && Array.isArray(dbProduct.variants)) {
+                        dbVariant = dbProduct.variants.find(v => String(v.id) === String(variantId));
+                    }
+
+                    // 2. Try finding variant by matching color/size if not matched by ID
+                    if (!dbVariant && (item.selected_color || item.variant?.color) && Array.isArray(dbProduct.variants)) {
+                        const targetColor = String(item.selected_color || item.variant?.color || '').trim().toLowerCase();
+                        const targetSize = String(item.selected_size || item.variant?.size || '').trim().toLowerCase();
+                        dbVariant = dbProduct.variants.find(v => {
+                            const vColor = String(v.color || '').trim().toLowerCase();
+                            const vSize = String(v.size || '').trim().toLowerCase();
+                            const colorMatches = vColor && vColor === targetColor;
+                            const sizeMatches = !targetSize || targetSize === 'standard' || !vSize || vSize === targetSize;
+                            return colorMatches && sizeMatches;
+                        });
+                    }
+
+                    // 3. Determine available stock
+                    let availableStock = 0;
+                    if (dbVariant && dbVariant.stock_quantity !== undefined && dbVariant.stock_quantity !== null && dbVariant.stock_quantity !== '') {
+                        availableStock = Number(dbVariant.stock_quantity);
+                    } else {
+                        availableStock = Number(dbProduct.stock_quantity ?? 0);
+                    }
+
+                    const requestedQty = Number(item.quantity) || 1;
+                    if (availableStock <= 0 || requestedQty > availableStock) {
+                        outOfStock.push({
+                            ...item,
+                            currentStock: availableStock
+                        });
+                    }
+                }
 
                 if (outOfStock.length > 0) {
                     setOutOfStockItems(outOfStock);
@@ -537,8 +576,12 @@ const Checkout = () => {
                                             <img src={item.image} alt={item.title} className="w-full h-full object-contain mix-blend-multiply" />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-bold text-text-main truncate font-outfit max-w-[120px]">{item.title}</p>
-                                            <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1">Out of Stock</p>
+                                            <p className="text-sm font-bold text-text-main truncate font-outfit max-w-[140px]">{item.title}</p>
+                                            <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1">
+                                                {typeof item.currentStock === 'number' && item.currentStock > 0
+                                                    ? `Only ${item.currentStock} left (ordered ${item.quantity})`
+                                                    : 'Out of Stock'}
+                                            </p>
                                         </div>
                                     </div>
                                     <button
