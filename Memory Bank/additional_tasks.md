@@ -449,3 +449,29 @@
     - [x] Built **Section 6: Contact & Support Details** in `MediaManager.jsx` with real-time live preview mirroring the public contact page.
     - [x] Added quick-jump pill navigation in Media & Content Manager and cross-link card in `CheckoutSettings.jsx`.
 
+## Phase 43: Courier Copy Formatting & Order Item Variant Enrichment
+- [x] **Courier Integration & Variant Detail Preservation**:
+    - [x] Updated `src/lib/api/orders.js` to systematically persist variant identifiers and labels (`selected_color`, `selected_size`, `variant_id`, `style`).
+    - [x] Streamlined one-click courier parcel copy generation in `src/pages/admin/Orders.jsx` optimized for Steadfast, Pathao, and RedX merchant dashboards.
+    - [x] Embedded variant thumbnail images and specification badges into admin order management views and customer order timelines (`OrderDetails.jsx`).
+
+## Phase 44: ChoshmaZone Spotlight Video & Image Media Suite
+- [x] **Spotlight Media Manager & Dynamic Public Showcase**:
+    - [x] Implemented `SpotlightManager.jsx` at `/admin/spotlight` supporting direct MP4/WebM video embeds, high-resolution lifestyle photography, catalog product tagging, and ordering priority.
+    - [x] Created `ChoshmaZoneSpotlight.jsx` component for the Homepage (`Home.jsx`) with dynamic video modals, auto-play/mute controls, and responsive grid layouts.
+    - [x] Added `getSpotlightSettings()` / `saveSpotlightSettings()` in `src/lib/api/settings.js` with instant local cache access.
+    - [x] Registered `/admin/spotlight` in `AdminLayout.jsx` and `App.jsx`.
+
+## Phase 45: Recently Viewed Eyewear Carousel & Database Sync
+- [x] **Storefront Recently Viewed Showcase (`RecentlyViewed.jsx`)**:
+    - [x] Upgraded client-side recently viewed tracking with direct Supabase synchronization via `products.js` (`fetchRecentlyViewed`).
+    - [x] Provided real-time stock indicators ("In Stock" / "Out of Stock"), formatted BDT pricing, and instant "Add to Bag" action.
+    - [x] Built responsive card and carousel presentation on product and category browsing pages.
+
+## Phase 46: Checkout Stock Engine Hardening & False Stock Blocker Resolution
+- [x] **Multi-Tiered Stock Validation Engine (`Checkout.jsx`)**:
+    - [x] Fixed root cause of false out-of-stock modal popups on checkout submission.
+    - [x] Implemented multi-tier stock checking: specific variant ID $\rightarrow$ variant color/size matching $\rightarrow$ base product stock fallback.
+    - [x] Attached `variant_id` explicitly in `ProductDetails.jsx`.
+    - [x] Added dynamic modal badge formatting (`Only X left (ordered Y)` vs `Out of Stock`).
+

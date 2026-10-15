@@ -138,6 +138,14 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **Quick Jump Pill Navigation**: Anchor bar in Media Manager enabling rapid navigation to Hero Banner, Promo Banner, Collections Header, Logos, Categories, and Contact Info.
 - **Facebook Catalog Feed XML Engine**:
     - **Compliant RSS/Atom Generator (`api/catalog.js`)**: Serverless function serving Meta Commerce Manager with XML-safe character entity sanitization and RFC-compliant URL escaping.
+- **ChoshmaZone Spotlight Video & Image Storytelling Engine**:
+    - **Media Spotlight Manager (`src/pages/admin/SpotlightManager.jsx`)**: Administrative management suite at `/admin/spotlight` for uploading/embedding MP4/WebM videos, photography, catalog product tagging, and priority ranking.
+    - **Interactive Homepage Showcase (`src/components/ChoshmaZoneSpotlight.jsx`)**: Responsive video playback modals with auto-play, sound control, and direct product link pills.
+    - **Settings Persistence**: Integrated with Supabase `site_settings` under key `spotlight_settings` with client-side TTL caching.
+- **Recently Viewed Eyewear Real-Time Sync**:
+    - **Client-Side Persistence & Live Hydration (`src/components/RecentlyViewed.jsx`)**: Persistent tracking of browsed items synchronized with Supabase via `products.js` (`fetchRecentlyViewed`) for up-to-date pricing, active statuses, and stock indicators.
+- **Multi-Tiered Checkout Stock Validation**:
+    - **Inventory Protection Engine (`src/pages/Checkout.jsx`)**: Multi-tiered stock verification (Variant ID $\rightarrow$ Variant Color/Size $\rightarrow$ Base Product fallback) preventing false out-of-stock modal popups while blocking genuinely depleted inventory with informative badges.
 
 
 

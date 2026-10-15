@@ -163,6 +163,7 @@ CREATE TABLE public.web_events (
 -- 'contact_showroom_title', 'contact_showroom_address': Showroom physical location title and multi-line address
 -- 'contact_email_title', 'contact_email': Support email label and recipient address
 -- 'contact_phone_title', 'contact_phone': Hotline section label and telephone number
+-- 'spotlight_settings': JSON object containing spotlight items array (id, title, subtitle, media_type ['video'|'image'], media_url, thumbnail_url, product_id, product_name, is_active, order)
 
 -- Realtime Publication (enable live order alerts without polling):
 -- ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;

@@ -79,6 +79,11 @@ Standard ecommerce setups pay $0.05+ per order for SMS (Twilio) or spend hundred
     *   Uses browser Web Audio API and Supabase Realtime WebSocket listeners.
     *   Plays an authentic "Cha-Ching!" cash register chime on incoming orders when the Admin tab is open.
 
+### E. Dynamic Content & Catalog Caching (Spotlight & Recently Viewed)
+To prevent dynamic homepage components from creating unnecessary database reads and egress:
+1.  **Spotlight Video & Media Settings**: `spotlight_settings` uses synchronous cache reads with local memory hydration so repeated visits load instantly with 0 Supabase egress.
+2.  **Recently Viewed Persistence**: Browsed IDs reside in browser `localStorage`, with batched hydration via `productParams.fetchAll(true)` ensuring full reuse of cached product listings without repeated queries.
+
 ---
 
 ## 3. The "Nuclear" Option: Self-Hosting (VPS)

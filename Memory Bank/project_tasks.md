@@ -642,3 +642,31 @@
   - [x] Added quick-jump pill navigation in Media & Content Manager and cross-linked from `CheckoutSettings.jsx`.
   - [x] Formatted clickable `mailto:` and `tel:` links on the public storefront.
 
+## Phase 62: Order Courier Formatting & Variant Line Item Precision
+- [x] **Courier Copy & Variant Data Enrichment (Task Id: 613)**:
+  - [x] Enhanced `src/lib/api/orders.js` to preserve variant attributes (`variant_id`, `selected_color`, `selected_size`, formatted `style`).
+  - [x] Upgraded courier booking copy generation in `src/pages/admin/Orders.jsx` adhering strictly to Steadfast, Pathao, and RedX logistics specifications.
+  - [x] Added variant thumbnail preview images, color pills, size labels, and prescription lens details to Admin Orders tables and customer order details (`OrderDetails.jsx`).
+
+## Phase 63: ChoshmaZone Spotlight Video & Image Brand Storytelling Engine
+- [x] **Spotlight Media Management & Public Showcase (Task Id: 614)**:
+  - [x] Created `SpotlightManager.jsx` at `/admin/spotlight` enabling administrators to curate visual brand campaigns, embedded MP4/WebM videos, and high-resolution lifestyle photography.
+  - [x] Integrated product tag linking, title, subtitle, custom action badge, order rank, and active toggles.
+  - [x] Developed `ChoshmaZoneSpotlight.jsx` on the Homepage (`Home.jsx`) with dynamic video player modals, auto-play/mute controls, product pill links, and responsive card layouts.
+  - [x] Built settings persistence via `getSpotlightSettings()` / `saveSpotlightSettings()` in `src/lib/api/settings.js`.
+  - [x] Registered `/admin/spotlight` route and sidebar navigation in `AdminLayout.jsx`.
+
+## Phase 64: Recently Viewed Products Database Sync & Storefront Showcase
+- [x] **Recently Viewed Eyewear Engine (Task Id: 615)**:
+  - [x] Redesigned `RecentlyViewed.jsx` (`src/components/RecentlyViewed.jsx`) with responsive grid and carousel presentation.
+  - [x] Added automatic synchronization with Supabase via `products.js` (`fetchRecentlyViewed`) to guarantee real-time price updates, active status verification, and inventory tracking.
+  - [x] Added instant "Add to Bag", stock badges ("In Stock" / "Out of Stock"), formatted BDT currency, and thumbnail previews.
+
+## Phase 65: Comprehensive Checkout Stock Validation & Inventory Resolution
+- [x] **Multi-Tiered Stock Validation Engine (Task Id: 616)**:
+  - [x] Resolved critical bug in `src/pages/Checkout.jsx` where items in cart were falsely marked as "OUT OF STOCK" during order submission.
+  - [x] Implemented multi-tiered stock verification: specific variant ID lookup $\rightarrow$ variant color/size matching fallback $\rightarrow$ base product `stock_quantity` fallback.
+  - [x] Updated `src/pages/ProductDetails.jsx` to explicitly track `variant_id` (set to `currentVariant.id` or `null`).
+  - [x] Upgraded Out of Stock Modal to dynamically display partial availability (`Only X left (ordered Y)`) versus complete stockouts.
+  - [x] Verified zero errors and clean build output with `npm run build`.
+

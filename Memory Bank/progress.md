@@ -530,3 +530,25 @@
   - Added updated high-resolution product and branding imagery in `src/assets/`.
   - Maintained complete build integrity with `npm run build` exiting code 0.
 
+- Task 107 (Courier Copy, Order Details & Variant Display Hardening): Completed
+  - Enhanced variant preservation (`variant_id`, `selected_color`, `selected_size`, formatted `style`) in `src/lib/api/orders.js`.
+  - Upgraded Admin Orders management in `src/pages/admin/Orders.jsx` with enhanced courier copy formatting (Steadfast, Pathao, RedX standard parcel booking formats), itemized variant thumbnail image previews, color, size, and custom prescription lens specifications.
+  - Upgraded customer-facing order tracking in `src/pages/account/OrderDetails.jsx` and `src/pages/ProductDetails.jsx` for consistent variant rendering.
+
+- Task 108 (ChoshmaZone Spotlight: High-Impact Video & Image Media Engine): Completed
+  - Developed `SpotlightManager.jsx` in the admin panel (`/admin/spotlight`) for curating visual brand stories, video highlights, and lifestyle photography.
+  - Built `ChoshmaZoneSpotlight.jsx` component on the Homepage (`src/pages/Home.jsx`) with dynamic video player modals, auto-play/mute controls, and product tag pill links.
+  - Extended `src/lib/api/settings.js` with `getSpotlightSettings()`, `saveSpotlightSettings()`, and `DEFAULT_SPOTLIGHT_SETTINGS`.
+  - Registered `/admin/spotlight` route and sidebar entry in `src/layouts/AdminLayout.jsx` and `src/App.jsx`.
+
+- Task 109 (Recently Viewed Eyewear Real-Time Sync & Responsive Carousel): Completed
+  - Upgraded `src/components/RecentlyViewed.jsx` with responsive grid/carousel layout, direct database synchronization with Supabase, real-time stock indicators ("In Stock" / "Out of Stock"), formatted BDT pricing, and instant "Add to Bag" action.
+  - Extended `src/lib/api/products.js` with dedicated caching and fetching helpers (`fetchRecentlyViewed`) to hydrate client-stored product IDs.
+
+- Task 110 (Checkout Stock Validation Engine & False Out-of-Stock Resolution): Completed
+  - Diagnosed and resolved critical stock validation bug in `src/pages/Checkout.jsx` where products were falsely flagged as "OUT OF STOCK" despite full database inventory.
+  - Re-engineered stock checking algorithm with multi-tiered resolution: specific variant ID $\rightarrow$ variant color/size matching $\rightarrow$ base product `stock_quantity` fallback.
+  - Updated `src/pages/ProductDetails.jsx` to explicitly track `variant_id` (set to `currentVariant.id` or `null`).
+  - Upgraded Out of Stock Modal to dynamically indicate partial availability (`Only X left (ordered Y)`) versus complete stockouts.
+  - Verified zero errors and clean build output with `npm run build`.
+

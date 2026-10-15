@@ -16,12 +16,12 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 
 ## 4. Functional Requirements
 ### Core Features
-- **Homepage**: Hero banner, featured collections, New Arrivals product grid, promotional highlights, and dynamic **Recently Purchased** showcase (privacy-guaranteed displaying latest purchased products without customer details).
+- **Homepage**: Hero banner, featured collections, New Arrivals product grid, **ChoshmaZone Spotlight** (high-impact video & lifestyle photo showcases with product tags and video modals), promotional highlights, dynamic **Recently Purchased** showcase (privacy-guaranteed displaying latest purchased products without customer details), and interactive **Recently Viewed** eyewear carousel with real-time stock sync.
 - **Product Catalog**: Advanced Grid view with "Premium Tag" filtering (Frame Style, Category, Price) and dynamic active filter chips for effortless navigation.
 - **Product Details Page**: High-resolution interactive image gallery with thumbnail support, floating navigation arrows, detailed rich text descriptions, specifications, custom Prescription Lens selection modal, and "Add to Bag" / "Buy Now" controls.
 - **Optical Prescription Flow**: Dedicated lens package selection (Single Vision, Blue Cut, Photochromic, Progressive) with 3 prescription submission flows (Slip Upload, Manual SPH/CYL/AXIS/PD matrix, WhatsApp Later).
 - **Shopping Cart**: Review selected items, adjust quantities, view lens package details, and dynamic subtotal calculation.
-- **Checkout Flow**: Dynamic guest/user checkout with configurable required/optional fields, strict 11-digit Bangladesh phone number validation (`013`–`019`) with live character counter, complete nationwide coverage across all **64 districts** and **500+ thanas/upazilas** aligned with Steadfast Courier (with `Other / অন্যান্য` fallback), district-based delivery charges (৳70 for Dhaka, ৳120 for outside Dhaka & sub-urban), item removal directly from order summary, optional Order Notes, and payment integration (Support for **bKash** and **Cash on Delivery**).
+- **Checkout Flow**: Dynamic guest/user checkout with configurable required/optional fields, multi-tiered stock validation engine (variant and base product inventory resolution preventing false out-of-stock modals), strict 11-digit Bangladesh phone number validation (`013`–`019`) with live character counter, complete nationwide coverage across all **64 districts** and **500+ thanas/upazilas** aligned with Steadfast Courier (with `Other / অন্যান্য` fallback), district-based delivery charges (৳70 for Dhaka, ৳120 for outside Dhaka & sub-urban), item removal directly from order summary, optional Order Notes, and payment integration (Support for **bKash** and **Cash on Delivery**).
 - **User Portal**:
     - Registration and Login system.
     - View Order History and Profile.
@@ -33,9 +33,10 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
     - **Product Management**: Full CRUD operations + One-Click Product Duplication, Advanced Multi-Image Upload, and **Unified Drag-and-Drop Gallery** management.
     - **Rich Text Editing**: Full HTML description support with professional formatting controls.
     - **Shopify-Style Variants**: Efficient variant management table with combined option views (Color / Size).
+    - **Spotlight Manager (`/admin/spotlight`)**: Curate brand campaigns, upload/embed MP4/WebM videos and lifestyle photography, tag catalog products, and set priority order.
     - **Lens Packages Management**: Full CRUD, pricing, feature list, active toggle, and reordering for optical lens packages at `/admin/lenses`.
     - **Checkout Form Settings**: Full control at `/admin/settings` to toggle Required vs Optional and Shown vs Hidden for every checkout field (`name`, `phone`, `email`, `address`, `district`, `thana`, `city`, `zip`, `notes`), plus custom label/placeholder management.
-    - **Order Management**: Monitor sales, update statuses, administrative deletion, view attached prescription slips/details, clickable rows for direct detail viewing, and Comprehensive Order Details Modal.
+    - **Order Management**: Monitor sales, update statuses, administrative deletion, view attached prescription slips/details, clickable rows for direct detail viewing, courier parcel copy generator (Steadfast, Pathao, RedX format), and Comprehensive Order Details Modal.
     - **Real-Time Order Alerting Suite**: 
         - **Cash Register Audio Chime**: Web Audio API tone synthesis and audio playback (`/sounds/cha-ching.mp3`) producing an authentic "Cha-Ching!" sound and device vibration on new orders.
         - **Live Floating Admin Banner**: Supabase Realtime PostgreSQL subscription displaying animated order popups and unread counter badge.
@@ -46,7 +47,7 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
     - **Category & Collection Control**: Manage dynamic store categories with active/deactivation state toggles (`Active` vs `Deactivated`) to temporarily hide categories without deleting, instant "Featured" toggling (★ / ☆), and live category status tab filters.
     - **Customer Management**: View registered user list and roles.
     - **Web Log & Funnel Analytics**: Dedicated real-time dashboard at `/admin/web-logs` tracking unique visitors, page views, conversion funnel milestones (Product View $\rightarrow$ Add to Cart $\rightarrow$ Checkout $\rightarrow$ Purchase) with drop-off percentages, Recharts area trends, device breakdown, high-demand cart items, and live event log table with JSON metadata inspector.
-    - **Inventory Control**: Manage stock levels and dynamic "Active/Inactive" visibility toggle.
+    - **Inventory Control**: Manage stock levels, variant-level quantities, and dynamic "Active/Inactive" visibility toggle.
     - **Automated WebP Image Optimizer**: Native client-side WebP compression module automatically optimizing all uploaded imagery (products, variants, site banners, and customer prescription slips) to under ~100 KB with real-time UI indicators, reducing Supabase Storage egress by 95-98%.
     - **Database Visibility**: Access to schemas and tables for debugging.
 
