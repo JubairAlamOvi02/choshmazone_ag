@@ -94,8 +94,8 @@ const getVariantColorDot = (colorName = '') => {
 const extractPurchasedVariant = (item, orderNotes = '') => {
     if (!item) return { color: 'Standard', size: 'Standard', frameStyle: '', displayText: 'Color: Standard • Size: Standard' };
 
-    let color = item.selected_color || '';
-    let size = item.selected_size || '';
+    let color = item.selected_color || item.variant_info?.color || '';
+    let size = item.selected_size || item.variant_info?.size || '';
     let frameStyle = item.products?.style || '';
 
     // 1. Raw style string from order_items table (e.g. "Black, medium" or "Round | Lens: ...")
@@ -993,7 +993,13 @@ const AdminOrders = () => {
                                     <td className="px-6 py-5">
                                         <div className="flex flex-col">
                                             <span className="text-base font-bold text-primary font-outfit">৳{Number(order.total_amount || 0).toLocaleString()}</span>
-                                            <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest">{order.payment_method}</span>
+                                            <div className="flex items-center gap-1.5 text-[10px] text-text-muted font-bold uppercase tracking-wider">
+                                                <span>{order.payment_method}</span>
+                                                <span>•</span>
+                                                <span className={order.order_items?.length ? "text-text-muted" : "text-amber-600 font-extrabold"}>
+                                                    {order.order_items?.length ? `${order.order_items.length} item${order.order_items.length > 1 ? 's' : ''}` : '0 items'}
+                                                </span>
+                                            </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-5" onClick={(e) => e.stopPropagation()}>
@@ -1305,6 +1311,15 @@ const AdminOrders = () => {
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-border/30">
+                                                {(!selectedOrder.order_items || selectedOrder.order_items.length === 0) && (
+                                                    <tr>
+                                                        <td colSpan={4} className="px-6 py-12 text-center text-text-muted font-outfit">
+                                                            <Package size={36} className="mx-auto mb-2 text-text-muted/40" />
+                                                            <p className="font-semibold text-sm text-text-muted">No items recorded for this order</p>
+                                                            <p className="text-xs text-text-muted/70 mt-1">This order has no line items recorded (checkout was interrupted or legacy order).</p>
+                                                        </td>
+                                                    </tr>
+                                                )}
                                                 {selectedOrder.order_items?.map((item) => {
                                                     const vInfo = extractPurchasedVariant(item, selectedOrder.shipping_address?.notes);
                                                     const urlMatch = item.style?.match(/\[URL:\s*([^\]]+)\]/);

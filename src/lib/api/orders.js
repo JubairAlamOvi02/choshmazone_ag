@@ -50,8 +50,12 @@ export const orderParams = {
 
             const selectedColor = item.selected_color || item.variant?.color || item.color || null;
             const selectedSize = item.selected_size || item.variant?.size || item.size || null;
-            const variantId = item.variant_id || item.variant?.id || null;
+            const variantObj = item.variant || (selectedColor || selectedSize ? { color: selectedColor, size: selectedSize } : null);
 
+            // In Supabase, order_items.variant_id is a UUID column with a foreign key constraint to legacy product_variants.
+            // In ChoshmaZone, dynamic variants are stored inside products.variants (jsonb) where IDs are timestamps/custom strings.
+            // Passing a non-UUID or unlinked string crashes with PostgreSQL 22P02 (invalid input syntax for type uuid) or 23503.
+            // To ensure 100% order item insertion reliability, variant details are preserved in selected_color, selected_size, style, and variant_info.
             return {
                 order_id: order.id,
                 product_id: isUUID ? item.id : null,
@@ -60,7 +64,8 @@ export const orderParams = {
                 style: styleStr || 'Default',
                 selected_color: selectedColor,
                 selected_size: selectedSize,
-                variant_id: variantId
+                variant_id: null,
+                variant_info: variantObj
             };
         });
 
@@ -68,7 +73,16 @@ export const orderParams = {
             .from('order_items')
             .insert(orderItems);
 
-        if (itemsError) throw itemsError;
+        if (itemsError) {
+            console.error('Failed to insert order items:', itemsError);
+            // Roll back the created order to avoid leaving orphaned orders with 0 items
+            try {
+                await supabase.from('orders').delete().eq('id', order.id);
+            } catch (cleanupErr) {
+                console.error('Failed to clean up orphaned order:', cleanupErr);
+            }
+            throw itemsError;
+        }
 
         // Invalidate recent purchased cache so fresh purchases show up
         cacheManager.invalidatePattern('recent_purchased_');
