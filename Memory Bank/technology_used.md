@@ -146,6 +146,17 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **Client-Side Persistence & Live Hydration (`src/components/RecentlyViewed.jsx`)**: Persistent tracking of browsed items synchronized with Supabase via `products.js` (`fetchRecentlyViewed`) for up-to-date pricing, active statuses, and stock indicators.
 - **Multi-Tiered Checkout Stock Validation**:
     - **Inventory Protection Engine (`src/pages/Checkout.jsx`)**: Multi-tiered stock verification (Variant ID $\rightarrow$ Variant Color/Size $\rightarrow$ Base Product fallback) preventing false out-of-stock modal popups while blocking genuinely depleted inventory with informative badges.
+- **Fault-Tolerant Order Item Persistence & Automated Rollback**:
+    - **Safe Dynamic Variant Decoupling (`src/lib/api/orders.js`)**: Dynamic product variants from `products.variants` (JSONB) are safely mapped into `order_items.variant_info` (JSONB) while setting legacy relational `variant_id` to `null`. This permanently eliminates PostgreSQL 22P02 / 23503 foreign key constraint crashes while preserving `selected_color`, `selected_size`, and `style`.
+    - **Automated Orphaned Order Rollback**: If line item insertion fails, the newly generated parent `orders` record is immediately purged (`supabase.from('orders').delete().eq('id', order.id)`), guaranteeing zero orphaned empty orders in the database.
+    - **Admin Empty State Polish (`src/pages/admin/Orders.jsx`)**: Distinct line item counter with amber warning highlight on 0 items and dedicated explanatory empty-state card in order details modals for interrupted checkouts.
+- **Meta Pixel Advanced Matching & Conversion Tracking Engine**:
+    - **Dedicated Meta Tracking Library (`src/lib/metaPixel.js`)**: Engineered specifically for Meta Pixel ID `28809507428687294`.
+    - **Persistent External ID**: Automatically supplies the persistent client `visitor_id` (from `src/lib/tracker.js`) or authenticated `user_id` as Meta `external_id`, maintaining consistent user identity across browser sessions.
+    - **Bangladeshi Phone Normalization (`formatMetaPhone`)**: Sanitizes and converts customer phone numbers to standard E.164 without leading `+` (`8801XXXXXXXXX`).
+    - **Advanced Matching Parameters**: Pre-populates customer identity attributes (`ph`, `em`, `fn`, `ln`, `ct`, and `country: 'bd'`) into Meta Pixel on checkout submission and order completion.
+    - **Event Deduplication (`eventID`)**: Emits unique `eventID` (`order.id` or `orderDisplayId`) on `Purchase` events to enable seamless client-side/server-side deduplication with Meta Conversions API (CAPI), maximizing Event Match Quality (EMQ) and ROAS.
+
 
 
 

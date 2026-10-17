@@ -21,7 +21,9 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 - **Product Details Page**: High-resolution interactive image gallery with thumbnail support, floating navigation arrows, detailed rich text descriptions, specifications, custom Prescription Lens selection modal, and "Add to Bag" / "Buy Now" controls.
 - **Optical Prescription Flow**: Dedicated lens package selection (Single Vision, Blue Cut, Photochromic, Progressive) with 3 prescription submission flows (Slip Upload, Manual SPH/CYL/AXIS/PD matrix, WhatsApp Later).
 - **Shopping Cart**: Review selected items, adjust quantities, view lens package details, and dynamic subtotal calculation.
-- **Checkout Flow**: Dynamic guest/user checkout with configurable required/optional fields, multi-tiered stock validation engine (variant and base product inventory resolution preventing false out-of-stock modals), strict 11-digit Bangladesh phone number validation (`013`–`019`) with live character counter, complete nationwide coverage across all **64 districts** and **500+ thanas/upazilas** aligned with Steadfast Courier (with `Other / অন্যান্য` fallback), district-based delivery charges (৳70 for Dhaka, ৳120 for outside Dhaka & sub-urban), item removal directly from order summary, optional Order Notes, and payment integration (Support for **bKash** and **Cash on Delivery**).
+- **Checkout Flow**: Dynamic guest/user checkout with configurable required/optional fields, multi-tiered stock validation engine (variant and base product inventory resolution preventing false out-of-stock modals), fault-tolerant line item persistence with dynamic variant encapsulation (`variant_info` JSONB) and automated parent order rollback on insertion failures, strict 11-digit Bangladesh phone number validation (`013`–`019`) with live character counter, complete nationwide coverage across all **64 districts** and **500+ thanas/upazilas** aligned with Steadfast Courier (with `Other / অন্যান্য` fallback), district-based delivery charges (৳70 for Dhaka, ৳120 for outside Dhaka & sub-urban), item removal directly from order summary, optional Order Notes, and payment integration (Support for **bKash** and **Cash on Delivery**).
+- **Meta Ad Conversion Tracking**: Full Meta Pixel integration (`src/lib/metaPixel.js`) featuring Advanced Matching (`ph`, `em`, `fn`, `ln`, `ct`, `country: 'bd'`), persistent client `external_id` (synchronized with visitor session analytics), Bangladeshi E.164 phone normalization, route-level tracking via `PageMonitor.jsx`, and deduplicated `Purchase` events (`eventID`) optimized for Meta Conversions API (CAPI) alignment and higher Event Match Quality (EMQ).
+
 - **User Portal**:
     - Registration and Login system.
     - View Order History and Profile.
@@ -61,7 +63,9 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 ## 6. Chosen Tech Stack
 - **Frontend**: React (Vite), Lucide Icons, Tailwind CSS v4.
 - **Backend/Data**: **Supabase** (PostgreSQL, Realtime, Auth, Storage).
+- **Ad & Conversion Tracking**: Meta Pixel (fbevents.js) with Advanced Matching, persistent external ID, and deduplication eventID for Meta Conversions API (CAPI).
 - **Redundancy & Email**: Google Sheets Integration for order backups + Google Apps Script for transactional emails.
 - **Mobile Notification & Audio Alerts**: ntfy.sh push notification protocol, Web Audio API Cha-Ching synthesizer, and Telegram Bot API with inline keyboards.
+
 
 

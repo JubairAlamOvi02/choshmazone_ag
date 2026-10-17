@@ -670,3 +670,19 @@
   - [x] Upgraded Out of Stock Modal to dynamically display partial availability (`Only X left (ordered Y)`) versus complete stockouts.
   - [x] Verified zero errors and clean build output with `npm run build`.
 
+## Phase 66: Order Line Item Variant Decoupling & Automated Order Rollback
+- [x] **Fault-Tolerant Order Item Persistence & Rollback (Task Id: 617)**:
+  - [x] Resolved PostgreSQL foreign key constraint violation (22P02 / 23503) in `src/lib/api/orders.js` caused by passing non-UUID dynamic variant IDs into legacy `variant_id` UUID column.
+  - [x] Safeguarded variant data by setting `variant_id: null` while preserving full variant specifications inside `variant_info` (JSONB), `selected_color`, `selected_size`, and formatted `style`.
+  - [x] Added automated rollback routine in `orders.js` that deletes the parent `orders` record if `order_items` insertion fails, eliminating orphaned zero-item orders.
+  - [x] Enhanced Admin Orders UI (`Orders.jsx`) with dynamic variant extraction fallback to `variant_info`, order line item count indicators (with amber highlight on 0 items), and dedicated empty-state notices for interrupted checkouts.
+
+## Phase 67: Meta Pixel Advanced Matching, Persistent External ID & Event Deduplication
+- [x] **Meta Pixel Advanced Matching Engine (Task Id: 618)**:
+  - [x] Built dedicated Meta Pixel helper library `src/lib/metaPixel.js` with Pixel ID `28809507428687294`.
+  - [x] Implemented Advanced Matching user parameters: `external_id` (anchored to persistent `visitor_id` from tracker or logged-in `user_id`), normalized E.164 phone formatting without leading `+` (`formatMetaPhone`: `8801XXXXXXXXX`), sanitized email, `fn`, `ln`, `ct` (city/district), and `country: 'bd'`.
+  - [x] Integrated `updateMetaUserData` in `PageMonitor.jsx` for persistent external ID synchronization across page navigation.
+  - [x] Upgraded `InitiateCheckout` tracking in `Checkout.jsx` (`trackMetaInitiateCheckout`) with item IDs, totals, and user parameters.
+  - [x] Upgraded `Purchase` tracking in `Checkout.jsx` (`trackMetaPurchase`) passing customer Advanced Matching data, cart items, order total, and deduplication `eventID` (`order.id` or `orderDisplayId`) to harmonize with Conversions API (CAPI) and maximize Event Match Quality (EMQ).
+
+

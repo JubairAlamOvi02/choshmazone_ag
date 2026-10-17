@@ -552,3 +552,17 @@
   - Upgraded Out of Stock Modal to dynamically indicate partial availability (`Only X left (ordered Y)`) versus complete stockouts.
   - Verified zero errors and clean build output with `npm run build`.
 
+- Task 111 (Order Line Item Variant Decoupling & Automated Order Rollback): Completed
+  - Diagnosed and resolved PostgreSQL foreign key violation (22P02 / 23503) in `src/lib/api/orders.js` where dynamic product variants (stored in `products.variants` JSONB with timestamp/custom IDs) crashed `order_items` insertion against legacy UUID `variant_id` foreign keys.
+  - Decoupled `order_items.variant_id` (safely passed as `null`) while preserving full variant specifications inside `variant_info` (JSONB) alongside explicit `selected_color`, `selected_size`, and formatted `style` strings.
+  - Implemented automatic order rollback cleanup: if line item insertion fails for any reason, the newly created parent `orders` record is immediately purged (`supabase.from('orders').delete().eq('id', order.id)`), completely preventing orphaned orders with 0 items.
+  - Enhanced Admin Orders management (`src/pages/admin/Orders.jsx`) with dynamic variant extraction fallback to `variant_info`, distinct order items counter with warning indicator for 0-item orders, and a dedicated empty-state card in the order details modal explaining legacy or interrupted checkouts.
+
+- Task 112 (Meta Pixel Advanced Matching, Persistent External ID & Event Deduplication): Completed
+  - Architected dedicated Meta Pixel integration engine in `src/lib/metaPixel.js` with Pixel ID `28809507428687294`.
+  - Implemented Meta Advanced Matching parameter pipeline: `external_id` (anchored to persistent `visitor_id` from tracker or authenticated `user_id`), normalized E.164 phone formatting without leading `+` (`formatMetaPhone`: `8801XXXXXXXXX`), sanitized lowercase email, first name (`fn`), last name (`ln`), city/district (`ct`), and country (`bd`).
+  - Connected `updateMetaUserData` in `PageMonitor.jsx` ensuring visitor sessions continuously sync their persistent client ID to Meta on every route navigation.
+  - Upgraded `InitiateCheckout` tracking in `src/pages/Checkout.jsx` (`trackMetaInitiateCheckout`) with cart content IDs, items count, total BDT value, and customer identification data.
+  - Upgraded `Purchase` tracking in `src/pages/Checkout.jsx` (`trackMetaPurchase`) passing customer Advanced Matching parameters, cart items, total amount, and deduplication `eventID` (`order.id` or `orderDisplayId`) to harmonize client-side Meta Pixel with server-side Conversions API (CAPI) and maximize Meta Event Match Quality (EMQ).
+
+

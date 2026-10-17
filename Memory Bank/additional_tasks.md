@@ -475,3 +475,18 @@
     - [x] Attached `variant_id` explicitly in `ProductDetails.jsx`.
     - [x] Added dynamic modal badge formatting (`Only X left (ordered Y)` vs `Out of Stock`).
 
+## Phase 47: Order Line Item Variant Decoupling & Automated Order Rollback
+- [x] **Safe Variant Persistence & Orphaned Order Cleanup (`orders.js` & `Orders.jsx`)**:
+    - [x] Decoupled `order_items.variant_id` (safely mapped as `null`) to eliminate PostgreSQL 22P02 / 23503 foreign key exceptions when dynamic variant IDs are saved.
+    - [x] Preserved full variant object payloads inside `order_items.variant_info` (JSONB) alongside explicit `selected_color`, `selected_size`, and formatted `style`.
+    - [x] Added automated rollback routine in `orders.js` deleting parent `orders` record if line items insertion encounters an error, preventing 0-item ghost orders.
+    - [x] Updated Admin Orders UI with variant extraction fallback, line item counter alert, and empty state warning for legacy/interrupted orders.
+
+## Phase 48: Meta Pixel Advanced Matching, Persistent External ID & Event Deduplication
+- [x] **Meta Pixel Tracking & Conversion Engine (`metaPixel.js`)**:
+    - [x] Created `src/lib/metaPixel.js` with Pixel ID `28809507428687294`.
+    - [x] Integrated Advanced Matching parameters: persistent `visitor_id` as Meta `external_id`, E.164 Bangladeshi phone normalization (`8801XXXXXXXXX`), sanitized email, `fn`, `ln`, `ct` (city/district), and `country: 'bd'`.
+    - [x] Synced external IDs across page transitions in `PageMonitor.jsx`.
+    - [x] Enhanced `InitiateCheckout` and `Purchase` event tracking in `Checkout.jsx` with order items, totals, user matching parameters, and deduplication `eventID` for seamless server-side Conversions API (CAPI) alignment.
+
+
