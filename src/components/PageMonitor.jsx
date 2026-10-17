@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { trackEvent, touchSession } from '../lib/tracker';
+import { updateMetaUserData } from '../lib/metaPixel';
 
 const HEARTBEAT_INTERVAL = 30000; // 30 seconds
 
@@ -12,6 +13,7 @@ const PageMonitor = () => {
     useEffect(() => {
         // 1. Facebook Pixel
         if (typeof window !== 'undefined' && window.fbq) {
+            updateMetaUserData();
             window.fbq('track', 'PageView');
         }
 

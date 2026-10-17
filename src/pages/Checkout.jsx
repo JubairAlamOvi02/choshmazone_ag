@@ -15,6 +15,7 @@ import { sendTelegramOrderNotification } from '../lib/telegramNotifier';
 import { sendNtfyOrderNotification } from '../lib/ntfyNotifier';
 import { settingsParams, DEFAULT_CHECKOUT_FIELD_SETTINGS } from '../lib/api/settings';
 import { trackEvent } from '../lib/tracker';
+import { trackMetaPurchase, trackMetaInitiateCheckout } from '../lib/metaPixel';
 import { compressImage } from '../lib/imageCompressor';
 
 // Bangladesh 11-digit phone validation helpers
@@ -65,13 +66,8 @@ const Checkout = () => {
 
         // Track Initiate Checkout
         if (cartItems.length > 0) {
-            if (typeof window !== 'undefined' && window.fbq) {
-                window.fbq('track', 'InitiateCheckout', {
-                    value: cartTotal,
-                    currency: 'BDT',
-                    num_items: cartItems.length
-                });
-            }
+            // Meta Pixel InitiateCheckout with External ID
+            trackMetaInitiateCheckout(cartItems, cartTotal, { userId: user?.id });
 
             // Web Log Analytics Initiate Checkout
             trackEvent('initiate_checkout', {
@@ -492,16 +488,21 @@ const Checkout = () => {
                 body: JSON.stringify(legacyOrderData)
             }).catch(err => console.error("Google Sheets Sync Failed:", err));
 
-            // Track Purchase event with Facebook Pixel
-            if (typeof window !== 'undefined' && window.fbq) {
-                window.fbq('track', 'Purchase', {
-                    value: Number(totalWithDelivery.toFixed(2)),
-                    currency: 'BDT',
-                    content_ids: cartItems.map(item => String(item.id)),
-                    content_type: 'product',
-                    num_items: cartItems.reduce((acc, item) => acc + item.quantity, 0)
-                });
-            }
+            // Track Purchase event with Meta Pixel (Enhanced with External ID, Browser ID & Advanced Matching)
+            trackMetaPurchase({
+                orderId: createdOrder?.id || orderDisplayId,
+                totalAmount: totalWithDelivery,
+                items: preparedItems.map(item => ({
+                    id: item.id,
+                    quantity: item.quantity
+                }))
+            }, {
+                userId: user?.id,
+                phone: cleanPhone || formData.phone,
+                email: formData.email,
+                name: formData.name,
+                district: formData.district
+            });
 
             // Web Log Analytics Purchase event
             trackEvent('purchase', {
