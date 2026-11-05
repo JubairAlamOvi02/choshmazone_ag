@@ -3,7 +3,7 @@ import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
     Menu, X, LayoutDashboard, Box, ShoppingCart, Users, LogOut, Bell, 
     Search, Settings, Glasses, Image as ImageIcon, Facebook, Tags, 
-    Activity, Volume2, VolumeX, Sparkles, Check, ExternalLink, Play
+    Activity, Volume2, VolumeX, Sparkles, Check, ExternalLink, Play, Grid
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -193,6 +193,7 @@ const AdminLayout = () => {
                         <AdminNavLink to="/admin/lenses" icon={Glasses} label="Lens Packages" isActive={isActive('/admin/lenses')} onClick={closeMobileMenu} />
                         <AdminNavLink to="/admin/media" icon={ImageIcon} label="Media & Content" isActive={isActive('/admin/media')} onClick={closeMobileMenu} />
                         <AdminNavLink to="/admin/spotlight" icon={Sparkles} label="choshmazone.com Section" isActive={isActive('/admin/spotlight')} onClick={closeMobileMenu} />
+                        <AdminNavLink to="/admin/showcases" icon={Grid} label="Product Showcases" isActive={isActive('/admin/showcases')} onClick={closeMobileMenu} />
                         <AdminNavLink to="/admin/customers" icon={Users} label="Members" isActive={isActive('/admin/customers')} onClick={closeMobileMenu} />
                         <AdminNavLink to="/admin/facebook-catalog" icon={Facebook} label="FB Catalog" isActive={isActive('/admin/facebook-catalog')} onClick={closeMobileMenu} />
                         <AdminNavLink to="/admin/settings" icon={Settings} label="Checkout Form" isActive={isActive('/admin/settings')} onClick={closeMobileMenu} />

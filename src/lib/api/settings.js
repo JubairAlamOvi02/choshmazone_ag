@@ -172,6 +172,169 @@ export const DEFAULT_CHOSHMAZONE_SECTION = {
     ]
 };
 
+export const DEFAULT_SHOWCASE_SECTIONS = [
+    {
+        id: 'sec-best-rimless',
+        title: 'Best Rimless Collections',
+        subtitle: '',
+        enabled: true,
+        currency: 'Tk',
+        columns: 4,
+        show_badge: true,
+        show_title: false,
+        show_quick_actions: true,
+        order: 1,
+        items: [
+            {
+                id: 'rimless-1',
+                product_id: '',
+                title: 'Cartier Rimless Powerless UV400 Sunglasses',
+                image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=80',
+                price: 1190,
+                original_price: 1750,
+                badge: 'Sale',
+                show_badge: true,
+                custom_link: '/shop'
+            },
+            {
+                id: 'rimless-2',
+                product_id: '',
+                title: 'Powerless PhotoSun Lens Wood Temple Rimless',
+                image: 'https://images.unsplash.com/photo-1591076482161-42ce6da69f67?auto=format&fit=crop&w=800&q=80',
+                price: 1299,
+                original_price: 1950,
+                badge: 'Sale',
+                show_badge: true,
+                custom_link: '/shop'
+            },
+            {
+                id: 'rimless-3',
+                product_id: '',
+                title: 'Powerless PhotoSun Lens Gradient Rimless Gold',
+                image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=800&q=80',
+                price: 1090,
+                original_price: 1379,
+                badge: 'Sale',
+                show_badge: true,
+                custom_link: '/shop'
+            },
+            {
+                id: 'rimless-4',
+                product_id: '',
+                title: 'Powerless PhotoSun Lens Beveled Edge Cut',
+                image: 'https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=800&q=80',
+                price: 1150,
+                original_price: 1860,
+                badge: 'Sale',
+                show_badge: true,
+                custom_link: '/shop'
+            },
+            {
+                id: 'rimless-5',
+                product_id: '',
+                title: 'Silver Temple PhotoSun Clear Lens Rimless',
+                image: 'https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=800&q=80',
+                price: 1190,
+                original_price: 1690,
+                badge: 'Sale',
+                show_badge: true,
+                custom_link: '/shop'
+            },
+            {
+                id: 'rimless-6',
+                product_id: '',
+                title: 'Gold Double Bridge Black Tint Rimless',
+                image: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?auto=format&fit=crop&w=800&q=80',
+                price: 1390,
+                original_price: 2100,
+                badge: 'Sale',
+                show_badge: true,
+                custom_link: '/shop'
+            },
+            {
+                id: 'rimless-7',
+                product_id: '',
+                title: 'Luxury Gold Sculpted Dragon Temple Rimless',
+                image: 'https://images.unsplash.com/photo-1582142306909-195724d33ffc?auto=format&fit=crop&w=800&q=80',
+                price: 1450,
+                original_price: 2200,
+                badge: 'Sale',
+                show_badge: true,
+                custom_link: '/shop'
+            },
+            {
+                id: 'rimless-8',
+                product_id: '',
+                title: 'Champagne Gradient Diamond Cut Rimless Glass',
+                image: 'https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=800&q=80',
+                price: 1250,
+                original_price: 1890,
+                badge: 'Sale',
+                show_badge: true,
+                custom_link: '/shop'
+            }
+        ]
+    },
+    {
+        id: 'sec-best-frames',
+        title: 'Best Frame Collections',
+        subtitle: '',
+        enabled: true,
+        currency: 'Tk',
+        columns: 4,
+        show_badge: true,
+        show_title: false,
+        show_quick_actions: true,
+        order: 2,
+        items: [
+            {
+                id: 'frame-1',
+                product_id: '',
+                title: 'Classic Clubmaster Acetate & Metal Frame',
+                image: 'https://images.unsplash.com/photo-1591076482161-42ce6da69f67?auto=format&fit=crop&w=800&q=80',
+                price: 1490,
+                original_price: 2100,
+                badge: 'Sale',
+                show_badge: true,
+                custom_link: '/shop'
+            },
+            {
+                id: 'frame-2',
+                product_id: '',
+                title: 'Minimalist Matte Black Square Frame',
+                image: 'https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=800&q=80',
+                price: 1290,
+                original_price: 1850,
+                badge: 'Sale',
+                show_badge: true,
+                custom_link: '/shop'
+            },
+            {
+                id: 'frame-3',
+                product_id: '',
+                title: 'Aviation Pilot Titanium Frame',
+                image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=800&q=80',
+                price: 1650,
+                original_price: 2400,
+                badge: 'Sale',
+                show_badge: true,
+                custom_link: '/shop'
+            },
+            {
+                id: 'frame-4',
+                product_id: '',
+                title: 'Retro Round Vintage Wire Frame',
+                image: 'https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=800&q=80',
+                price: 1190,
+                original_price: 1750,
+                badge: 'Sale',
+                show_badge: true,
+                custom_link: '/shop'
+            }
+        ]
+    }
+];
+
 export const settingsParams = {
     getCachedAll: () => settingsCache || [],
 
@@ -319,6 +482,38 @@ export const settingsParams = {
 
     saveChoshmazoneSection: async (sectionData) => {
         return await settingsParams.set('choshmazone_section', sectionData);
+    },
+
+    getShowcaseSections: async () => {
+        try {
+            const raw = await settingsParams.get('product_showcase_sections');
+            if (!raw) return DEFAULT_SHOWCASE_SECTIONS;
+            const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                // Ensure proper fallbacks and IDs for every item
+                return parsed.map((sec, secIdx) => ({
+                    id: sec.id || `sec-${secIdx + 1}`,
+                    title: sec.title || 'Featured Collection',
+                    subtitle: sec.subtitle || '',
+                    enabled: sec.enabled !== false,
+                    currency: sec.currency || 'Tk',
+                    columns: Number(sec.columns) || 4,
+                    show_badge: sec.show_badge !== false,
+                    show_title: !!sec.show_title,
+                    show_quick_actions: sec.show_quick_actions !== false,
+                    order: Number(sec.order) || (secIdx + 1),
+                    items: Array.isArray(sec.items) ? sec.items : []
+                }));
+            }
+            return DEFAULT_SHOWCASE_SECTIONS;
+        } catch (e) {
+            console.warn('[Settings] Failed to fetch product_showcase_sections:', e);
+            return DEFAULT_SHOWCASE_SECTIONS;
+        }
+    },
+
+    saveShowcaseSections: async (sections) => {
+        return await settingsParams.set('product_showcase_sections', sections);
     },
 
     uploadAsset: async (file, path = 'site-assets') => {

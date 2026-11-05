@@ -2,6 +2,7 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import FeaturedCollections from '../components/FeaturedCollections';
+import ProductShowcaseList from '../components/Showcase/ProductShowcaseList';
 import ProductCard from '../components/ProductCard';
 import PromotionalBanner from '../components/PromotionalBanner';
 import RecentlyPurchased from '../components/RecentlyPurchased';
@@ -45,6 +46,8 @@ const Home = () => {
                 <Hero />
 
                 <FeaturedCollections />
+
+                <ProductShowcaseList />
 
                 <section className="container mx-auto px-4 py-16 md:py-24">
                     <div className="text-center mb-12">
