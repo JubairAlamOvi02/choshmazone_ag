@@ -156,6 +156,12 @@ The application utilizes a **Mobile-First Responsive Strategy**:
     - **Bangladeshi Phone Normalization (`formatMetaPhone`)**: Sanitizes and converts customer phone numbers to standard E.164 without leading `+` (`8801XXXXXXXXX`).
     - **Advanced Matching Parameters**: Pre-populates customer identity attributes (`ph`, `em`, `fn`, `ln`, `ct`, and `country: 'bd'`) into Meta Pixel on checkout submission and order completion.
     - **Event Deduplication (`eventID`)**: Emits unique `eventID` (`order.id` or `orderDisplayId`) on `Purchase` events to enable seamless client-side/server-side deduplication with Meta Conversions API (CAPI), maximizing Event Match Quality (EMQ) and ROAS.
+- **Product Showcase Sections & Curated Collection Grids Engine**:
+    - **Storefront Component Architecture (`ProductShowcaseCard.jsx`, `ProductShowcaseSection.jsx`, `ProductShowcaseList.jsx`)**: Modular, high-impact product showcase grid displaying curated eyewear collections on the homepage.
+    - **High-Converting Visual Aesthetics**: 1:1 square photography with smooth zoom on hover, floating top-right "Sale" pill badge, dual-pricing typography (`Tk 1,190.00` & strikethrough `Tk 1,750.00`), title visibility toggle, and desktop hover action overlay (Add to Cart, Buy Now, View Details).
+    - **Multiple Sections Scalability**: Full support for unlimited independent showcase sections (e.g. "Best Rimless Collections", "Best Frame Collections", "Trending Retro Lenses"), each with custom column configurations (2, 3, 4, 5 columns), order ranking, and visibility toggles.
+    - **Admin Control Suite (`ShowcaseManager.jsx` at `/admin/showcases`)**: Complete admin dashboard featuring a multi-product Inventory Picker Modal with live search and category filtering, custom item creation, asset upload integration (`settingsParams.uploadAsset`), inline item reordering and deletion, live storefront preview tab, and 1-click cloud publishing to Supabase `site_settings` under key `product_showcase_sections`.
+
 
 
 

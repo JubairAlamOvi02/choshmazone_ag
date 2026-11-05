@@ -565,4 +565,26 @@
   - Upgraded `InitiateCheckout` tracking in `src/pages/Checkout.jsx` (`trackMetaInitiateCheckout`) with cart content IDs, items count, total BDT value, and customer identification data.
   - Upgraded `Purchase` tracking in `src/pages/Checkout.jsx` (`trackMetaPurchase`) passing customer Advanced Matching parameters, cart items, total amount, and deduplication `eventID` (`order.id` or `orderDisplayId`) to harmonize client-side Meta Pixel with server-side Conversions API (CAPI) and maximize Meta Event Match Quality (EMQ).
 
+- Task 113 (Product Showcase Sections: Dynamic Curated Collection Grids & Admin ShowcaseManager): Completed
+  - Architected modular Storefront Product Showcase system: `ProductShowcaseCard.jsx`, `ProductShowcaseSection.jsx`, and `ProductShowcaseList.jsx`.
+  - Replicated exact visual design from high-converting eyewear references:
+    - High-impact square (1:1) aspect ratio product image with smooth hover zoom.
+    - Pill "Sale" badge on top-right (`bg-white text-neutral-900 rounded-full`).
+    - Clean dual-price display directly below image: Selling Price (`Tk 1,190.00`) and strikethrough original price (`Tk 1,750.00`).
+    - Desktop hover action overlay (Add to Cart, Buy Now, View Details).
+    - Responsive 4-column layout on desktop, 2 columns on mobile.
+  - Multi-section capability: supports adding, reordering, and customizing multiple sections (e.g. "Best Rimless Collections", "Best Frame Collections", etc.) on the Homepage (`Home.jsx`).
+  - Developed comprehensive Admin Management Suite at `/admin/showcases` (`ShowcaseManager.jsx`):
+    - Section controls: Add new section, rename, reorder (Move Up/Down), duplicate, delete, and toggle Active/Hidden.
+    - Layout controls: columns per row (2, 3, 4, 5), currency prefix (`Tk` / `৳`), show/hide "Sale" badge, show/hide product title, and quick-actions toggle.
+    - Inventory Picker Modal: search by product name/category, multi-select store products, and add in 1 click with automatic import of name, image, price, suggested compare-at price, and link.
+    - Custom Items: upload custom images via `settingsParams.uploadAsset`, define custom prices, badges, and destinations.
+    - Inline product reordering (Move Left/Right) and deletion.
+    - Real-time Storefront Live Preview tab mirroring the public homepage layout.
+    - 1-Click "Publish Changes" saving to Supabase `site_settings` under key `product_showcase_sections`.
+  - Extended `src/lib/api/settings.js` with `DEFAULT_SHOWCASE_SECTIONS`, `getShowcaseSections()`, and `saveShowcaseSections()`.
+  - Integrated `/admin/showcases` route in `src/App.jsx` and added "Product Showcases" link with `Grid` icon in `src/layouts/AdminLayout.jsx`.
+  - Verified zero errors and clean build output with `npm run build`.
+
+
 

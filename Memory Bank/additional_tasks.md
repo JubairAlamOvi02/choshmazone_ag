@@ -489,4 +489,22 @@
     - [x] Synced external IDs across page transitions in `PageMonitor.jsx`.
     - [x] Enhanced `InitiateCheckout` and `Purchase` event tracking in `Checkout.jsx` with order items, totals, user matching parameters, and deduplication `eventID` for seamless server-side Conversions API (CAPI) alignment.
 
+## Phase 49: Product Showcase Sections (Curated Collection Grids & Admin ShowcaseManager)
+- [x] **Storefront Curated Showcase Grids & Admin Control Engine**:
+    - [x] Created `ProductShowcaseCard.jsx` displaying 1:1 square photography, white "Sale" pill badge, dual-pricing typography (`Tk 1,190.00` & strikethrough `Tk 1,750.00`), title toggle, and desktop quick action buttons (Add to Cart, Buy Now, View Details).
+    - [x] Created `ProductShowcaseSection.jsx` and `ProductShowcaseList.jsx` rendering multiple dynamic sections with customizable column layouts (2–5 columns) and centered headers.
+    - [x] Integrated `<ProductShowcaseList />` on the Homepage (`Home.jsx`) below Featured Collections.
+    - [x] Developed comprehensive Admin Control Panel at `/admin/showcases` (`ShowcaseManager.jsx`):
+        - [x] Section management: Add new section, rename, reorder (Move Up/Down), duplicate, delete, and enable/disable toggle.
+        - [x] Section display settings: Columns (2, 3, 4, 5), currency prefix (`Tk` / `৳`), show badge, show title, and quick-actions toggle.
+        - [x] Multi-product Inventory Picker Modal with live search and category filtering for 1-click product addition.
+        - [x] Custom item adder with custom image upload via `settingsParams.uploadAsset`, pricing, and link destination.
+        - [x] Inline product card editing, reordering (Move Left/Right), and removal.
+        - [x] Storefront Live Preview tab mirroring public customer presentation.
+        - [x] 1-Click "Publish Changes" to Supabase `site_settings` under key `product_showcase_sections`.
+    - [x] Extended `src/lib/api/settings.js` with `DEFAULT_SHOWCASE_SECTIONS`, `getShowcaseSections()`, and `saveShowcaseSections()`.
+    - [x] Registered `/admin/showcases` in `src/App.jsx` and added "Product Showcases" sidebar navigation link with `Grid` icon in `src/layouts/AdminLayout.jsx`.
+    - [x] Maintained complete build integrity with `npm run build` exiting code 0.
+
+
 

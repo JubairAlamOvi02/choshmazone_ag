@@ -16,7 +16,7 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
 
 ## 4. Functional Requirements
 ### Core Features
-- **Homepage**: Hero banner, featured collections, New Arrivals product grid, **ChoshmaZone Spotlight** (high-impact video & lifestyle photo showcases with product tags and video modals), promotional highlights, dynamic **Recently Purchased** showcase (privacy-guaranteed displaying latest purchased products without customer details), and interactive **Recently Viewed** eyewear carousel with real-time stock sync.
+- **Homepage**: Hero banner, featured collections, **Curated Product Showcase Sections** (multiple dynamic sections such as "Best Rimless Collections", "Best Frame Collections" with 4-column responsive grid, "Sale" pill badge, dual-pricing `Tk 1,190.00` & strikethrough `Tk 1,750.00`, and direct product links), New Arrivals product grid, **ChoshmaZone Spotlight** (high-impact video & lifestyle photo showcases with product tags and video modals), promotional highlights, dynamic **Recently Purchased** showcase (privacy-guaranteed displaying latest purchased products without customer details), and interactive **Recently Viewed** eyewear carousel with real-time stock sync.
 - **Product Catalog**: Advanced Grid view with "Premium Tag" filtering (Frame Style, Category, Price) and dynamic active filter chips for effortless navigation.
 - **Product Details Page**: High-resolution interactive image gallery with thumbnail support, floating navigation arrows, detailed rich text descriptions, specifications, custom Prescription Lens selection modal, and "Add to Bag" / "Buy Now" controls.
 - **Optical Prescription Flow**: Dedicated lens package selection (Single Vision, Blue Cut, Photochromic, Progressive) with 3 prescription submission flows (Slip Upload, Manual SPH/CYL/AXIS/PD matrix, WhatsApp Later).
@@ -36,6 +36,7 @@ We are building a robust, stylish ecommerce website dedicated to selling sunglas
     - **Rich Text Editing**: Full HTML description support with professional formatting controls.
     - **Shopify-Style Variants**: Efficient variant management table with combined option views (Color / Size).
     - **Spotlight Manager (`/admin/spotlight`)**: Curate brand campaigns, upload/embed MP4/WebM videos and lifestyle photography, tag catalog products, and set priority order.
+    - **Product Showcase Manager (`/admin/showcases`)**: Create, reorder, duplicate, and toggle multiple storefront product grid sections (e.g., "Best Rimless Collections", "Best Frame Collections") with one-click multi-product inventory selector, custom image uploader, compare-at pricing, and real-time live preview.
     - **Lens Packages Management**: Full CRUD, pricing, feature list, active toggle, and reordering for optical lens packages at `/admin/lenses`.
     - **Checkout Form Settings**: Full control at `/admin/settings` to toggle Required vs Optional and Shown vs Hidden for every checkout field (`name`, `phone`, `email`, `address`, `district`, `thana`, `city`, `zip`, `notes`), plus custom label/placeholder management.
     - **Order Management**: Monitor sales, update statuses, administrative deletion, view attached prescription slips/details, clickable rows for direct detail viewing, courier parcel copy generator (Steadfast, Pathao, RedX format), and Comprehensive Order Details Modal.

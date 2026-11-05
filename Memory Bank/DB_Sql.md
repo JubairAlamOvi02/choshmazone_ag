@@ -169,6 +169,7 @@ CREATE TABLE public.web_events (
 -- 'contact_email_title', 'contact_email': Support email label and recipient address
 -- 'contact_phone_title', 'contact_phone': Hotline section label and telephone number
 -- 'spotlight_settings': JSON object containing spotlight items array (id, title, subtitle, media_type ['video'|'image'], media_url, thumbnail_url, product_id, product_name, is_active, order)
+-- 'product_showcase_sections': JSON array of curated showcase sections (id, title, subtitle, enabled, currency, columns, show_badge, show_title, show_quick_actions, order, items: [{id, product_id, title, image, price, original_price, badge, show_badge, custom_link}])
 
 -- Realtime Publication (enable live order alerts without polling):
 -- ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;

@@ -685,4 +685,22 @@
   - [x] Upgraded `InitiateCheckout` tracking in `Checkout.jsx` (`trackMetaInitiateCheckout`) with item IDs, totals, and user parameters.
   - [x] Upgraded `Purchase` tracking in `Checkout.jsx` (`trackMetaPurchase`) passing customer Advanced Matching data, cart items, order total, and deduplication `eventID` (`order.id` or `orderDisplayId`) to harmonize with Conversions API (CAPI) and maximize Event Match Quality (EMQ).
 
+## Phase 68: Product Showcase Sections (Curated Collection Grids & Admin ShowcaseManager)
+- [x] **Storefront Curated Showcase Grids & Admin Control Engine (Task Id: 619)**:
+  - [x] Developed `ProductShowcaseCard.jsx` featuring 1:1 square aspect ratio, hover scale, white "Sale" pill badge, dual pricing (`Tk 1,190.00` & strikethrough `Tk 1,750.00`), quick action overlay, and direct product linking.
+  - [x] Developed `ProductShowcaseSection.jsx` and `ProductShowcaseList.jsx` rendering multiple dynamic sections with configurable grid columns (2, 3, 4, 5) and clean centered headers.
+  - [x] Integrated `<ProductShowcaseList />` on the Homepage (`Home.jsx`).
+  - [x] Created `ShowcaseManager.jsx` at `/admin/showcases` for complete section and product management:
+    - [x] Section controls: Add, rename, move up/down, duplicate, delete, and enable/disable.
+    - [x] Section settings: Column count, currency prefix, show/hide badge, show/hide title, and quick action toggle.
+    - [x] Multi-product Inventory Picker Modal with live search and category filtering.
+    - [x] Custom item adder with custom image upload, pricing, and link destination.
+    - [x] Inline product reordering (move left/right) and removal.
+    - [x] Real-time Storefront Live Preview tab mirroring the public storefront.
+    - [x] One-click "Publish Changes" to Supabase `site_settings`.
+  - [x] Extended `src/lib/api/settings.js` with `DEFAULT_SHOWCASE_SECTIONS`, `getShowcaseSections()`, and `saveShowcaseSections()`.
+  - [x] Added `/admin/showcases` route in `App.jsx` and "Product Showcases" sidebar link in `AdminLayout.jsx`.
+  - [x] Verified zero errors and clean build output with `npm run build`.
+
+
 
