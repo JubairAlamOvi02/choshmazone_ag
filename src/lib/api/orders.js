@@ -198,10 +198,54 @@ export const orderParams = {
     },
 
     // Update order status (Admin)
-    updateStatus: async (id, status) => {
+    updateStatus: async (id, status, paymentUpdates = null) => {
+        const updatePayload = { status };
+
+        if (paymentUpdates && typeof paymentUpdates === 'object') {
+            try {
+                const { data: currentOrder } = await supabase
+                    .from('orders')
+                    .select('payment_details')
+                    .eq('id', id)
+                    .maybeSingle();
+
+                updatePayload.payment_details = {
+                    ...(currentOrder?.payment_details || {}),
+                    ...paymentUpdates
+                };
+            } catch (mergeErr) {
+                console.warn('Could not merge payment details during status update:', mergeErr);
+                updatePayload.payment_details = paymentUpdates;
+            }
+        }
+
         const { data, error } = await supabase
             .from('orders')
-            .update({ status })
+            .update(updatePayload)
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
+    },
+
+    // Update payment details directly
+    updatePaymentDetails: async (id, paymentUpdates) => {
+        const { data: currentOrder } = await supabase
+            .from('orders')
+            .select('payment_details')
+            .eq('id', id)
+            .maybeSingle();
+
+        const mergedDetails = {
+            ...(currentOrder?.payment_details || {}),
+            ...paymentUpdates
+        };
+
+        const { data, error } = await supabase
+            .from('orders')
+            .update({ payment_details: mergedDetails })
             .eq('id', id)
             .select()
             .single();

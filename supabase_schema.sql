@@ -66,7 +66,7 @@ create policy "Admins can delete products."
 create table public.orders (
   id uuid default uuid_generate_v4() primary key,
   user_id uuid references public.profiles(id),
-  status text default 'pending' check (status in ('pending', 'processing', 'shipped', 'cancelled', 'completed')),
+  status text default 'pending', -- Can be any custom status (pending, processing, partial_payment, confirmed, shipped, completed, cancelled, etc.)
   total_amount numeric(10,2) not null,
   shipping_address jsonb, -- Stores full address snapshot
   payment_method text,

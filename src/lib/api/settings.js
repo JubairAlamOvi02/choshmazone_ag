@@ -606,5 +606,287 @@ export const settingsParams = {
         }
 
         return assets.filter(a => !a.name.startsWith('.'));
+    },
+
+    getOrderStatuses: async () => {
+        try {
+            const raw = await settingsParams.get('order_status_options');
+            if (!raw) return DEFAULT_ORDER_STATUSES;
+            const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                // Ensure every status has minimum required properties
+                return parsed.map((item, idx) => {
+                    const preset = STATUS_COLOR_PRESETS[item.color] || STATUS_COLOR_PRESETS.blue;
+                    return {
+                        id: item.id || `status_${idx}`,
+                        label: item.label || item.id || 'Status',
+                        color: item.color || 'blue',
+                        bgColor: item.bgColor || preset.bgColor,
+                        textColor: item.textColor || preset.textColor,
+                        borderColor: item.borderColor || preset.borderColor,
+                        isDefault: Boolean(item.isDefault),
+                        description: item.description || ''
+                    };
+                });
+            }
+            return DEFAULT_ORDER_STATUSES;
+        } catch (e) {
+            console.warn('[Settings] Failed to fetch order_status_options:', e);
+            return DEFAULT_ORDER_STATUSES;
+        }
+    },
+
+    saveOrderStatuses: async (statuses) => {
+        return await settingsParams.set('order_status_options', statuses);
+    }
+};
+
+export const STATUS_COLOR_PRESETS = {
+    amber: {
+        id: 'amber',
+        label: 'Amber / Yellow',
+        bgColor: '#FEF3C7',
+        textColor: '#B45309',
+        borderColor: '#FDE68A',
+        badgeClass: 'bg-amber-100 text-amber-700'
+    },
+    blue: {
+        id: 'blue',
+        label: 'Blue',
+        bgColor: '#DBEAFE',
+        textColor: '#1D4ED8',
+        borderColor: '#BFDBFE',
+        badgeClass: 'bg-blue-100 text-blue-700'
+    },
+    purple: {
+        id: 'purple',
+        label: 'Purple / Violet',
+        bgColor: '#F3E8FF',
+        textColor: '#7E22CE',
+        borderColor: '#E9D5FF',
+        badgeClass: 'bg-purple-100 text-purple-700'
+    },
+    teal: {
+        id: 'teal',
+        label: 'Teal / Cyan',
+        bgColor: '#CCFBF1',
+        textColor: '#0F766E',
+        borderColor: '#99F6E4',
+        badgeClass: 'bg-teal-100 text-teal-700'
+    },
+    indigo: {
+        id: 'indigo',
+        label: 'Indigo',
+        bgColor: '#E0E7FF',
+        textColor: '#4338CA',
+        borderColor: '#C7D2FE',
+        badgeClass: 'bg-indigo-100 text-indigo-700'
+    },
+    emerald: {
+        id: 'emerald',
+        label: 'Emerald / Mint',
+        bgColor: '#D1FAE5',
+        textColor: '#047857',
+        borderColor: '#A7F3D0',
+        badgeClass: 'bg-emerald-100 text-emerald-700'
+    },
+    green: {
+        id: 'green',
+        label: 'Green',
+        bgColor: '#DCFCE7',
+        textColor: '#15803D',
+        borderColor: '#BBF7D0',
+        badgeClass: 'bg-green-100 text-green-700'
+    },
+    red: {
+        id: 'red',
+        label: 'Red',
+        bgColor: '#FEE2E2',
+        textColor: '#B91C1C',
+        borderColor: '#FECACA',
+        badgeClass: 'bg-red-100 text-red-700'
+    },
+    rose: {
+        id: 'rose',
+        label: 'Rose / Pink',
+        bgColor: '#FFE4E6',
+        textColor: '#BE123C',
+        borderColor: '#FECDD3',
+        badgeClass: 'bg-rose-100 text-rose-700'
+    },
+    orange: {
+        id: 'orange',
+        label: 'Orange',
+        bgColor: '#FFEDD5',
+        textColor: '#C2410C',
+        borderColor: '#FED7AA',
+        badgeClass: 'bg-orange-100 text-orange-700'
+    },
+    slate: {
+        id: 'slate',
+        label: 'Slate / Gray',
+        bgColor: '#F1F5F9',
+        textColor: '#475569',
+        borderColor: '#E2E8F0',
+        badgeClass: 'bg-slate-100 text-slate-700'
+    }
+};
+
+export const DEFAULT_ORDER_STATUSES = [
+    {
+        id: 'pending',
+        label: 'Pending',
+        color: 'amber',
+        bgColor: '#FEF3C7',
+        textColor: '#B45309',
+        borderColor: '#FDE68A',
+        isDefault: true,
+        description: 'New order placed, waiting for review'
+    },
+    {
+        id: 'processing',
+        label: 'Processing',
+        color: 'blue',
+        bgColor: '#DBEAFE',
+        textColor: '#1D4ED8',
+        borderColor: '#BFDBFE',
+        isDefault: true,
+        description: 'Order confirmed and being packed/prepared'
+    },
+    {
+        id: 'partial_payment',
+        label: 'Partial Payment',
+        color: 'purple',
+        bgColor: '#F3E8FF',
+        textColor: '#7E22CE',
+        borderColor: '#E9D5FF',
+        isDefault: true,
+        description: 'Partial advance payment received, balance on delivery'
+    },
+    {
+        id: 'confirmed',
+        label: 'Confirmed',
+        color: 'teal',
+        bgColor: '#CCFBF1',
+        textColor: '#0F766E',
+        borderColor: '#99F6E4',
+        isDefault: true,
+        description: 'Customer verified over phone/WhatsApp'
+    },
+    {
+        id: 'shipped',
+        label: 'Shipped',
+        color: 'indigo',
+        bgColor: '#E0E7FF',
+        textColor: '#4338CA',
+        borderColor: '#C7D2FE',
+        isDefault: true,
+        description: 'Handed over to courier (Pathao/Steadfast/RedX)'
+    },
+    {
+        id: 'delivered',
+        label: 'Delivered',
+        color: 'emerald',
+        bgColor: '#D1FAE5',
+        textColor: '#047857',
+        borderColor: '#A7F3D0',
+        isDefault: true,
+        description: 'Parcel successfully delivered to customer'
+    },
+    {
+        id: 'completed',
+        label: 'Completed',
+        color: 'green',
+        bgColor: '#DCFCE7',
+        textColor: '#15803D',
+        borderColor: '#BBF7D0',
+        isDefault: true,
+        description: 'Order fulfilled and payment fully settled'
+    },
+    {
+        id: 'cancelled',
+        label: 'Cancelled',
+        color: 'red',
+        bgColor: '#FEE2E2',
+        textColor: '#B91C1C',
+        borderColor: '#FECACA',
+        isDefault: true,
+        description: 'Order cancelled by customer or admin'
+    },
+    {
+        id: 'returned',
+        label: 'Returned',
+        color: 'slate',
+        bgColor: '#F1F5F9',
+        textColor: '#475569',
+        borderColor: '#E2E8F0',
+        isDefault: false,
+        description: 'Courier parcel returned back to store'
+    },
+    {
+        id: 'refunded',
+        label: 'Refunded',
+        color: 'rose',
+        bgColor: '#FFE4E6',
+        textColor: '#BE123C',
+        borderColor: '#FECDD3',
+        isDefault: false,
+        description: 'Payment refunded to the customer'
+    }
+];
+
+export const getOrderStatusInfo = (statusId, customStatuses = null) => {
+    const list = Array.isArray(customStatuses) && customStatuses.length > 0 
+        ? customStatuses 
+        : DEFAULT_ORDER_STATUSES;
+    
+    const normalized = (statusId || '').toLowerCase().trim();
+    const found = list.find(s => s.id?.toLowerCase() === normalized || s.label?.toLowerCase() === normalized);
+
+    if (found) {
+        const preset = STATUS_COLOR_PRESETS[found.color];
+        return {
+            id: found.id,
+            label: found.label || found.id,
+            bgColor: found.bgColor || preset?.bgColor || '#F1F5F9',
+            textColor: found.textColor || preset?.textColor || '#475569',
+            borderColor: found.borderColor || preset?.borderColor || '#E2E8F0',
+            badgeClass: preset?.badgeClass || 'bg-gray-100 text-gray-700'
+        };
+    }
+
+    // Default fallback based on common names if not explicitly matched
+    switch (normalized) {
+        case 'pending':
+            return { id: 'pending', label: 'Pending', bgColor: '#FEF3C7', textColor: '#B45309', borderColor: '#FDE68A', badgeClass: 'bg-amber-100 text-amber-700' };
+        case 'processing':
+            return { id: 'processing', label: 'Processing', bgColor: '#DBEAFE', textColor: '#1D4ED8', borderColor: '#BFDBFE', badgeClass: 'bg-blue-100 text-blue-700' };
+        case 'partial_payment':
+        case 'partially_paid':
+        case 'partial payment':
+            return { id: 'partial_payment', label: 'Partial Payment', bgColor: '#F3E8FF', textColor: '#7E22CE', borderColor: '#E9D5FF', badgeClass: 'bg-purple-100 text-purple-700' };
+        case 'confirmed':
+            return { id: 'confirmed', label: 'Confirmed', bgColor: '#CCFBF1', textColor: '#0F766E', borderColor: '#99F6E4', badgeClass: 'bg-teal-100 text-teal-700' };
+        case 'shipped':
+            return { id: 'shipped', label: 'Shipped', bgColor: '#E0E7FF', textColor: '#4338CA', borderColor: '#C7D2FE', badgeClass: 'bg-indigo-100 text-indigo-700' };
+        case 'delivered':
+            return { id: 'delivered', label: 'Delivered', bgColor: '#D1FAE5', textColor: '#047857', borderColor: '#A7F3D0', badgeClass: 'bg-emerald-100 text-emerald-700' };
+        case 'completed':
+            return { id: 'completed', label: 'Completed', bgColor: '#DCFCE7', textColor: '#15803D', borderColor: '#BBF7D0', badgeClass: 'bg-green-100 text-green-700' };
+        case 'cancelled':
+            return { id: 'cancelled', label: 'Cancelled', bgColor: '#FEE2E2', textColor: '#B91C1C', borderColor: '#FECACA', badgeClass: 'bg-red-100 text-red-700' };
+        case 'returned':
+            return { id: 'returned', label: 'Returned', bgColor: '#F1F5F9', textColor: '#475569', borderColor: '#E2E8F0', badgeClass: 'bg-slate-100 text-slate-700' };
+        case 'refunded':
+            return { id: 'refunded', label: 'Refunded', bgColor: '#FFE4E6', textColor: '#BE123C', borderColor: '#FECDD3', badgeClass: 'bg-rose-100 text-rose-700' };
+        default:
+            return {
+                id: normalized || 'unknown',
+                label: (statusId || 'Unknown').replace(/_/g, ' '),
+                bgColor: '#F1F5F9',
+                textColor: '#475569',
+                borderColor: '#E2E8F0',
+                badgeClass: 'bg-gray-100 text-gray-700'
+            };
     }
 };

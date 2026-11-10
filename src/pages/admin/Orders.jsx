@@ -6,11 +6,18 @@ import {
     Trash2, ExternalLink, Filter, Search, MoreVertical, X, Package, 
     User, Mail, Phone, MapPin, CreditCard, ChevronRight, Bell, Eye, 
     Copy, Check, Truck, Image as ImageIcon, Clock, Tag, ZoomIn, Calendar,
-    Palette, Maximize2 
+    Palette, Maximize2, Sliders, DollarSign, CheckCircle2 
 } from 'lucide-react';
 import { testTelegramNotification } from '../../lib/telegramNotifier';
 import { testNtfyNotification, getNtfyTopic } from '../../lib/ntfyNotifier';
 import { supabase } from '../../lib/supabaseClient';
+import OrderStatusManagerModal from '../../components/admin/OrderStatusManagerModal';
+import PartialPaymentModal from '../../components/admin/PartialPaymentModal';
+import { 
+    settingsParams, 
+    DEFAULT_ORDER_STATUSES, 
+    getOrderStatusInfo 
+} from '../../lib/api/settings';
 
 // Helper to format full order date and time
 const formatOrderDateTime = (dateStr) => {
@@ -275,7 +282,11 @@ const formatCourierText = (order) => {
     const isPaid = order.payment_method?.toLowerCase() !== 'cod' && 
                    order.payment_method?.toLowerCase() !== 'cash on delivery' && 
                    Boolean(order.payment_details?.transaction_id);
-    const codAmount = isPaid ? 0 : (order.total_amount || 0);
+    const paidAmount = Number(order.payment_details?.paid_amount || 0);
+    const totalAmount = Number(order.total_amount || 0);
+    const codAmount = paidAmount > 0 
+        ? Math.max(0, totalAmount - paidAmount) 
+        : (isPaid ? 0 : totalAmount);
 
     const orderItems = order.order_items || [];
     const isSingleItem = orderItems.length === 1;
@@ -321,7 +332,11 @@ const formatCourierText = (order) => {
     let res = `Name: ${name}\n`;
     res += `Phone: ${phone}\n`;
     res += `Address: ${address}\n`;
-    res += `Amount: ৳${codAmount}\n`;
+    if (paidAmount > 0) {
+        res += `Amount: ৳${codAmount} (Total: ৳${totalAmount}, Advance Paid: ৳${paidAmount})\n`;
+    } else {
+        res += `Amount: ৳${codAmount}\n`;
+    }
     if (itemsDetails) {
         res += itemsDetails;
     }
@@ -342,6 +357,8 @@ const generateFullOrderText = (order, getItemImgFn) => {
     const fullAddr = formatShippingAddress(addr);
     const deliveryCharge = calculateDeliveryCharge(addr.district);
     const subtotal = Math.max(0, (order.total_amount || 0) - deliveryCharge);
+    const paidAmount = Number(order.payment_details?.paid_amount || 0);
+    const dueAmount = Math.max(0, (order.total_amount || 0) - paidAmount);
 
     let text = `===============================\n`;
     text += `📦 CHOSHMA ZONE - ORDER DETAILS\n`;
@@ -360,12 +377,20 @@ const generateFullOrderText = (order, getItemImgFn) => {
 
     text += `💳 PAYMENT DETAILS:\n`;
     text += `Method: ${(order.payment_method || 'N/A').toUpperCase()}\n`;
+    if (paidAmount > 0) {
+        text += `Advance Paid: ৳${paidAmount.toLocaleString()}\n`;
+        text += `Remaining COD Due: ৳${dueAmount.toLocaleString()}\n`;
+    }
     if (order.payment_details?.bkash_number) {
         text += `bKash Number: ${order.payment_details.bkash_number}\n`;
     }
     if (order.payment_details?.transaction_id) {
         text += `TrxID: ${order.payment_details.transaction_id}\n`;
     }
+    if (order.payment_details?.partial_payment_note) {
+        text += `Note: ${order.payment_details.partial_payment_note}\n`;
+    }
+    text += `\n`;
     text += `\n`;
 
     text += `🛍️ ORDER ITEMS (${(order.order_items || []).length}):\n`;
@@ -522,8 +547,16 @@ const AdminOrders = () => {
     const [showNtfyModal, setShowNtfyModal] = useState(false);
     const ntfyTopic = getNtfyTopic();
 
+    // Order Status & Partial Payment Management States
+    const [orderStatuses, setOrderStatuses] = useState(DEFAULT_ORDER_STATUSES);
+    const [showStatusModal, setShowStatusModal] = useState(false);
+    const [partialPaymentTarget, setPartialPaymentTarget] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
+
     useEffect(() => {
         fetchOrders();
+        loadOrderStatuses();
 
         const channel = supabase
             .channel('admin_orders_page_realtime')
@@ -547,6 +580,17 @@ const AdminOrders = () => {
         };
     }, []);
 
+    const loadOrderStatuses = async () => {
+        try {
+            const list = await settingsParams.getOrderStatuses();
+            if (Array.isArray(list) && list.length > 0) {
+                setOrderStatuses(list);
+            }
+        } catch (e) {
+            console.warn('Failed to load order statuses:', e);
+        }
+    };
+
     const fetchOrders = async () => {
         try {
             setLoading(true);
@@ -560,13 +604,57 @@ const AdminOrders = () => {
         }
     };
 
-    const handleStatusChange = async (orderId, newStatus) => {
+    const handleStatusChange = async (orderId, newStatus, paymentUpdates = null) => {
+        // If selecting partial_payment without details, prompt modal to record advance amount
+        if (newStatus === 'partial_payment' && !paymentUpdates) {
+            const order = orders.find(o => o.id === orderId) || (selectedOrder?.id === orderId ? selectedOrder : null);
+            if (order) {
+                setPartialPaymentTarget({ order, targetStatus: newStatus });
+                return;
+            }
+        }
+
         try {
-            await orderParams.updateStatus(orderId, newStatus);
-            // Update local state
-            setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+            await orderParams.updateStatus(orderId, newStatus, paymentUpdates);
+            
+            // Update local orders state
+            setOrders(prev => prev.map(o => {
+                if (o.id !== orderId) return o;
+                const updatedDetails = paymentUpdates 
+                    ? { ...(o.payment_details || {}), ...paymentUpdates } 
+                    : o.payment_details;
+                return { ...o, status: newStatus, payment_details: updatedDetails };
+            }));
+
+            // If selectedOrder modal is open, update it
+            if (selectedOrder && selectedOrder.id === orderId) {
+                setSelectedOrder(prev => ({
+                    ...prev,
+                    status: newStatus,
+                    payment_details: paymentUpdates 
+                        ? { ...(prev.payment_details || {}), ...paymentUpdates } 
+                        : prev.payment_details
+                }));
+            }
+
+            const info = getOrderStatusInfo(newStatus, orderStatuses);
+            showToast(`Order status updated to "${info.label}"`, 'success');
         } catch (err) {
-            alert('Failed to update status');
+            console.error('Failed to update status:', err);
+            const errMsg = err?.message || '';
+            if (errMsg.includes('check constraint') || errMsg.includes('orders_status_check')) {
+                alert(
+                    '⚠️ Database Check Constraint Detected!\n\n' +
+                    'Your Supabase "orders" table currently restricts status values with a check constraint.\n\n' +
+                    'To enable new statuses (such as Partial Payment):\n' +
+                    '1. Open your Supabase Dashboard -> SQL Editor\n' +
+                    '2. Execute the script in "update_order_status_check.sql":\n\n' +
+                    '   ALTER TABLE public.orders DROP CONSTRAINT IF EXISTS orders_status_check;\n\n' +
+                    'Once dropped, all current and custom statuses will save smoothly.'
+                );
+            } else {
+                alert('Failed to update status: ' + errMsg);
+            }
         }
     };
 
@@ -592,9 +680,36 @@ const AdminOrders = () => {
         setSelectedOrder(null);
     };
 
+    const filteredOrders = orders.filter(order => {
+        // 1. Status Filter
+        if (statusFilter !== 'all') {
+            const orderStatus = (order.status || '').toLowerCase().trim();
+            if (orderStatus !== statusFilter.toLowerCase().trim()) {
+                return false;
+            }
+        }
+
+        // 2. Search Query
+        if (searchQuery.trim()) {
+            const q = searchQuery.toLowerCase().trim();
+            const idMatch = String(order.id || '').toLowerCase().includes(q);
+            const customerName = `${order.shipping_address?.first_name || ''} ${order.shipping_address?.last_name || ''}`.toLowerCase();
+            const nameMatch = customerName.includes(q);
+            const phoneMatch = String(order.shipping_address?.phone || '').toLowerCase().includes(q);
+            const emailMatch = String(order.shipping_address?.email || '').toLowerCase().includes(q);
+            const notesMatch = String(order.shipping_address?.notes || '').toLowerCase().includes(q);
+            const trxMatch = String(order.payment_details?.transaction_id || '').toLowerCase().includes(q);
+            if (!idMatch && !nameMatch && !phoneMatch && !emailMatch && !notesMatch && !trxMatch) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+
     const handleSelectAll = (e) => {
         if (e.target.checked) {
-            setSelectedOrders(orders.map(o => o.id));
+            setSelectedOrders(filteredOrders.map(o => o.id));
         } else {
             setSelectedOrders([]);
         }
@@ -845,40 +960,103 @@ const AdminOrders = () => {
 
     return (
         <div className="animate-in fade-in duration-700">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
                 <div>
                     <h1 className="text-3xl font-bold text-text-main font-outfit uppercase tracking-tight">Order Management</h1>
                     <p className="text-text-muted font-outfit">Review and manage all customer transactions.</p>
                 </div>
-                <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex items-center gap-2.5 flex-wrap">
+                    {/* Order Statuses Manager */}
+                    <button 
+                        onClick={() => setShowStatusModal(true)}
+                        title="Manage and customize order statuses (such as Partial Payment), badge colors, and options"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-white border border-border text-text-main hover:border-primary hover:text-primary rounded-xl text-xs font-bold transition-all font-outfit uppercase tracking-wider shadow-xs cursor-pointer"
+                    >
+                        <Sliders size={15} className="text-primary" />
+                        <span>Order Statuses ({orderStatuses.length})</span>
+                    </button>
 
                     {/* Telegram Instant Alert Test */}
                     <button 
                         onClick={handleTestTelegram}
                         disabled={isTestingTelegram}
                         title="Send a test notification to your phone via Telegram Bot (Lock screen alert)"
-                        className="flex items-center gap-2 px-5 py-3 bg-blue-50 border border-blue-200 text-blue-600 rounded-xl text-sm font-bold hover:bg-blue-100 transition-all font-outfit uppercase tracking-widest shadow-sm disabled:opacity-50 cursor-pointer"
+                        className="flex items-center gap-1.5 px-4 py-2.5 bg-blue-50 border border-blue-200 text-blue-600 rounded-xl text-xs font-bold hover:bg-blue-100 transition-all font-outfit uppercase tracking-wider shadow-xs disabled:opacity-50 cursor-pointer"
                     >
-                        <Bell size={16} className={isTestingTelegram ? 'animate-bounce' : ''} />
-                        {isTestingTelegram ? 'Sending Test...' : 'Test Telegram'}
+                        <Bell size={15} className={isTestingTelegram ? 'animate-bounce' : ''} />
+                        <span>{isTestingTelegram ? 'Testing...' : 'Telegram'}</span>
                     </button>
 
                     {/* ntfy Instant Phone Push Setup & Test */}
                     <button 
                         onClick={() => setShowNtfyModal(true)}
                         title="Setup & Test real-time lock screen phone alerts on Android & iPhone (ntfy)"
-                        className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-sm font-bold hover:brightness-110 transition-all font-outfit uppercase tracking-widest shadow-md cursor-pointer"
+                        className="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-xs font-bold hover:brightness-110 transition-all font-outfit uppercase tracking-wider shadow-xs cursor-pointer"
                     >
                         <span>📲</span>
-                        <span>Phone Alerts (ntfy)</span>
+                        <span>Phone Alerts</span>
                     </button>
-                    <button className="p-3 bg-white border border-border rounded-xl text-text-muted hover:text-text-main transition-colors">
-                        <Search size={20} />
-                    </button>
-                    <button className="flex items-center gap-2 px-6 py-3 bg-white border border-border rounded-xl text-sm font-bold text-text-main hover:bg-gray-50 transition-all font-outfit uppercase tracking-widest shadow-sm">
-                        <Filter size={16} />
-                        Filter
-                    </button>
+                </div>
+            </div>
+
+            {/* Search & Status Filter Toolbar */}
+            <div className="bg-white border border-border/70 rounded-2xl p-3.5 mb-6 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 flex-1 max-w-md bg-gray-50/80 border border-border rounded-xl px-3.5 py-2">
+                    <Search size={16} className="text-text-muted shrink-0" />
+                    <input
+                        type="text"
+                        placeholder="Search by ID, customer name, phone, notes..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="bg-transparent border-none outline-none text-xs sm:text-sm font-outfit w-full text-text-main placeholder:text-text-muted/70"
+                    />
+                    {searchQuery && (
+                        <button 
+                            onClick={() => setSearchQuery('')}
+                            className="text-text-muted hover:text-text-main p-0.5"
+                            title="Clear Search"
+                        >
+                            <X size={14} />
+                        </button>
+                    )}
+                </div>
+
+                <div className="flex items-center gap-3 flex-wrap justify-between md:justify-end">
+                    <div className="flex items-center gap-2">
+                        <Filter size={14} className="text-text-muted shrink-0" />
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted font-outfit">Filter:</span>
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="bg-white border border-border rounded-xl px-3 py-1.5 text-xs font-bold font-outfit text-text-main outline-none focus:border-primary cursor-pointer uppercase tracking-wider"
+                        >
+                            <option value="all">All Statuses ({orders.length})</option>
+                            {orderStatuses.map(s => {
+                                const count = orders.filter(o => (o.status || '').toLowerCase().trim() === s.id.toLowerCase().trim()).length;
+                                return (
+                                    <option key={s.id} value={s.id}>
+                                        {s.label} ({count})
+                                    </option>
+                                );
+                            })}
+                        </select>
+                    </div>
+
+                    {(searchQuery || statusFilter !== 'all') && (
+                        <button
+                            onClick={() => {
+                                setSearchQuery('');
+                                setStatusFilter('all');
+                            }}
+                            className="px-2.5 py-1 text-[11px] text-text-muted hover:text-primary font-bold font-outfit uppercase tracking-wider underline cursor-pointer"
+                        >
+                            Reset
+                        </button>
+                    )}
+
+                    <div className="text-xs text-text-muted font-outfit font-medium">
+                        Showing <strong className="text-text-main">{filteredOrders.length}</strong> of {orders.length}
+                    </div>
                 </div>
             </div>
 
@@ -899,11 +1077,9 @@ const AdminOrders = () => {
                             className="bg-white border border-border rounded-lg px-3 py-2 text-sm font-outfit outline-none focus:border-primary disabled:opacity-50"
                         >
                             <option value="">Change Status...</option>
-                            <option value="pending">Pending</option>
-                            <option value="processing">Processing</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="completed">Completed</option>
-                            <option value="cancelled">Cancelled</option>
+                            {orderStatuses.map(s => (
+                                <option key={s.id} value={s.id}>{s.label}</option>
+                            ))}
                         </select>
                         <button
                             onClick={handleBulkDelete}
@@ -931,7 +1107,7 @@ const AdminOrders = () => {
                                         type="checkbox" 
                                         className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
                                         onChange={handleSelectAll}
-                                        checked={orders.length > 0 && selectedOrders.length === orders.length}
+                                        checked={filteredOrders.length > 0 && selectedOrders.length === filteredOrders.length}
                                     />
                                 </th>
                                 <th className="px-6 py-5 text-xs font-bold text-text-muted uppercase tracking-[0.2em] font-outfit">Order ID</th>
@@ -943,7 +1119,22 @@ const AdminOrders = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border/30">
-                            {orders.map(order => (
+                            {filteredOrders.length === 0 ? (
+                                <tr>
+                                    <td colSpan={7} className="text-center py-16 text-text-muted font-outfit">
+                                        <div className="flex flex-col items-center justify-center gap-2">
+                                            <Package size={32} className="text-text-muted/40" />
+                                            <p className="text-base font-bold text-text-main">No orders found</p>
+                                            <p className="text-xs text-text-muted">
+                                                {searchQuery || statusFilter !== 'all' 
+                                                    ? 'No orders match your search or status filter criteria.' 
+                                                    : 'No customer orders have been placed yet.'}
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : (
+                                filteredOrders.map(order => (
                                 <tr 
                                     key={order.id} 
                                     onClick={() => openOrderDetails(order)}
@@ -993,6 +1184,13 @@ const AdminOrders = () => {
                                     <td className="px-6 py-5">
                                         <div className="flex flex-col">
                                             <span className="text-base font-bold text-primary font-outfit">৳{Number(order.total_amount || 0).toLocaleString()}</span>
+                                            {Number(order.payment_details?.paid_amount || 0) > 0 && (
+                                                <div className="flex items-center gap-1 text-[10px] font-bold">
+                                                    <span className="text-purple-700">Paid: ৳{Number(order.payment_details.paid_amount).toLocaleString()}</span>
+                                                    <span className="text-text-muted">•</span>
+                                                    <span className="text-amber-700">Due: ৳{Math.max(0, Number(order.total_amount || 0) - Number(order.payment_details.paid_amount)).toLocaleString()}</span>
+                                                </div>
+                                            )}
                                             <div className="flex items-center gap-1.5 text-[10px] text-text-muted font-bold uppercase tracking-wider">
                                                 <span>{order.payment_method}</span>
                                                 <span>•</span>
@@ -1003,20 +1201,27 @@ const AdminOrders = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-5" onClick={(e) => e.stopPropagation()}>
-                                        <select
-                                            value={order.status}
-                                            onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                                            className={`
-                                                text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border-none outline-none cursor-pointer shadow-xs transition-transform hover:scale-105
-                                                ${getStatusStyles(order.status)}
-                                            `}
-                                        >
-                                            <option value="pending">Pending</option>
-                                            <option value="processing">Processing</option>
-                                            <option value="shipped">Shipped</option>
-                                            <option value="completed">Completed</option>
-                                            <option value="cancelled">Cancelled</option>
-                                        </select>
+                                        {(() => {
+                                            const statusInfo = getOrderStatusInfo(order.status, orderStatuses);
+                                            return (
+                                                <select
+                                                    value={order.status}
+                                                    onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                                                    style={{
+                                                        backgroundColor: statusInfo.bgColor,
+                                                        color: statusInfo.textColor,
+                                                        borderColor: statusInfo.borderColor
+                                                    }}
+                                                    className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border outline-none cursor-pointer shadow-xs transition-transform hover:scale-105"
+                                                >
+                                                    {orderStatuses.map(s => (
+                                                        <option key={s.id} value={s.id} className="text-gray-900 bg-white font-medium py-1">
+                                                            {s.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            );
+                                        })()}
                                     </td>
                                     <td className="px-6 py-5">
                                         <div className="flex flex-col">
@@ -1057,6 +1262,7 @@ const AdminOrders = () => {
                                         </div>
                                     </td>
                                 </tr>
+                                )
                             ))}
                         </tbody>
                     </table>
@@ -1077,9 +1283,30 @@ const AdminOrders = () => {
                             <div>
                                 <div className="flex items-center gap-3 mb-1.5 flex-wrap">
                                     <h2 className="text-2xl font-bold text-text-main font-outfit uppercase tracking-tight">Order Details</h2>
-                                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${getStatusStyles(selectedOrder.status)}`}>
-                                        {selectedOrder.status}
-                                    </span>
+                                    {(() => {
+                                        const modalStatusInfo = getOrderStatusInfo(selectedOrder.status, orderStatuses);
+                                        return (
+                                            <div className="flex items-center gap-1.5">
+                                                <select
+                                                    value={selectedOrder.status}
+                                                    onChange={(e) => handleStatusChange(selectedOrder.id, e.target.value)}
+                                                    style={{
+                                                        backgroundColor: modalStatusInfo.bgColor,
+                                                        color: modalStatusInfo.textColor,
+                                                        borderColor: modalStatusInfo.borderColor
+                                                    }}
+                                                    className="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border outline-none cursor-pointer shadow-xs transition-transform hover:scale-105"
+                                                    title="Click to change order status"
+                                                >
+                                                    {orderStatuses.map(s => (
+                                                        <option key={s.id} value={s.id} className="text-gray-900 bg-white font-medium">
+                                                            {s.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
                                 <div className="flex items-center gap-3 flex-wrap">
                                     <div className="flex items-center gap-1.5">
@@ -1283,6 +1510,53 @@ const AdminOrders = () => {
                                                         />
                                                     </div>
                                                 </div>
+                                            )}
+
+                                            {/* Partial Payment Tracking Box */}
+                                            {(selectedOrder.status === 'partial_payment' || Number(selectedOrder.payment_details?.paid_amount || 0) > 0) ? (
+                                                <div className="mt-3 p-3.5 bg-purple-50/80 border border-purple-200/80 rounded-xl space-y-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[10px] font-extrabold text-purple-800 uppercase tracking-wider flex items-center gap-1">
+                                                            <DollarSign size={13} />
+                                                            <span>Partial Payment Summary</span>
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setPartialPaymentTarget({ order: selectedOrder, targetStatus: selectedOrder.status })}
+                                                            className="text-[10px] font-bold text-purple-700 hover:text-purple-900 underline font-outfit uppercase tracking-wider cursor-pointer"
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-2 text-xs font-outfit pt-1 border-t border-purple-200/60">
+                                                        <div>
+                                                            <span className="text-text-muted block text-[10px] uppercase">Advance Paid</span>
+                                                            <span className="font-extrabold text-purple-700">
+                                                                ৳{Number(selectedOrder.payment_details?.paid_amount || 0).toLocaleString()}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-text-muted block text-[10px] uppercase">Remaining Due (COD)</span>
+                                                            <span className="font-extrabold text-amber-700">
+                                                                ৳{Math.max(0, Number(selectedOrder.total_amount || 0) - Number(selectedOrder.payment_details?.paid_amount || 0)).toLocaleString()}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    {selectedOrder.payment_details?.partial_payment_note && (
+                                                        <p className="text-[11px] text-text-muted italic pt-1 border-t border-purple-200/40">
+                                                            Note: {selectedOrder.payment_details.partial_payment_note}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPartialPaymentTarget({ order: selectedOrder, targetStatus: 'partial_payment' })}
+                                                    className="w-full mt-2 py-1.5 px-3 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200/60 rounded-xl text-xs font-bold font-outfit uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                                                >
+                                                    <DollarSign size={13} />
+                                                    <span>Record Advance / Partial Payment</span>
+                                                </button>
                                             )}
                                         </div>
                                     </section>
@@ -1698,19 +1972,37 @@ const AdminOrders = () => {
                     </div>
                 </div>
             )}
+            {/* Order Status Manager Modal */}
+            <OrderStatusManagerModal
+                isOpen={showStatusModal}
+                onClose={() => setShowStatusModal(false)}
+                currentStatuses={orderStatuses}
+                onStatusesUpdated={(updatedList) => {
+                    setOrderStatuses(updatedList);
+                }}
+            />
+
+            {/* Partial Payment Prompt Modal */}
+            {partialPaymentTarget && (
+                <PartialPaymentModal
+                    isOpen={Boolean(partialPaymentTarget)}
+                    onClose={() => setPartialPaymentTarget(null)}
+                    order={partialPaymentTarget.order}
+                    onSave={async (orderId, paymentUpdates) => {
+                        await handleStatusChange(orderId, 'partial_payment', paymentUpdates);
+                    }}
+                    onSkip={async () => {
+                        await handleStatusChange(partialPaymentTarget.order.id, 'partial_payment', { is_partial: true });
+                    }}
+                />
+            )}
         </div>
     );
 };
 
 const getStatusStyles = (status) => {
-    switch (status) {
-        case 'pending': return 'bg-amber-100 text-amber-700';
-        case 'processing': return 'bg-blue-100 text-blue-700';
-        case 'shipped': return 'bg-indigo-100 text-indigo-700';
-        case 'completed': return 'bg-green-100 text-green-700';
-        case 'cancelled': return 'bg-red-100 text-red-700';
-        default: return 'bg-gray-100 text-gray-700';
-    }
+    const info = getOrderStatusInfo(status);
+    return info.badgeClass;
 };
 
 export default AdminOrders;

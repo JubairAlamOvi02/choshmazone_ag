@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
 import { Smartphone, Mail, CheckCircle2, Clock, ChevronRight, Truck, ArrowLeft } from 'lucide-react';
+import { getOrderStatusInfo } from '../lib/api/settings';
 
 const TrackOrder = () => {
     const [step, setStep] = useState(1); // 1: Phone Input, 2: OTP Input, 3: Orders List
@@ -246,11 +247,18 @@ const TrackOrder = () => {
                                                         <span className="text-sm font-bold text-text-main">{new Date(order.created_at).toLocaleDateString()}</span>
                                                     </div>
                                                 </div>
-                                                <div className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 ${order.status === 'completed' || order.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
-                                                    }`}>
-                                                    {order.status === 'completed' || order.status === 'delivered' ? <CheckCircle2 size={14} /> : <Clock size={14} />}
-                                                    {order.status}
-                                                </div>
+                                                {(() => {
+                                                    const sInfo = getOrderStatusInfo(order.status);
+                                                    return (
+                                                        <div 
+                                                            style={{ backgroundColor: sInfo.bgColor, color: sInfo.textColor }}
+                                                            className="px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 border border-border/40"
+                                                        >
+                                                            {order.status === 'completed' || order.status === 'delivered' ? <CheckCircle2 size={14} /> : <Clock size={14} />}
+                                                            <span>{sInfo.label}</span>
+                                                        </div>
+                                                    );
+                                                })()}
                                             </div>
 
                                             <div className="flex flex-wrap gap-4 mb-8">

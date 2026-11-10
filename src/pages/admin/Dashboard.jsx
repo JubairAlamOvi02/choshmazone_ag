@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { TrendingUp, ShoppingBag, Clock, Glasses, Users, RefreshCcw, ArrowUpRight } from 'lucide-react';
+import { getOrderStatusInfo } from '../../lib/api/settings';
 
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -251,11 +252,17 @@ const Dashboard = () => {
                                 </div>
                                 <div className="text-right">
                                     <p className="text-sm font-bold text-primary font-outfit">৳{Number(order.total_amount).toLocaleString()}</p>
-                                    <span className={`text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${order.status === 'completed' ? 'bg-green-100 text-green-700' :
-                                        order.status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'
-                                        }`}>
-                                        {order.status}
-                                    </span>
+                                    {(() => {
+                                        const sInfo = getOrderStatusInfo(order.status);
+                                        return (
+                                            <span 
+                                                style={{ backgroundColor: sInfo.bgColor, color: sInfo.textColor }}
+                                                className="text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+                                            >
+                                                {sInfo.label}
+                                            </span>
+                                        );
+                                    })()}
                                 </div>
                             </Link>
                         ))}
