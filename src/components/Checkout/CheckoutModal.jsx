@@ -64,7 +64,7 @@ const CheckoutModal = () => {
     const [formErrors, setFormErrors] = useState({});
     const [phoneError, setPhoneError] = useState('');
     const [availableThanas, setAvailableThanas] = useState([]);
-    const [selectedDeliveryZone, setSelectedDeliveryZone] = useState('inside'); // 'inside' (70), 'sub' (100), 'outside' (130)
+    const [selectedDeliveryZone, setSelectedDeliveryZone] = useState('inside'); // 'inside' (70), 'sub' (100), 'outside' (120)
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [stockError, setStockError] = useState(null);
 
@@ -143,7 +143,7 @@ const CheckoutModal = () => {
             case 'sub':
                 return 100;
             case 'outside':
-                return 130;
+                return 120;
             default:
                 return 70;
         }
@@ -940,7 +940,7 @@ const CheckoutModal = () => {
                                             />
                                             <span className="text-xs font-medium text-slate-800">🚚 ঢাকার বাহিরে</span>
                                         </div>
-                                        <span className="text-xs font-bold text-slate-900 font-outfit">Tk 130.00</span>
+                                        <span className="text-xs font-bold text-slate-900 font-outfit">Tk 120.00</span>
                                     </label>
                                 </div>
                             )}
