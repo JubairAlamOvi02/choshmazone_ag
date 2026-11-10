@@ -18,7 +18,8 @@ import {
     Sparkles, 
     Check,
     Truck,
-    ShieldCheck
+    ShieldCheck,
+    Trash2
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
@@ -821,33 +822,47 @@ const CheckoutModal = () => {
                                                     </div>
                                                 </div>
 
-                                                {/* Stepper */}
-                                                <div className="flex items-center border border-slate-200 bg-white rounded-xl p-0.5 shrink-0 shadow-2xs">
+                                                {/* Right: Delete Icon Button on Top + Stepper on Bottom */}
+                                                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                                    {/* Pure Icon Delete Button (No text) */}
                                                     <button 
                                                         type="button"
-                                                        onClick={() => {
-                                                            if (itemQty > 1) {
-                                                                updateQuantity(itemId, -1);
-                                                            } else {
-                                                                removeFromCart(itemId);
-                                                            }
-                                                        }}
-                                                        className="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors font-bold text-sm"
-                                                        title={itemQty === 1 ? 'মুছে ফেলুন' : 'কমান'}
+                                                        onClick={() => removeFromCart(itemId)}
+                                                        className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer group"
+                                                        title="পণ্যটি বাদ দিন"
+                                                        aria-label="Remove item"
                                                     >
-                                                        −
+                                                        <Trash2 size={15} className="transition-transform group-hover:scale-110" />
                                                     </button>
-                                                    <span className="w-7 text-center font-bold text-xs font-outfit text-slate-900">
-                                                        {itemQty}
-                                                    </span>
-                                                    <button 
-                                                        type="button"
-                                                        onClick={() => updateQuantity(itemId, 1)}
-                                                        className="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors font-bold text-sm"
-                                                        title="বাড়ান"
-                                                    >
-                                                        +
-                                                    </button>
+
+                                                    {/* Stepper with Minus & Plus Intact */}
+                                                    <div className="flex items-center border border-slate-200 bg-white rounded-xl p-0.5 shadow-2xs">
+                                                        <button 
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (itemQty > 1) {
+                                                                    updateQuantity(itemId, -1);
+                                                                } else {
+                                                                    removeFromCart(itemId);
+                                                                }
+                                                            }}
+                                                            className="w-7 h-7 flex items-center justify-center text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors font-bold text-sm cursor-pointer"
+                                                            title="কমান"
+                                                        >
+                                                            −
+                                                        </button>
+                                                        <span className="w-7 text-center font-bold text-xs font-outfit text-slate-900">
+                                                            {itemQty}
+                                                        </span>
+                                                        <button 
+                                                            type="button"
+                                                            onClick={() => updateQuantity(itemId, 1)}
+                                                            className="w-7 h-7 flex items-center justify-center text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors font-bold text-sm cursor-pointer"
+                                                            title="বাড়ান"
+                                                        >
+                                                            +
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         );
