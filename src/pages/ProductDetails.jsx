@@ -19,7 +19,7 @@ import { trackEvent } from '../lib/tracker';
 const ProductDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addToCart } = useCart();
+    const { addToCart, openCheckoutModal } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
     const { addToRecentlyViewed } = useRecentlyViewed();
     const [product, setProduct] = useState(null);
@@ -271,8 +271,7 @@ const ProductDetails = () => {
 
     const handleBuyNow = () => {
         if (!product || isOutOfStock) return;
-        addToCart(getCartItem(), false);
-        navigate('/checkout');
+        openCheckoutModal(getCartItem());
     };
 
     const handlePrevImage = () => {

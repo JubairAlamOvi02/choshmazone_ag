@@ -22,6 +22,7 @@ export const CartProvider = ({ children }) => {
         }
     });
     const [isCartOpen, setIsCartOpen] = useState(false);
+    const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
 
     // Validate cart items against database on mount
     useEffect(() => {
@@ -169,6 +170,21 @@ export const CartProvider = ({ children }) => {
         setCartItems(prevItems => prevItems.map(item => ({ ...item, quantity: 1 })));
     }, []);
 
+    const openCheckoutModal = useCallback((product = null) => {
+        if (product) {
+            addToCart(product, false);
+        }
+        startTransition(() => {
+            setIsCheckoutModalOpen(true);
+        });
+    }, [addToCart]);
+
+    const closeCheckoutModal = useCallback(() => {
+        startTransition(() => {
+            setIsCheckoutModalOpen(false);
+        });
+    }, []);
+
     const cartCount = useMemo(() => cartItems.reduce((acc, item) => acc + item.quantity, 0), [cartItems]);
     const cartTotal = useMemo(() => cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0), [cartItems]);
 
@@ -179,11 +195,14 @@ export const CartProvider = ({ children }) => {
         updateQuantity,
         isCartOpen,
         toggleCart,
+        isCheckoutModalOpen,
+        openCheckoutModal,
+        closeCheckoutModal,
         cartCount,
         cartTotal,
         clearCart,
         resetQuantities
-    }), [cartItems, isCartOpen, addToCart, removeFromCart, updateQuantity, toggleCart, cartCount, cartTotal, clearCart, resetQuantities]);
+    }), [cartItems, isCartOpen, isCheckoutModalOpen, addToCart, removeFromCart, updateQuantity, toggleCart, openCheckoutModal, closeCheckoutModal, cartCount, cartTotal, clearCart, resetQuantities]);
 
     return (
         <CartContext.Provider value={contextValue}>

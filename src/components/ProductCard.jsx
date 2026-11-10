@@ -10,7 +10,7 @@ const ProductCard = ({ product }) => {
     const { id, title, price, image, images } = product;
     const hoverImage = Array.isArray(images) && images.length > 1 && images[1] && typeof images[1] === 'string' && images[1].trim() !== '' && images[1] !== image ? images[1] : null;
     const navigate = useNavigate();
-    const { addToCart } = useCart();
+    const { addToCart, openCheckoutModal } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
     const isWishlisted = isInWishlist(id);
 
@@ -25,8 +25,7 @@ const ProductCard = ({ product }) => {
         e.preventDefault();
         e.stopPropagation();
         if (product.stock_quantity <= 0) return;
-        addToCart(product, false);
-        navigate('/checkout');
+        openCheckoutModal(product);
     };
 
     const handleWaitlist = (e) => {

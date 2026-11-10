@@ -6,12 +6,12 @@ import CartItem from './CartItem';
 import Button from '../Button';
 
 const CartDrawer = () => {
-    const { isCartOpen, toggleCart, cartItems, cartTotal } = useCart();
+    const { isCartOpen, toggleCart, cartItems, cartTotal, openCheckoutModal } = useCart();
     const navigate = useNavigate();
 
     const handleCheckout = () => {
         toggleCart();
-        navigate('/checkout');
+        openCheckoutModal();
     };
 
     // Prevent body scroll when cart is open

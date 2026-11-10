@@ -18,22 +18,8 @@ import { trackEvent } from '../lib/tracker';
 import { trackMetaPurchase, trackMetaInitiateCheckout } from '../lib/metaPixel';
 import { compressImage } from '../lib/imageCompressor';
 
-// Bangladesh 11-digit phone validation helpers
-export const normalizeBDPhone = (input) => {
-    if (!input) return '';
-    let digits = String(input).replace(/[^\d+]/g, '');
-    if (digits.startsWith('+880')) digits = digits.slice(3);
-    else if (digits.startsWith('+88')) digits = digits.slice(3);
-    else if (digits.startsWith('880')) digits = digits.slice(2);
-    else if (digits.startsWith('88')) digits = digits.slice(2);
-    return digits.replace(/\D/g, '');
-};
-
-export const isValidBDPhone = (phone) => {
-    const cleaned = normalizeBDPhone(phone);
-    // Standard Bangladesh 11-digit mobile format: 013, 014, 015, 016, 017, 018, 019 followed by 8 digits
-    return /^01[3-9]\d{8}$/.test(cleaned);
-};
+import { normalizeBDPhone, isValidBDPhone } from '../lib/phoneValidation';
+export { normalizeBDPhone, isValidBDPhone };
 
 const Checkout = () => {
     const { cartItems, cartTotal, clearCart, updateQuantity, resetQuantities, removeFromCart } = useCart();
@@ -102,16 +88,23 @@ const Checkout = () => {
     const [deliveryCharge, setDeliveryCharge] = useState(0);
     const [availableThanas, setAvailableThanas] = useState([]);
 
+    const totalItemsCount = cartItems.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0);
+    const isFreeDelivery = totalItemsCount >= 3;
+
     // Update thanas and delivery charge when district changes
     useEffect(() => {
         if (formData.district) {
             setAvailableThanas(getThanas(formData.district));
-            setDeliveryCharge(calculateDeliveryCharge(formData.district));
+            if (isFreeDelivery) {
+                setDeliveryCharge(0);
+            } else {
+                setDeliveryCharge(calculateDeliveryCharge(formData.district));
+            }
         } else {
             setAvailableThanas([]);
             setDeliveryCharge(0);
         }
-    }, [formData.district]);
+    }, [formData.district, isFreeDelivery]);
 
     const focusAndScrollToField = (elementId) => {
         const el = document.getElementById(elementId);
@@ -1010,9 +1003,26 @@ const Checkout = () => {
                     {/* Right Column: Order Summary */}
                     <div className="lg:sticky lg:top-24 h-fit">
                         <div className="bg-gray-50 p-6 md:p-8 rounded-xl border border-border shadow-sm">
-                            <h3 className="text-lg font-bold mb-6 font-outfit uppercase tracking-widest text-text-main">
+                            <h3 className="text-lg font-bold mb-4 font-outfit uppercase tracking-widest text-text-main">
                                 Order Summary
                             </h3>
+
+                            {/* Free Delivery Banner */}
+                            {isFreeDelivery ? (
+                                <div className="mb-5 p-3 bg-emerald-50 border border-emerald-300 rounded-xl flex items-center justify-between text-xs text-emerald-950 font-bold">
+                                    <span className="flex items-center gap-1.5">
+                                        <span>🎉</span>
+                                        <span>৩টি পণ্য সিলেক্ট করায় ফ্রি ডেলিভারি একটিভ!</span>
+                                    </span>
+                                    <span className="bg-emerald-600 text-white px-2 py-0.5 rounded-full text-[10px]">Free</span>
+                                </div>
+                            ) : (
+                                <div className="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between text-xs text-amber-900">
+                                    <span>🚚 আর <strong>{3 - totalItemsCount}টি</strong> পণ্য যোগ করলেই ফ্রি ডেলিভারি!</span>
+                                    <span className="bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-full text-[10px] font-bold font-outfit">{totalItemsCount}/3</span>
+                                </div>
+                            )}
+
                             <div className="space-y-4 mb-6 pb-6 border-b border-border max-h-[400px] overflow-y-auto pr-2 scrollbar-thin">
                                 {cartItems.map(item => (
                                     <div key={item.cartItemId || item.id} className="flex gap-4 items-start relative pb-4 border-b border-border/40 last:border-0 last:pb-0">
@@ -1083,7 +1093,16 @@ const Checkout = () => {
                                 </div>
                                 <div className="flex justify-between text-sm text-text-muted">
                                     <span>Delivery Charge</span>
-                                    {formData.district ? (
+                                    {isFreeDelivery ? (
+                                        <span className="font-bold text-emerald-600 font-outfit flex items-center gap-1.5">
+                                            <span>Free</span>
+                                            {formData.district && (
+                                                <span className="text-xs line-through text-text-muted/60">
+                                                    ৳{calculateDeliveryCharge(formData.district).toFixed(2)}
+                                                </span>
+                                            )}
+                                        </span>
+                                    ) : formData.district ? (
                                         <span className="font-bold text-text-main">
                                             ৳{deliveryCharge.toFixed(2)}
                                             <span className="text-xs ml-1 text-secondary">({formData.district})</span>

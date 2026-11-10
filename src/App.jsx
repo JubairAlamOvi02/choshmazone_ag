@@ -7,6 +7,7 @@ import { WishlistProvider } from './context/WishlistContext';
 import { RecentlyViewedProvider } from './context/RecentlyViewedContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import CartDrawer from './components/Cart/CartDrawer';
+import CheckoutModal from './components/Checkout/CheckoutModal';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 import PageMonitor from './components/PageMonitor';
@@ -74,6 +75,7 @@ function App() {
                 <RecentlyViewedProvider>
                   <div className="app">
                     <CartDrawer />
+                    <CheckoutModal />
                     <Suspense fallback={<PageLoader />}>
                       <Routes>
                         {/* Public Routes */}

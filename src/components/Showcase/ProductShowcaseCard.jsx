@@ -13,7 +13,7 @@ const ProductShowcaseCard = ({
     linkedProduct = null
 }) => {
     const navigate = useNavigate();
-    const { addToCart } = useCart();
+    const { addToCart, openCheckoutModal } = useCart();
 
     if (!item) return null;
 
@@ -62,8 +62,7 @@ const ProductShowcaseCard = ({
         e.preventDefault();
         e.stopPropagation();
         if (linkedProduct) {
-            addToCart(linkedProduct, false);
-            navigate('/checkout');
+            openCheckoutModal(linkedProduct);
         } else if (item.product_id) {
             navigate(`/product/${item.product_id}`);
         } else {
