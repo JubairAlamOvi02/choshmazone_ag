@@ -18,7 +18,6 @@ import {
     Sparkles, 
     Check,
     Truck,
-    ShieldCheck,
     Trash2
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
@@ -1030,18 +1029,6 @@ const CheckoutModal = () => {
                                 </>
                             )}
                         </button>
-
-                        {/* Trust Badges */}
-                        <div className="flex items-center justify-center gap-3 text-[10px] text-slate-500 pt-1">
-                            <span className="flex items-center gap-1">
-                                <ShieldCheck size={13} className="text-emerald-600" />
-                                ক্যাশ অন ডেলিভারি
-                            </span>
-                            <span>•</span>
-                            <span>১০০% অরিজিনাল প্রডাক্ট</span>
-                            <span>•</span>
-                            <span>চেক করে নেওয়ার সুবিধা</span>
-                        </div>
                     </form>
                 </div>
 

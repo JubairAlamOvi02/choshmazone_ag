@@ -586,5 +586,22 @@
   - Integrated `/admin/showcases` route in `src/App.jsx` and added "Product Showcases" link with `Grid` icon in `src/layouts/AdminLayout.jsx`.
   - Verified zero errors and clean build output with `npm run build`.
 
+- Task 114 (Quick Checkout Modal, 3-Product Free Delivery & Item Delete Engine): Completed
+  - Architected high-converting, mobile-first Quick Checkout Modal component (`src/components/Checkout/CheckoutModal.jsx`).
+  - Added global modal state management in `src/context/CartContext.jsx` (`isCheckoutModalOpen`, `openCheckoutModal`, `closeCheckoutModal`).
+  - Integrated modal opening seamlessly with:
+    - `ProductDetails.jsx` ("Buy Now" desktop and mobile sticky buttons).
+    - `ProductCard.jsx` ("Buy Now" buttons across catalog and shop).
+    - `ProductShowcaseCard.jsx` ("Buy Now" hover and tap actions).
+    - `CartDrawer.jsx` ("Proceed to Checkout" action).
+  - Implemented **Optional Email Field** with helper text and non-blocking validation.
+  - Implemented **Automated 3-Product Free Delivery**: automatically unlocks Free Delivery (৳0) with dynamic progress banner (*"আর ১টি পণ্য যোগ করলেই পাচ্ছেন সম্পূর্ণ ফ্রি ডেলিভারি!"*) across both the modal and dedicated `/checkout` page.
+  - Configured delivery fee tiers: ৳70 (Dhaka inside), ৳100 (Dhaka Sub-Urban: Gazipur, Narayanganj, Savar, Keraniganj), ৳120 (Outside Dhaka), or ৳0 (Free on 3+ items).
+  - Integrated in-modal item controls: intact quantity stepper `[ − ] [ qty ] [ + ]` paired with a minimalist icon-only delete button `[ 🗑️ ]` (`Trash2` icon) positioned directly above the stepper.
+  - Modularized Bangladesh 11-digit mobile phone number validation into `src/lib/phoneValidation.js` (`normalizeBDPhone`, `isValidBDPhone`), optimizing Vite code-splitting chunks.
+  - Removed redundant bottom trust badges row per customer request for a clean, distraction-free action area.
+  - Preserved all real-time order notifications (Telegram Bot with inline buttons, ntfy.sh mobile push, Google Sheets sync, Meta Pixel `Purchase` event tracking, and Supabase real-time stock checks).
+  - Verified clean production build with `npm run build` exiting code 0.
+
 
 
