@@ -337,7 +337,7 @@ const ProductDetails = () => {
 
             {/* Breadcrumbs */}
             <div className="bg-background-alt/50 border-b border-border">
-                <div className="container mx-auto px-4 py-4">
+                <div className="container mx-auto px-4 py-2.5 md:py-4">
                     <nav className="flex items-center gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest font-outfit text-text-muted">
                         <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                         <ChevronRight size={12} strokeWidth={3} className="text-border" />
@@ -352,7 +352,7 @@ const ProductDetails = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-start">
                     {/* Left: Image Gallery */}
                     <div className="flex flex-col gap-4 lg:sticky lg:top-24 h-fit">
-                        <div className="relative group bg-background-alt rounded-2xl overflow-hidden aspect-square w-full flex items-center justify-center border border-border/50 shadow-sm transition-all duration-500 hover:shadow-xl mx-auto">
+                        <div className="relative group bg-background-alt rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-[16/10] md:aspect-square w-full flex items-center justify-center border border-border/50 shadow-sm transition-all duration-500 hover:shadow-xl mx-auto">
                             <OptimizedImage
                                 src={mainImage}
                                 alt={product.title}
@@ -388,6 +388,18 @@ const ProductDetails = () => {
                                 </>
                             )}
 
+                            {/* Mobile In-Image Pagination Dots */}
+                            {product.images && product.images.length > 1 && (
+                                <div className="md:hidden absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full z-10 pointer-events-none">
+                                    {product.images.map((img, idx) => (
+                                        <span
+                                            key={idx}
+                                            className={`rounded-full transition-all duration-300 ${mainImage === img ? 'w-2 h-2 bg-white' : 'w-1.5 h-1.5 bg-white/50'}`}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+
                             {/* Zoom Indicator */}
                             <div className="absolute bottom-3 right-3 bg-white/80 backdrop-blur-md p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                                 <Plus size={16} className="text-primary" />
@@ -395,11 +407,11 @@ const ProductDetails = () => {
                         </div>
 
                         {product.images.length > 1 && (
-                            <div className="flex gap-2.5 overflow-x-auto pb-1 no-scrollbar">
+                            <div className="flex gap-2 md:gap-2.5 overflow-x-auto pb-1 no-scrollbar">
                                 {product.images.map((img, index) => (
                                     <button
                                         key={index}
-                                        className={`flex-shrink-0 p-1 bg-white border-2 rounded-xl aspect-square w-16 h-16 md:w-20 md:h-20 cursor-pointer transition-all duration-300 ${mainImage === img ? 'border-secondary scale-105 shadow-md ring-2 ring-secondary/20' : 'border-background-alt hover:border-border hover:scale-105'}`}
+                                        className={`flex-shrink-0 p-1 bg-white border-2 rounded-xl aspect-square w-12 h-12 md:w-20 md:h-20 cursor-pointer transition-all duration-300 ${mainImage === img ? 'border-secondary scale-105 shadow-md ring-2 ring-secondary/20' : 'border-background-alt hover:border-border hover:scale-105'}`}
                                         onClick={() => setMainImage(img)}
                                     >
                                         <img src={img} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-contain mix-blend-multiply" />
@@ -454,15 +466,6 @@ const ProductDetails = () => {
                             </div>
                         </div>
 
-                        {/* Product Description & Overview */}
-                        <div className="mb-6 text-text-muted font-outfit text-sm md:text-base max-w-full overflow-hidden text-left">
-                            {product.description ? (
-                                <div className="quill-content max-w-full" dangerouslySetInnerHTML={{ __html: sanitizeQuillHtml(product.description) }} />
-                            ) : (
-                                <p>Experience premium vision with our handcrafted {product.style || 'sunglasses'}. Designed for ultimate comfort and durability, these frames feature high-quality materials and 100% UV protection lenses.</p>
-                            )}
-                        </div>
-
                         {/* Variants Selection */}
                         {((product.variants && product.variants.length > 0) || product.color) && (() => {
                             const availableColors = [...new Set([
@@ -475,11 +478,11 @@ const ProductDetails = () => {
                             ].filter(Boolean))];
 
                             return (
-                            <div className="mb-5 space-y-3.5">
+                            <div className="mb-4 space-y-3">
                                 {/* Colors */}
                                 {availableColors.length > 0 && (
                                     <div>
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2 block">Color</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-1.5 block">Color</span>
                                         <div className="flex flex-wrap gap-2">
                                             {availableColors.map(color => (
                                                 <button
@@ -501,7 +504,7 @@ const ProductDetails = () => {
                                 {/* Sizes */}
                                 {availableSizes.length > 0 && (
                                     <div>
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2 block">Size</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-1.5 block">Size</span>
                                         <div className="flex flex-wrap gap-2">
                                             {availableSizes.map(size => (
                                                 <button
@@ -605,6 +608,15 @@ const ProductDetails = () => {
                                     </button>
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Product Description & Overview */}
+                        <div className="mb-6 text-text-muted font-outfit text-sm md:text-base max-w-full overflow-hidden text-left">
+                            {product.description ? (
+                                <div className="quill-content max-w-full" dangerouslySetInnerHTML={{ __html: sanitizeQuillHtml(product.description) }} />
+                            ) : (
+                                <p>Experience premium vision with our handcrafted {product.style || 'sunglasses'}. Designed for ultimate comfort and durability, these frames feature high-quality materials and 100% UV protection lenses.</p>
+                            )}
                         </div>
 
                         {/* Shipping & Returns Tab / Accordion */}
