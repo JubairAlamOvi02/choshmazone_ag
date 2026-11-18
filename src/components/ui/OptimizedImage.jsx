@@ -5,12 +5,17 @@ const OptimizedImage = ({
     alt,
     className = "",
     placeholder = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdib3g9IjAgMCAxIDEiPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNmMmYyZjIiLz48L3N2Zz4=",
-    priority = false
+    priority = false,
+    objectFit
 }) => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [isInView, setIsInView] = useState(priority);
     const imgRef = useRef(null);
     const hasValidSrc = Boolean(src && typeof src === 'string' && src.trim() !== '');
+
+    const fitClass = objectFit 
+        ? (objectFit === 'contain' ? 'object-contain' : 'object-cover')
+        : (className.includes('object-contain') ? 'object-contain' : 'object-cover');
 
     useEffect(() => {
         if (priority) return;
@@ -68,7 +73,7 @@ const OptimizedImage = ({
                     alt={alt}
                     onLoad={handleLoad}
                     onError={handleLoad}
-                    className={`block w-full h-full object-cover transition-opacity duration-500 ease-in-out ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+                    className={`block w-full h-full ${fitClass} transition-opacity duration-500 ease-in-out ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
                     style={{ position: 'relative', zIndex: 10 }}
                 />
             )}

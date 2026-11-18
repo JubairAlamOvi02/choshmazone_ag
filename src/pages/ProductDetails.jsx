@@ -352,7 +352,7 @@ const ProductDetails = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 xl:gap-16 items-start">
                     {/* Left: Image Gallery */}
                     <div className="flex flex-col gap-2.5 md:gap-4 lg:sticky lg:top-24 h-fit">
-                        <div className="relative group bg-background-alt rounded-2xl overflow-hidden h-[200px] sm:h-[240px] md:h-auto md:aspect-square w-full flex items-center justify-center border border-border/50 shadow-sm transition-all duration-500 hover:shadow-xl mx-auto">
+                        <div className="relative group bg-background-alt rounded-2xl overflow-hidden h-[280px] sm:h-[320px] md:h-auto md:aspect-square w-full flex items-center justify-center border border-border/50 shadow-sm transition-all duration-500 hover:shadow-xl mx-auto">
                             <OptimizedImage
                                 src={mainImage}
                                 alt={product.title}
