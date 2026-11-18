@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "export:server": "node export_to_server_project.js",
     "export:woocommerce": "node export_woocommerce.js"
   },
   "dependencies": {

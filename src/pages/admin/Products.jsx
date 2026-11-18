@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { productParams } from '../../lib/api/products';
-import { Plus, Edit3, Trash2, Copy, Power, PowerOff, Glasses, Search, Filter, FileSpreadsheet } from 'lucide-react';
+import { Plus, Edit3, Trash2, Copy, Power, PowerOff, Glasses, Search, Filter, FileSpreadsheet, Database } from 'lucide-react';
 import ExportWooCommerceModal from '../../components/admin/ExportWooCommerceModal';
+import ExportServerModal from '../../components/admin/ExportServerModal';
 
 const AdminProducts = () => {
     const [products, setProducts] = useState([]);
@@ -11,6 +12,7 @@ const AdminProducts = () => {
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [isProcessingBulk, setIsProcessingBulk] = useState(false);
     const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+    const [isServerExportModalOpen, setIsServerExportModalOpen] = useState(false);
 
     useEffect(() => {
         fetchProducts();
@@ -165,6 +167,15 @@ const AdminProducts = () => {
                             className="bg-transparent border-none outline-none text-sm font-outfit w-40"
                         />
                     </div>
+                    <button
+                        type="button"
+                        onClick={() => setIsServerExportModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-3 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 font-bold rounded-xl transition-all shadow-sm font-outfit text-sm"
+                        title="Export products tailored for Choshmazone Server"
+                    >
+                        <Database size={18} />
+                        <span>Export for Server</span>
+                    </button>
                     <button
                         type="button"
                         onClick={() => setIsExportModalOpen(true)}
@@ -343,6 +354,13 @@ const AdminProducts = () => {
             <ExportWooCommerceModal
                 isOpen={isExportModalOpen}
                 onClose={() => setIsExportModalOpen(false)}
+                allProducts={products}
+                selectedProductIds={selectedProducts}
+            />
+
+            <ExportServerModal
+                isOpen={isServerExportModalOpen}
+                onClose={() => setIsServerExportModalOpen(false)}
                 allProducts={products}
                 selectedProductIds={selectedProducts}
             />
