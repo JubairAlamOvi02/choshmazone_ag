@@ -337,7 +337,7 @@ const ProductDetails = () => {
 
             {/* Breadcrumbs */}
             <div className="bg-background-alt/50 border-b border-border">
-                <div className="container mx-auto px-4 py-2.5 md:py-4">
+                <div className="container mx-auto px-4 py-2 md:py-4">
                     <nav className="flex items-center gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest font-outfit text-text-muted">
                         <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                         <ChevronRight size={12} strokeWidth={3} className="text-border" />
@@ -348,11 +348,11 @@ const ProductDetails = () => {
                 </div>
             </div>
 
-            <main className="container mx-auto px-4 py-6 md:py-10 pb-32 lg:pb-16 max-w-7xl">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-start">
+            <main className="container mx-auto px-4 pt-2.5 pb-32 md:py-10 lg:pb-16 max-w-7xl">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 xl:gap-16 items-start">
                     {/* Left: Image Gallery */}
-                    <div className="flex flex-col gap-4 lg:sticky lg:top-24 h-fit">
-                        <div className="relative group bg-background-alt rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-[16/10] md:aspect-square w-full flex items-center justify-center border border-border/50 shadow-sm transition-all duration-500 hover:shadow-xl mx-auto">
+                    <div className="flex flex-col gap-2.5 md:gap-4 lg:sticky lg:top-24 h-fit">
+                        <div className="relative group bg-background-alt rounded-2xl overflow-hidden h-[200px] sm:h-[240px] md:h-auto md:aspect-square w-full flex items-center justify-center border border-border/50 shadow-sm transition-all duration-500 hover:shadow-xl mx-auto">
                             <OptimizedImage
                                 src={mainImage}
                                 alt={product.title}
@@ -370,9 +370,9 @@ const ProductDetails = () => {
                                             handlePrevImage();
                                         }}
                                         aria-label="Previous Image"
-                                        className="absolute left-3.5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/95 hover:bg-white text-primary shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 hover:shadow-xl border border-border/60 z-10 cursor-pointer"
+                                        className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/95 hover:bg-white text-primary shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 hover:shadow-xl border border-border/60 z-10 cursor-pointer"
                                     >
-                                        <ChevronLeft size={22} strokeWidth={2.5} />
+                                        <ChevronLeft size={18} strokeWidth={2.5} className="md:w-5 md:h-5" />
                                     </button>
                                     <button
                                         type="button"
@@ -381,9 +381,9 @@ const ProductDetails = () => {
                                             handleNextImage();
                                         }}
                                         aria-label="Next Image"
-                                        className="absolute right-3.5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/95 hover:bg-white text-primary shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 hover:shadow-xl border border-border/60 z-10 cursor-pointer"
+                                        className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/95 hover:bg-white text-primary shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 hover:shadow-xl border border-border/60 z-10 cursor-pointer"
                                     >
-                                        <ChevronRight size={22} strokeWidth={2.5} />
+                                        <ChevronRight size={18} strokeWidth={2.5} className="md:w-5 md:h-5" />
                                     </button>
                                 </>
                             )}
@@ -442,11 +442,11 @@ const ProductDetails = () => {
                                 )}
                             </div>
 
-                            <h1 className="text-2xl md:text-3xl xl:text-4xl font-bold text-text-main mb-3 font-outfit leading-snug md:leading-tight tracking-tight break-words">
+                            <h1 className="text-xl sm:text-2xl md:text-3xl xl:text-4xl font-bold text-text-main mb-2 md:mb-3 font-outfit leading-snug md:leading-tight tracking-tight break-words">
                                 {product.title}
                             </h1>
 
-                            <div className="flex items-center gap-4 mb-4">
+                            <div className="flex items-center gap-4 mb-3 md:mb-4">
                                 <div className="flex items-baseline gap-2 flex-wrap">
                                     <span className="text-2xl md:text-3xl font-bold text-primary font-outfit">
                                         ৳{effectiveUnitPrice.toLocaleString()}
